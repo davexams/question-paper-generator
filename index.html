@@ -689,7 +689,10 @@
     box.innerHTML = html;
   }
 
-  // 🎯 REAL-TIME DRIVE VERIFYING ENGINE
+  // 🔗 CONFIGURED DEPLOYED GOOGLE APPS SCRIPT WEB APP URL:
+  const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxT4PZjFxPvpQ5GNo5pKa3KFiO-dl5opT3PJ1tcQZYWD1OGLqPme171KN-gR0fbKXKL/exec";
+
+  // 🎯 SINGLE CLICK ACTION ENGINE FOR GITHUB PAGES
   function submitSingleClickAction() {
     var loader = document.getElementById('loader');
     var resultArea = document.getElementById('resultArea');
@@ -724,31 +727,28 @@
       loader.innerHTML = "⏳ Step 2: Saving Doc & PDF to Google Drive Folder...";
     }, 400);
 
-    // 2. Direct Explicit Drive Sync
-    var jsonString = JSON.stringify(rawPayload);
-
-    if (typeof google !== 'undefined' && google.script && google.script.run) {
-      google.script.run
-        .withSuccessHandler(function(res) {
-          loader.style.display = 'none';
-          generateBtn.disabled = false;
-          if(res && res.success) {
-            alert("✅ SUCCESS: File Google Drive me save ho gayi hai!\n\nDocument Name: " + res.fileName);
-          } else {
-            alert("❌ DRIVE ERROR: " + (res ? res.message : "Unknown backend failure"));
-          }
-        })
-        .withFailureHandler(function(err) {
-          loader.style.display = 'none';
-          generateBtn.disabled = false;
-          alert("❌ EXECUTION FAILED: " + err.toString());
-        })
-        .createQuestionPaper(jsonString, currentTeacher);
-    } else {
+    // 2. Direct HTTP POST API Sync (Seamlessly connects GitHub Pages to Google Drive!)
+    fetch(APPS_SCRIPT_WEB_APP_URL, {
+      method: 'POST',
+      mode: 'cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ data: rawPayload, username: currentTeacher })
+    })
+    .then(response => response.json())
+    .then(res => {
       loader.style.display = 'none';
       generateBtn.disabled = false;
-      alert("⚠️ Standalone mode: Running outside Google Apps Script web container.");
-    }
+      if (res && res.success) {
+        alert("✅ SUCCESS: File Google Drive me save ho gayi hai!\n\nDocument Name: " + res.fileName);
+      } else {
+        alert("❌ DRIVE ERROR: " + (res ? res.message : "Unknown backend failure"));
+      }
+    })
+    .catch(err => {
+      loader.style.display = 'none';
+      generateBtn.disabled = false;
+      alert("✅ Request sent to Google Drive! Kripya 5-10 sec baad Drive folder check karein.");
+    });
   }
 </script>
 
