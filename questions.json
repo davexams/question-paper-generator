@@ -1,33 +1,21 @@
 [
   {
-    "id": 1,
-    "class": "10",
-    "subject": "Science",
-    "chapter": "Light",
-    "type": "MCQ",
-    "marks": 1,
-    "question": "Which of the following materials cannot be used to make a lens?",
-    "options": ["Water", "Glass", "Plastic", "Clay"],
-    "answer": "Clay"
-  },
-  {
-    "id": 2,
+    "id": 101,
     "class": "10",
     "subject": "Science",
     "chapter": "Electricity",
-    "type": "Short",
-    "marks": 2,
-    "question": "State Ohm's Law and write its mathematical formula.",
-    "answer": "V = IR"
+    "type": "MCQ",
+    "marks": 1,
+    "question": "What is the SI unit of Electric Current?",
+    "options": ["Volt", "Ampere", "Ohm", "Watt"]
   },
   {
-    "id": 3,
+    "id": 102,
     "class": "10",
     "subject": "Science",
-    "chapter": "Light",
+    "chapter": "Light - Reflection",
     "type": "Numerical",
     "marks": 3,
-    "question": "A concave mirror produces three times magnified real image of an object placed at 10 cm in front of it. Where is the image located?",
-    "answer": "-30 cm"
+    "question": "A concave mirror produces a real image of size 3 times that of the object. Calculate focal length if image distance is 30 cm using mirror formula: \\( \\frac{1}{f} = \\frac{1}{v} + \\frac{1}{u} \\)"
   }
 ]
