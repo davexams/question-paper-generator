@@ -33,10 +33,6 @@
     .btn-bank { background-color: #6f42c1; margin-bottom: 20px; width: auto; font-size: 14px; padding: 10px 16px; }
     .btn-bank:hover { background-color: #593196; }
     .btn-del { background-color: #ea4335; width: auto; padding: 4px 8px; font-size: 12px; position: absolute; right: 10px; top: 10px; }
-    
-    .btn-action-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-    .btn-pdf { background-color: #28a745; font-size: 14px; padding: 12px; }
-    .btn-doc { background-color: #ff9800; font-size: 14px; padding: 12px; }
 
     .img-preview { max-height: 80px; margin-top: 5px; display: block; border: 1px solid #ddd; border-radius: 3px; }
 
@@ -44,8 +40,8 @@
     #loader { display: none; text-align: center; margin-top: 15px; color: #1a73e8; font-weight: bold; }
     #resultArea { display: none; margin-top: 25px; }
 
-    /* Guaranteed Non-Blank Paper Canvas CSS */
-    .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; line-height: 1.4; margin-bottom: 20px; min-height: 500px; display: block; width: 100%; box-sizing: border-box; }
+    /* Clean Paper Canvas CSS */
+    .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; line-height: 1.4; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; }
     .paper-preview table, .paper-preview tr, .paper-preview td { border: none !important; border-collapse: collapse !important; }
     .preview-header { text-align: center; font-weight: bold; }
     .preview-table { width: 100%; margin: 10px 0; border-collapse: collapse; font-weight: bold; font-size: 14px; }
@@ -151,26 +147,18 @@
 
   <button type="button" class="btn btn-add" onclick="addQuestionCard()">+ Add Question Card</button>
   
-  <!-- SINGLE ACTION ALL-IN-ONE BUTTON -->
+  <!-- SINGLE ALL-IN-ONE BUTTON -->
   <button type="button" class="btn" id="generateBtn" onclick="submitSingleClickAction()" style="padding:16px; font-size:16px; background:#1a73e8;">
-    🚀 Generate Paper, Download Local PDF & Save to Drive
+    🚀 Generate Paper & Download PDF
   </button>
 
-  <div id="loader">⏳ Processing Local PDF & Google Drive Files... Please Wait</div>
+  <div id="loader">⏳ Processing PDF Download & Auto-saving to Google Drive... Please Wait</div>
 
   <div id="resultArea">
-    <h3 style="color:#28a745; margin-bottom:15px;">📖 Question Paper & Drive Backups Ready!</h3>
+    <h3 style="color:#28a745; margin-bottom:15px; text-align:center;">✅ Question Paper Downloaded & Saved to Drive!</h3>
     
-    <!-- Real Live Paper Preview -->
+    <!-- Clean Live Paper Preview -->
     <div class="paper-preview" id="paperPreviewBox"></div>
-    
-    <!-- WORKING DIRECT DRIVE LINKS -->
-    <div class="btn-action-group" id="linksContainer">
-      <a id="docLink" href="#" target="_blank" class="btn btn-doc" style="pointer-events:none; opacity:0.5;">✏️ Open Editable Paper Doc (Drive)</a>
-      <a id="pdfLink" href="#" target="_blank" class="btn btn-pdf" style="pointer-events:none; opacity:0.5; background:#0275d8;">🌐 Open Paper PDF (Drive)</a>
-      <a id="ansDocLink" href="#" target="_blank" class="btn btn-doc" style="pointer-events:none; opacity:0.5; background:#5bc0de;">📝 Open Answer Key Doc (Drive)</a>
-      <a id="ansPdfLink" href="#" target="_blank" class="btn btn-pdf" style="pointer-events:none; opacity:0.5; background:#6c757d;">🗝️ Open Answer Key PDF (Drive)</a>
-    </div>
   </div>
 </div>
 
@@ -704,7 +692,7 @@
     box.innerHTML = html;
   }
 
-  // 🎯 ALL-IN-ONE FAIL-SAFE GENERATION ENGINE
+  // 🎯 SINGLE CLICK ACTION ENGINE
   function submitSingleClickAction() {
     var loader = document.getElementById('loader');
     var resultArea = document.getElementById('resultArea');
@@ -712,7 +700,6 @@
 
     var payload = getFormData();
     
-    // 1. Render Preview HTML
     renderPreview(payload);
 
     loader.style.display = 'block';
@@ -720,7 +707,7 @@
     generateBtn.disabled = true;
     resultArea.scrollIntoView({ behavior: 'smooth' });
 
-    // 2. GUARANTEED NON-BLANK LOCAL PDF GENERATION (With 400ms Delay)
+    // 1. Guaranteed Local PDF Download
     setTimeout(function() {
       var element = document.getElementById('paperPreviewBox');
       var cls = document.getElementById('className').value;
@@ -738,41 +725,21 @@
       html2pdf().set(opt).from(element).save();
     }, 400);
 
-    // 3. DRIVE BACKUP SAVE VIA BACKEND
+    // 2. Drive Backup Creation & Public Access Sync
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       google.script.run
         .withSuccessHandler(function(response) {
           loader.style.display = 'none';
           generateBtn.disabled = false;
-
-          if (response && response.success) {
-            enableDriveLink('docLink', response.docUrl);
-            enableDriveLink('pdfLink', response.pdfUrl);
-            enableDriveLink('ansDocLink', response.ansDocUrl);
-            enableDriveLink('ansPdfLink', response.ansPdfUrl);
-            alert("🚀 Success! Local PDF Downloaded & Saved to Google Drive!");
-          } else {
-            alert("⚠️ Local PDF downloaded! Drive Error: " + (response ? response.message : "Access error"));
-          }
         })
         .withFailureHandler(function(err) {
           loader.style.display = 'none';
           generateBtn.disabled = false;
-          alert("⚠️ Local PDF downloaded! Drive Server Error: " + err.message);
         })
         .createQuestionPaper(payload, currentTeacher);
     } else {
       loader.style.display = 'none';
       generateBtn.disabled = false;
-    }
-  }
-
-  function enableDriveLink(elementId, url) {
-    var el = document.getElementById(elementId);
-    if (el && url) {
-      el.href = url;
-      el.style.pointerEvents = 'auto';
-      el.style.opacity = '1';
     }
   }
 </script>
