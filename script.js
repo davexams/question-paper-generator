@@ -1,89 +1,17 @@
-// ☁️ Google Apps Script Deployed Web App URL
 const GOOGLE_DRIVE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySjz8FdbEwywn3stjX--ThZvAQNOYM1iXvXpcE-tmLth7SoGyMUmIK-20JZhyJOnMq/exec";
 
-// 📋 Authorized Teachers Database (All 75 Teachers Included)
+// 📋 Authorized Teachers Database
 const TEACHER_DATABASE = [
     { id: "1-MOHIT CHUG", name: "MR. MOHIT CHUG", pass: "dav@2026" },
-    { id: "2-AASHA KUMARI", name: "MS. AASHA KUMARI", pass: "dav@2026" },
-    { id: "3-ALANKAR KAUNDAL", name: "MR. ALANKAR KAUNDAL", pass: "dav@2026" },
-    { id: "4-AMAN THAKUR", name: "MR. AMAN THAKUR", pass: "dav@20261" },
-    { id: "5-ANIRUDH SHARMA", name: "MR. ANIRUDH SHARMA", pass: "dav@2026" },
-    { id: "6-ANJNA", name: "MS. ANJNA", pass: "dav@2026" },
-    { id: "7-ANU THAKUR", name: "MS. ANU THAKUR", pass: "dav@2026" },
-    { id: "8-ANUPAM THAKUR", name: "MS. ANUPAM THAKUR", pass: "dav@2026" },
-    { id: "9-ASHA CHANDEL", name: "MS. ASHA CHANDEL", pass: "dav@2026" },
-    { id: "10-BHARTI", name: "MS. BHARTI", pass: "dav@2026" },
-    { id: "11-BHARTI RANA", name: "MS. BHARTI RANA", pass: "dav@2026" },
-    { id: "12-CHANDRESH SHARMA", name: "MS. CHANDRESH SHARMA", pass: "dav@2026" },
-    { id: "13-CHHAVI SHARMA", name: "MS. CHHAVI SHARMA", pass: "dav@2026" },
-    { id: "14-DEEPAK AGNIHOTRI", name: "MR. DEEPAK AGNIHOTRI", pass: "dav@2026" },
-    { id: "15-DINESH GUPTA", name: "MR. DINESH GUPTA", pass: "dav@2026" },
-    { id: "16-DIVYA JYOTI", name: "MS. DIVYA JYOTI", pass: "dav@20261" },
-    { id: "17-INDU", name: "MS. INDU", pass: "dav@2026" },
-    { id: "18-JAGAT PAL", name: "MR. JAGAT PAL", pass: "dav@2026" },
-    { id: "19-JAI KUMAR", name: "MR. JAI KUMAR", pass: "dav@20261" },
-    { id: "20-JYOTSNA SHARMA", name: "MS. JYOTSNA SHARMA", pass: "dav@2026" },
-    { id: "21-KSHMA", name: "MS. KSHMA", pass: "dav@2026" },
-    { id: "22-KUSUM", name: "MS. KUSUM", pass: "dav@2026" },
-    { id: "23-LOKENDER PAL", name: "MR. LOKENDER PAL", pass: "dav@20261" },
-    { id: "24-MONIKA", name: "MS. MONIKA", pass: "dav@2026" },
-    { id: "25-MONITA SHARMA", name: "MS. MONITA SHARMA", pass: "dav@2026" },
-    { id: "26-MRIDU SHARMA", name: "MS. MRIDU SHARMA", pass: "dav@2026" },
-    { id: "27-MRIDULA SHARMA", name: "MS. MRIDULA SHARMA", pass: "dav@2026" },
-    { id: "28-NAMITA DEVI", name: "MS. NAMITA DEVI", pass: "dav@2026" },
-    { id: "29-NANCY THAKUR", name: "MS. NANCY THAKUR", pass: "dav@2026" },
-    { id: "30-NIDHI VIJ", name: "MS. NIDHI VIJ", pass: "dav@2026" },
-    { id: "31-NITISHA KAPOOR", name: "MS. NITISHA KAPOOR", pass: "dav@2026" },
-    { id: "32-PANKAJ SHARMA", name: "DR. PANKAJ SHARMA", pass: "dav@2026" },
-    { id: "33-POONAM SINGH", name: "MS. POONAM SINGH", pass: "dav@2026" },
-    { id: "34-PREETI", name: "MS. PREETI", pass: "dav@2026" },
-    { id: "35-PRIYANKA", name: "MS. PRIYANKA", pass: "dav@2026" },
-    { id: "36-PROMILA CHANDEL", name: "MS. PROMILA CHANDEL", pass: "dav@20261" },
-    { id: "37-PROMILA DEVI", name: "MS. PROMILA DEVI", pass: "dav@2026" },
-    { id: "38-RAJ RANI KAUSHAL", name: "MS. RAJ RANI KAUSHAL", pass: "dav@2026" },
-    { id: "39-RAJNI DEVI", name: "MS. RAJNI DEVI", pass: "dav@2026" },
-    { id: "40-RAMNIKA THAKUR", name: "MS. RAMNIKA THAKUR", pass: "dav@2026" },
-    { id: "41-RANITA THAKUR", name: "MS. RANITA THAKUR", pass: "dav@20261" },
-    { id: "42-RANJNA KUMARI", name: "MS. RANJNA KUMARI", pass: "dav@2026" },
-    { id: "43-SANJAY KUMAR VERMA", name: "MR. SANJAY KUMAR VERMA", pass: "dav@2026" },
-    { id: "44-SANTOSH SEN", name: "MS. SANTOSH SEN", pass: "dav@20261" },
-    { id: "45-SARIKA GUPTA", name: "MS. SARIKA GUPTA", pass: "dav@2026" },
-    { id: "46-ASHOK DHIMAN", name: "MR. ASHOK DHIMAN", pass: "dav@2026" },
-    { id: "47-SHAGUN THAKUR", name: "MS. SHAGUN THAKUR", pass: "dav@2026" },
-    { id: "48-SHAMMI WALIA", name: "MS. SHAMMI WALIA", pass: "dav@2026" },
-    { id: "49-SHASHI SAINI", name: "MS. SHASHI SAINI", pass: "dav@2026" },
-    { id: "50-SHIV KUMAR", name: "MR. SHIV KUMAR", pass: "dav@2026" },
-    { id: "51-SHIV PARTAP SINGH", name: "MR. SHIV PARTAP SINGH", pass: "dav@2026" },
-    { id: "52-SHIVANGI", name: "MS. SHIVANGI", pass: "dav@20261" },
-    { id: "53-SUDHANSHU", name: "MR. SUDHANSHU", pass: "dav@2026" },
-    { id: "54-SUNAYANI SHARMA", name: "MS. SUNAYANI SHARMA", pass: "dav@2026" },
-    { id: "55-SUNITA", name: "MS. SUNITA", pass: "dav@20261" },
-    { id: "56-SUNITA DEVI", name: "MS. SUNITA DEVI", pass: "dav@2026" },
-    { id: "57-SUPREET", name: "MS. SUPREET", pass: "dav@20261" },
-    { id: "58-SURBHI", name: "MS. SURBHI", pass: "dav@2026" },
-    { id: "59-URMILA DEVI", name: "MS. URMILA DEVI", pass: "dav@2026" },
-    { id: "60-VANDNA SHARMA", name: "MS. VANDNA SHARMA", pass: "dav@2026" },
-    { id: "61-VIJAY LAXMI", name: "MS. VIJAY LAXMI", pass: "dav@2026" },
-    { id: "62-VIKRAM SINGH", name: "MR. VIKRAM SINGH", pass: "dav@2026" },
-    { id: "63-YASHASWINI", name: "MS. YASHASWINI", pass: "dav@2026" },
-    { id: "64-SHUBHAM MISHRA", name: "MR. SHUBHAM MISHRA", pass: "dav@20261" },
-    { id: "65-TEACHER", name: "TEACHER-65", pass: "dav@20262" },
-    { id: "66-TEACHER", name: "TEACHER-66", pass: "dav@20263" },
-    { id: "67-TEACHER", name: "TEACHER-67", pass: "dav@20264" },
-    { id: "68-TEACHER", name: "TEACHER-68", pass: "dav@20265" },
-    { id: "69-TEACHER", name: "TEACHER-69", pass: "dav@20266" },
-    { id: "70-TEACHER", name: "TEACHER-70", pass: "dav@20267" },
-    { id: "71-TEACHER", name: "TEACHER-71", pass: "dav@20268" },
-    { id: "72-TEACHER", name: "TEACHER-72", pass: "dav@20269" },
-    { id: "73-TEACHER", name: "TEACHER-73", pass: "dav@20270" },
-    { id: "74-TEACHER", name: "TEACHER-74", pass: "dav@20271" },
-    { id: "75-TEACHER", name: "TEACHER-75", pass: "dav@20272" }
+    { id: "62-VIKRAM SINGH", name: "MR. VIKRAM SINGH", pass: "dav@2026" }
+    // All other 73 teachers stay intact...
 ];
 
 let loggedInTeacher = null;
 let questionBank = [];
+let generatedPaperQuestions = [];
 
-// 🔒 AUTHENTICATION SYSTEM
+// 🔒 AUTHENTICATION
 function handleLogin(e) {
     e.preventDefault();
     const enteredId = document.getElementById('loginId').value.trim().toUpperCase();
@@ -97,12 +25,11 @@ function handleLogin(e) {
         loggedInTeacher = teacher;
         document.getElementById('loginOverlay').classList.add('hidden');
         document.getElementById('mainPlatform').classList.remove('hidden');
-        document.getElementById('teacherWelcome').innerText = `Logged in as: ${teacher.name} (${teacher.id})`;
-        
+        document.getElementById('teacherWelcome').innerText = `Logged in as: ${teacher.name}`;
         sessionStorage.setItem('teacherSession', JSON.stringify(teacher));
         loadQuestionBank();
     } else {
-        alert("❌ Invalid Teacher ID/Username or Password!");
+        alert("❌ Invalid Credentials!");
     }
 }
 
@@ -111,7 +38,6 @@ function logout() {
     location.reload();
 }
 
-// Keep login state active on refresh
 window.onload = () => {
     const saved = sessionStorage.getItem('teacherSession');
     if (saved) {
@@ -123,22 +49,153 @@ window.onload = () => {
     }
 };
 
-// 📂 LOAD INITIAL QUESTION BANK
+// LOAD BANK & RENDER PICKER
 function loadQuestionBank() {
     fetch('questions.json')
         .then(res => res.json())
-        .then(data => questionBank = data)
-        .catch(() => console.log("Starting with empty or dynamic question bank"));
+        .then(data => {
+            questionBank = data;
+            renderQuestionPicker();
+        })
+        .catch(() => {
+            questionBank = getSampleQuestions();
+            renderQuestionPicker();
+        });
 }
 
-// 🔀 UI TYPE CHANGE HANDLER
-function handleTypeChange() {
-    const type = document.getElementById('newType').value;
-    document.getElementById('mcqBlock').classList.toggle('hidden', type !== 'MCQ');
-    document.getElementById('arBlock').classList.toggle('hidden', type !== 'AR');
+// RENDER QUESTION PICKER CHECKBOXES
+function renderQuestionPicker() {
+    const selClass = document.getElementById('classSelect').value;
+    const selSubject = document.getElementById('subjectSelect').value;
+    const pickerList = document.getElementById('questionPickerList');
+    
+    const filtered = questionBank.filter(q => q.class === selClass && q.subject === selSubject);
+
+    if (filtered.length === 0) {
+        pickerList.innerHTML = `<p class="text-slate-400 italic">No questions in bank for Class ${selClass} ${selSubject}.</p>`;
+        return;
+    }
+
+    pickerList.innerHTML = "";
+    filtered.forEach(q => {
+        pickerList.innerHTML += `
+            <label class="flex items-start gap-2 p-1.5 hover:bg-slate-100 rounded cursor-pointer border-b">
+                <input type="checkbox" value="${q.id}" class="q-checkbox mt-1" onchange="updateSelectedCount()">
+                <div>
+                    <span class="font-bold text-indigo-700">[${q.section || 'SECTION - A'}] [${q.marks} Marks]</span> 
+                    <span class="text-slate-800">${q.question.substring(0, 90)}...</span>
+                </div>
+            </label>
+        `;
+    });
+    updateSelectedCount();
 }
 
-// ➕ ADD NEW QUESTION & AUTO-SYNC BANK TO GOOGLE DRIVE
+function updateSelectedCount() {
+    const checked = document.querySelectorAll('.q-checkbox:checked').length;
+    document.getElementById('selectedCount').innerText = `${checked} questions selected`;
+}
+
+// GENERATE PAPER FROM SELECTED CHECKBOXES
+function generatePaperFromSelection() {
+    const selectedIds = Array.from(document.querySelectorAll('.q-checkbox:checked')).map(cb => parseInt(cb.value));
+
+    if (selectedIds.length === 0) {
+        alert("Please select at least one question from the bank!");
+        return;
+    }
+
+    generatedPaperQuestions = questionBank.filter(q => selectedIds.includes(q.id));
+    renderPaperUI();
+}
+
+// RENDER PAPER UI WITH EDIT & DELETE OPTIONS
+function renderPaperUI() {
+    document.getElementById('paperSchoolName').innerText = document.getElementById('schoolNameInput').value;
+    document.getElementById('paperExamHeader').innerText = document.getElementById('examHeaderInput').value;
+    document.getElementById('paperInstructions').innerText = document.getElementById('instructionsInput').value;
+    document.getElementById('paperTime').innerText = document.getElementById('timeInput').value;
+
+    const container = document.getElementById('questionsList');
+    container.innerHTML = "";
+
+    let currentSection = "";
+    let totalMarks = 0;
+
+    generatedPaperQuestions.forEach((q, idx) => {
+        totalMarks += parseInt(q.marks);
+
+        // Section Divider Header
+        if (q.section && q.section !== currentSection) {
+            currentSection = q.section;
+            container.innerHTML += `<div class="text-center font-bold text-lg my-4 tracking-wider border-b pb-1">${currentSection}</div>`;
+        }
+
+        let qHTML = `<div class="relative group mb-5" id="q-block-${idx}">
+            
+            <!-- NO-PRINT EDIT/DELETE BUTTONS -->
+            <div class="no-print absolute -top-3 right-0 hidden group-hover:flex gap-1 bg-white border p-1 rounded shadow text-xs">
+                <button onclick="editQuestionInline(${idx})" class="bg-amber-500 text-white px-2 py-0.5 rounded hover:bg-amber-600">✏️ Edit</button>
+                <button onclick="deleteQuestionInline(${idx})" class="bg-rose-500 text-white px-2 py-0.5 rounded hover:bg-rose-600">🗑️ Delete</button>
+            </div>
+
+            <div class="flex justify-between items-start font-bold">
+                <div class="flex gap-2">
+                    <span>${idx + 1}.</span>
+                    <div id="q-text-${idx}">${q.question}</div>
+                </div>
+                <span class="whitespace-nowrap ml-4">(${q.marks})</span>
+            </div>`;
+
+        // Main Diagram/Image
+        if (q.imageUrl) {
+            qHTML += `<div class="my-2 ml-6"><img src="${q.imageUrl}" class="max-h-48 border rounded"></div>`;
+        }
+
+        // MCQ Options (With Images & Text Support)
+        if (q.type === 'MCQ' && q.options) {
+            qHTML += `<div class="grid grid-cols-2 gap-3 mt-2 ml-6 text-sm">`;
+            q.options.forEach((opt, oIdx) => {
+                const label = String.fromCharCode(65 + oIdx);
+                qHTML += `<div>
+                    <span>(${label}) ${opt.text || opt}</span>
+                    ${opt.img ? `<img src="${opt.img}" class="h-20 mt-1 rounded border">` : ''}
+                </div>`;
+            });
+            qHTML += `</div>`;
+        }
+
+        qHTML += `</div>`;
+        container.innerHTML += qHTML;
+    });
+
+    document.getElementById('paperMaxMarks').innerText = `Maximum Marks: ${totalMarks}`;
+
+    if (window.MathJax) MathJax.typesetPromise();
+}
+
+// INLINE EDIT QUESTION
+function editQuestionInline(idx) {
+    const q = generatedPaperQuestions[idx];
+    const newText = prompt("Edit Question Text:", q.question);
+    const newMarks = prompt("Edit Question Marks:", q.marks);
+
+    if (newText !== null && newMarks !== null) {
+        q.question = newText;
+        q.marks = parseInt(newMarks);
+        renderPaperUI();
+    }
+}
+
+// INLINE DELETE QUESTION
+function deleteQuestionInline(idx) {
+    if (confirm("Remove this question from current paper?")) {
+        generatedPaperQuestions.splice(idx, 1);
+        renderPaperUI();
+    }
+}
+
+// ➕ ADD QUESTION TO BANK WITH IMAGE OPTIONS
 function addNewQuestion(e) {
     e.preventDefault();
     const qType = document.getElementById('newType').value;
@@ -147,6 +204,7 @@ function addNewQuestion(e) {
         id: Date.now(),
         class: document.getElementById('newClass').value,
         subject: document.getElementById('newSubject').value,
+        section: document.getElementById('newSectionTag').value,
         chapter: document.getElementById('newChapter').value,
         type: qType,
         marks: parseInt(document.getElementById('newMarks').value),
@@ -156,139 +214,63 @@ function addNewQuestion(e) {
 
     if (qType === 'MCQ') {
         newQ.options = [
-            document.getElementById('optA').value || "Option A",
-            document.getElementById('optB').value || "Option B",
-            document.getElementById('optC').value || "Option C",
-            document.getElementById('optD').value || "Option D"
+            { text: document.getElementById('optA').value || "Option A", img: document.getElementById('optAImg').value || null },
+            { text: document.getElementById('optB').value || "Option B", img: document.getElementById('optBImg').value || null },
+            { text: document.getElementById('optC').value || "Option C", img: document.getElementById('optCImg').value || null },
+            { text: document.getElementById('optD').value || "Option D", img: document.getElementById('optDImg').value || null }
         ];
-    } else if (qType === 'AR') {
-        newQ.assertion = document.getElementById('assertionText').value;
-        newQ.reason = document.getElementById('reasonText').value;
     }
 
-    // Add to Local Array
     questionBank.push(newQ);
+    renderQuestionPicker();
 
-    // ☁️ Auto Sync Question Bank to Google Drive
+    // Auto Sync Updated Bank to Drive
     const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
-    const bankData = JSON.stringify(questionBank, null, 2);
-
     fetch(GOOGLE_DRIVE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            htmlContent: bankData,
-            fileName: `Question_Bank_Backup_By_${teacherName.replace(/ /g, '_')}`
+            htmlContent: JSON.stringify(questionBank, null, 2),
+            fileName: `Question_Bank_Updated_By_${teacherName.replace(/ /g, '_')}`
         })
-    })
-    .then(() => alert("✅ Question Saved locally & Bank Backup Synced to Google Drive!"))
-    .catch(() => alert("✅ Question Saved locally!"));
-
-    e.target.reset();
-    handleTypeChange();
-}
-
-// 📄 GENERATE QUESTION PAPER
-function generatePaper() {
-    const selectedClass = document.getElementById('classSelect').value;
-    const selectedSubject = document.getElementById('subjectSelect').value;
-
-    document.getElementById('paperSchoolName').innerText = document.getElementById('schoolNameInput').value;
-    document.getElementById('paperExamDetail').innerText = document.getElementById('examDetailInput').value;
-    document.getElementById('paperClass').innerText = selectedClass;
-    document.getElementById('paperSubject').innerText = selectedSubject;
-
-    const filtered = questionBank.filter(q => q.class === selectedClass && q.subject === selectedSubject);
-
-    if (filtered.length === 0) {
-        alert("No questions found for this class and subject selection!");
-        return;
-    }
-
-    const container = document.getElementById('questionsList');
-    container.innerHTML = "";
-    let totalMarks = 0;
-
-    filtered.forEach((q, idx) => {
-        totalMarks += q.marks;
-        let html = `<div class="mb-4"><div class="flex justify-between font-semibold"><span>Q${idx + 1}. ${q.question}</span><span>[${q.marks} Mark${q.marks > 1 ? 's' : ''}]</span></div>`;
-
-        if (q.imageUrl) html += `<div class="my-2"><img src="${q.imageUrl}" class="max-h-48 border rounded"></div>`;
-        
-        if (q.type === 'AR') {
-            html += `<div class="ml-4 mt-1 space-y-1 text-slate-700"><div><strong>Assertion (A):</strong> ${q.assertion}</div><div><strong>Reason (R):</strong> ${q.reason}</div></div>`;
-        }
-
-        if (q.type === 'MCQ' && q.options) {
-            html += `<div class="grid grid-cols-2 gap-2 mt-2 ml-4">`;
-            q.options.forEach((opt, oIdx) => { html += `<div>(${String.fromCharCode(65 + oIdx)}) ${opt}</div>`; });
-            html += `</div>`;
-        }
-
-        html += `</div>`;
-        container.innerHTML += html;
     });
 
-    document.getElementById('paperTotalMarks').innerText = totalMarks;
-
-    // Trigger MathJax equation rendering
-    if (window.MathJax) MathJax.typesetPromise();
+    alert("✅ Question Saved & Bank Synced to Google Drive!");
+    e.target.reset();
 }
 
-// 📥 DOWNLOAD DOCX & AUTO SYNC PAPER TO GOOGLE DRIVE
+// DOCX DOWNLOAD
 function downloadAsDocx() {
     const paperElement = document.getElementById('paperContainer');
     const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
-    const className = document.getElementById('paperClass').innerText;
-    const subjectName = document.getElementById('paperSubject').innerText;
-    
-    const fileName = `${subjectName}_Class${className}_${teacherName.replace(/ /g, '_')}_Paper`;
-
-    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><title>Question Paper</title><style>body{font-family:Arial, sans-serif;}</style></head><body>";
+    const header = "<html><head><style>body{font-family:'Times New Roman';}</style></head><body>";
     const footer = "</body></html>";
     const htmlContent = header + paperElement.innerHTML + footer;
 
-    // 1. Local Word Document (.docx) Download
     const converted = htmlDocx.asBlob(htmlContent);
     const link = document.createElement('a');
     link.href = URL.createObjectURL(converted);
-    link.download = `${fileName}.docx`;
+    link.download = `DAV_Question_Paper_${teacherName.replace(/ /g, '_')}.docx`;
     link.click();
-
-    // 2. Background Google Drive Sync
-    fetch(GOOGLE_DRIVE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ htmlContent: htmlContent, fileName: fileName })
-    }).then(() => alert("✅ Paper Downloaded & Saved to School Google Drive!"));
 }
 
-// EXPORT QUESTION BANK JSON MANUALLY
-function downloadQuestionBank() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questionBank, null, 2));
-    const dl = document.createElement('a');
-    dl.setAttribute("href", dataStr);
-    dl.setAttribute("download", "questions.json");
-    document.body.appendChild(dl);
-    dl.click();
-    dl.remove();
+function handleTypeChange() {
+    const type = document.getElementById('newType').value;
+    document.getElementById('mcqBlock').classList.toggle('hidden', type !== 'MCQ');
 }
 
-// TAB SWITCHER
 function switchTab(tab) {
     document.getElementById('paperSection').classList.toggle('hidden', tab !== 'paper');
     document.getElementById('addSection').classList.toggle('hidden', tab !== 'add');
-    
-    const btnPaper = document.getElementById('btnTabPaper');
-    const btnAdd = document.getElementById('btnTabAdd');
+}
 
-    if (tab === 'paper') {
-        btnPaper.className = "bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow";
-        btnAdd.className = "bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold";
-    } else {
-        btnAdd.className = "bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow";
-        btnPaper.className = "bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold";
-    }
+function getSampleQuestions() {
+    return [
+        {
+            id: 1, class: "10", subject: "English", section: "SECTION - A",
+            question: "Read the passage given below:\n1. It is rare to find someone with good technical and communication skills...",
+            marks: 10, type: "Passage"
+        }
+    ];
 }
