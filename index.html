@@ -67,11 +67,6 @@
       <label>Select Teacher User ID:</label>
       <select id="loginUserSelect" required>
         <option value="">-- Select Your Name / ID --</option>
-        <? if (typeof teachers !== 'undefined' && teachers.length > 0) { ?>
-          <? for (var i = 0; i < teachers.length; i++) { ?>
-            <option value="<?= teachers[i] ?>"><?= teachers[i] ?></option>
-          <? } ?>
-        <? } ?>
       </select>
     </div>
     <div class="form-group">
@@ -191,11 +186,32 @@
 </div>
 
 <script>
+  // Complete Teacher List Backup Array
+  const FALLBACK_TEACHER_LIST = [
+    "1-MOHIT CHUG", "2-AASHA KUMARI", "3-ALANKAR KAUNDAL", "4-AMAN THAKUR", "5-ANIRUDH SHARMA",
+    "6-ANJNA", "7-ANU THAKUR", "8-ANUPAM THAKUR", "9-ASHA CHANDEL", "10-BHARTI",
+    "11-BHARTI RANA", "12-CHANDRESH SHARMA", "13-CHHAVI SHARMA", "14-DEEPAK AGNIHOTRI", "15-DINESH GUPTA",
+    "16-DIVYA JYOTI", "17-INDU", "18-JAGAT PAL", "19-JAI KUMAR", "20-JYOTSNA SHARMA",
+    "21-KSHMA", "22-KUSUM", "23-LOKENDER PAL", "24-MONIKA", "25-MONITA SHARMA",
+    "26-MRIDU SHARMA", "27-MRIDULA SHARMA", "28-NAMITA DEVI", "29-NANCY THAKUR", "30-NIDHI VIJ",
+    "31-NITISHA KAPOOR", "32-PANKAJ SHARMA", "33-POONAM SINGH", "34-PREETI", "35-PRIYANKA",
+    "36-PROMILA CHANDEL", "37-PROMILA DEVI", "38-RAJ RANI KAUSHAL", "39-RAJNI DEVI", "40-RAMNIKA THAKUR",
+    "41-RANITA THAKUR", "42-RANJNA KUMARI", "43-SANJAY KUMAR VERMA", "44-SANTOSH SEN", "45-SARIKA GUPTA",
+    "46-ASHOK DHIMAN", "47-SHAGUN THAKUR", "48-SHAMMI WALIA", "49-SHASHI SAINI", "50-SHIV KUMAR",
+    "51-SHIV PARTAP SINGH", "52-SHIVANGI", "53-SUDHANSHU", "54-SUNAYANI SHARMA", "55-SUNITA",
+    "56-SUNITA DEVI", "57-SUPREET", "58-SURBHI", "59-URMILA DEVI", "60-VANDNA SHARMA",
+    "61-VIJAY LAXMI", "62-VIKRAM SINGH", "63-YASHASWINI", "64-SHUBHAM MISHRA", "65-TEACHER",
+    "66-TEACHER", "67-TEACHER", "68-TEACHER", "69-TEACHER", "70-TEACHER",
+    "71-TEACHER", "72-TEACHER", "73-TEACHER", "74-TEACHER", "75-TEACHER"
+  ];
+
   var currentTeacher = null;
   var qCount = 0;
   var autoSaveTimer = null;
 
   window.onload = function() {
+    populateTeacherDropdown();
+
     try {
       var savedUser = localStorage.getItem('cbse_portal_user');
       var savedName = localStorage.getItem('cbse_portal_teacher_name');
@@ -208,6 +224,35 @@
       }
     } catch(e) {}
   };
+
+  // Populate Dropdown reliably
+  function populateTeacherDropdown() {
+    var select = document.getElementById('loginUserSelect');
+    
+    // First try fetching from Google Apps Script server template
+    google.script.run
+      .withSuccessHandler(function(teachers) {
+        if (teachers && teachers.length > 0) {
+          fillDropdownOptions(select, teachers);
+        } else {
+          fillDropdownOptions(select, FALLBACK_TEACHER_LIST);
+        }
+      })
+      .withFailureHandler(function() {
+        fillDropdownOptions(select, FALLBACK_TEACHER_LIST);
+      })
+      .getTeacherList();
+  }
+
+  function fillDropdownOptions(selectEl, teacherArray) {
+    selectEl.innerHTML = '<option value="">-- Select Your Name / ID --</option>';
+    teacherArray.forEach(function(t) {
+      var opt = document.createElement('option');
+      opt.value = t;
+      opt.innerText = t;
+      selectEl.appendChild(opt);
+    });
+  }
 
   function handleLogin() {
     var u = document.getElementById('loginUserSelect').value;
@@ -282,12 +327,10 @@
     }
   }
 
-  // REFRESH-PROOF AUTO-SAVE SYSTEM
   function triggerAutoSave() {
     if (!currentTeacher) return;
 
     var payload = getFormData();
-    // Save locally for instant persistence
     try { localStorage.setItem('draft_' + currentTeacher, JSON.stringify(payload)); } catch(e){}
 
     clearTimeout(autoSaveTimer);
@@ -398,7 +441,6 @@
     };
   }
 
-  // REFRESH PERSISTENCE RESTORE
   function loadDraftData() {
     var localDraft = null;
     try { localDraft = JSON.parse(localStorage.getItem('draft_' + currentTeacher)); } catch(e){}
@@ -554,7 +596,6 @@
     optsDiv.style.display = (selectEl.value === 'MCQ') ? 'grid' : 'none';
   }
 
-  // QUESTION BANK MODAL LOGIC
   function openBankModal() { document.getElementById('bankModal').style.display = 'block'; }
   function closeBankModal() { document.getElementById('bankModal').style.display = 'none'; }
   function importBankQuestion(sec, type, text, marks, opts) {
