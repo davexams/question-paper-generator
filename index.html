@@ -65,7 +65,7 @@
     <div class="form-group">
       <label>Select Teacher User ID:</label>
       <select id="loginUserSelect" required>
-        <option value="">-- Loading Teachers List... --</option>
+        <option value="">-- Select Your Name / ID --</option>
       </select>
     </div>
     <div class="form-group">
@@ -185,30 +185,89 @@
 </div>
 
 <script>
-  // Complete 75 Teachers Master Database
+  // 📋 75 Authorized Teachers Direct Master Database
   const TEACHERS_MASTER = [
-    "1-MOHIT CHUG", "2-AASHA KUMARI", "3-ALANKAR KAUNDAL", "4-AMAN THAKUR", "5-ANIRUDH SHARMA",
-    "6-ANJNA", "7-ANU THAKUR", "8-ANUPAM THAKUR", "9-ASHA CHANDEL", "10-BHARTI",
-    "11-BHARTI RANA", "12-CHANDRESH SHARMA", "13-CHHAVI SHARMA", "14-DEEPAK AGNIHOTRI", "15-DINESH GUPTA",
-    "16-DIVYA JYOTI", "17-INDU", "18-JAGAT PAL", "19-JAI KUMAR", "20-JYOTSNA SHARMA",
-    "21-KSHMA", "22-KUSUM", "23-LOKENDER PAL", "24-MONIKA", "25-MONITA SHARMA",
-    "26-MRIDU SHARMA", "27-MRIDULA SHARMA", "28-NAMITA DEVI", "29-NANCY THAKUR", "30-NIDHI VIJ",
-    "31-NITISHA KAPOOR", "32-PANKAJ SHARMA", "33-POONAM SINGH", "34-PREETI", "35-PRIYANKA",
-    "36-PROMILA CHANDEL", "37-PROMILA DEVI", "38-RAJ RANI KAUSHAL", "39-RAJNI DEVI", "40-RAMNIKA THAKUR",
-    "41-RANITA THAKUR", "42-RANJNA KUMARI", "43-SANJAY KUMAR VERMA", "44-SANTOSH SEN", "45-SARIKA GUPTA",
-    "46-ASHOK DHIMAN", "47-SHAGUN THAKUR", "48-SHAMMI WALIA", "49-SHASHI SAINI", "50-SHIV KUMAR",
-    "51-SHIV PARTAP SINGH", "52-SHIVANGI", "53-SUDHANSHU", "54-SUNAYANI SHARMA", "55-SUNITA",
-    "56-SUNITA DEVI", "57-SUPREET", "58-SURBHI", "59-URMILA DEVI", "60-VANDNA SHARMA",
-    "61-VIJAY LAXMI", "62-VIKRAM SINGH", "63-YASHASWINI", "64-SHUBHAM MISHRA", "65-TEACHER",
-    "66-TEACHER", "67-TEACHER", "68-TEACHER", "69-TEACHER", "70-TEACHER",
-    "71-TEACHER", "72-TEACHER", "73-TEACHER", "74-TEACHER", "75-TEACHER"
+    { id: "1-MOHIT CHUG", name: "MR. MOHIT CHUG", pass: "dav@2026" },
+    { id: "2-AASHA KUMARI", name: "MS. AASHA KUMARI", pass: "dav@2026" },
+    { id: "3-ALANKAR KAUNDAL", name: "MR. ALANKAR KAUNDAL", pass: "dav@2026" },
+    { id: "4-AMAN THAKUR", name: "MR. AMAN THAKUR", pass: "dav@20261" },
+    { id: "5-ANIRUDH SHARMA", name: "MR. ANIRUDH SHARMA", pass: "dav@2026" },
+    { id: "6-ANJNA", name: "MS. ANJNA", pass: "dav@2026" },
+    { id: "7-ANU THAKUR", name: "MS. ANU THAKUR", pass: "dav@2026" },
+    { id: "8-ANUPAM THAKUR", name: "MS. ANUPAM THAKUR", pass: "dav@2026" },
+    { id: "9-ASHA CHANDEL", name: "MS. ASHA CHANDEL", pass: "dav@2026" },
+    { id: "10-BHARTI", name: "MS. BHARTI", pass: "dav@2026" },
+    { id: "11-BHARTI RANA", name: "MS. BHARTI RANA", pass: "dav@2026" },
+    { id: "12-CHANDRESH SHARMA", name: "MS. CHANDRESH SHARMA", pass: "dav@2026" },
+    { id: "13-CHHAVI SHARMA", name: "MS. CHHAVI SHARMA", pass: "dav@2026" },
+    { id: "14-DEEPAK AGNIHOTRI", name: "MR. DEEPAK AGNIHOTRI", pass: "dav@2026" },
+    { id: "15-DINESH GUPTA", name: "MR. DINESH GUPTA", pass: "dav@2026" },
+    { id: "16-DIVYA JYOTI", name: "MS. DIVYA JYOTI", pass: "dav@20261" },
+    { id: "17-INDU", name: "MS. INDU", pass: "dav@2026" },
+    { id: "18-JAGAT PAL", name: "MR. JAGAT PAL", pass: "dav@2026" },
+    { id: "19-JAI KUMAR", name: "MR. JAI KUMAR", pass: "dav@20261" },
+    { id: "20-JYOTSNA SHARMA", name: "MS. JYOTSNA SHARMA", pass: "dav@2026" },
+    { id: "21-KSHMA", name: "MS. KSHMA", pass: "dav@2026" },
+    { id: "22-KUSUM", name: "MS. KUSUM", pass: "dav@2026" },
+    { id: "23-LOKENDER PAL", name: "MR. LOKENDER PAL", pass: "dav@20261" },
+    { id: "24-MONIKA", name: "MS. MONIKA", pass: "dav@2026" },
+    { id: "25-MONITA SHARMA", name: "MS. MONITA SHARMA", pass: "dav@2026" },
+    { id: "26-MRIDU SHARMA", name: "MS. MRIDU SHARMA", pass: "dav@2026" },
+    { id: "27-MRIDULA SHARMA", name: "MS. MRIDULA SHARMA", pass: "dav@2026" },
+    { id: "28-NAMITA DEVI", name: "MS. NAMITA DEVI", pass: "dav@2026" },
+    { id: "29-NANCY THAKUR", name: "MS. NANCY THAKUR", pass: "dav@2026" },
+    { id: "30-NIDHI VIJ", name: "MS. NIDHI VIJ", pass: "dav@2026" },
+    { id: "31-NITISHA KAPOOR", name: "MS. NITISHA KAPOOR", pass: "dav@2026" },
+    { id: "32-PANKAJ SHARMA", name: "DR. PANKAJ SHARMA", pass: "dav@2026" },
+    { id: "33-POONAM SINGH", name: "MS. POONAM SINGH", pass: "dav@2026" },
+    { id: "34-PREETI", name: "MS. PREETI", pass: "dav@2026" },
+    { id: "35-PRIYANKA", name: "MS. PRIYANKA", pass: "dav@2026" },
+    { id: "36-PROMILA CHANDEL", name: "MS. PROMILA CHANDEL", pass: "dav@20261" },
+    { id: "37-PROMILA DEVI", name: "MS. PROMILA DEVI", pass: "dav@2026" },
+    { id: "38-RAJ RANI KAUSHAL", name: "MS. RAJ RANI KAUSHAL", pass: "dav@2026" },
+    { id: "39-RAJNI DEVI", name: "MS. RAJNI DEVI", pass: "dav@2026" },
+    { id: "40-RAMNIKA THAKUR", name: "MS. RAMNIKA THAKUR", pass: "dav@2026" },
+    { id: "41-RANITA THAKUR", name: "MS. RANITA THAKUR", pass: "dav@20261" },
+    { id: "42-RANJNA KUMARI", name: "MS. RANJNA KUMARI", pass: "dav@2026" },
+    { id: "43-SANJAY KUMAR VERMA", name: "MR. SANJAY KUMAR VERMA", pass: "dav@2026" },
+    { id: "44-SANTOSH SEN", name: "MS. SANTOSH SEN", pass: "dav@20261" },
+    { id: "45-SARIKA GUPTA", name: "MS. SARIKA GUPTA", pass: "dav@2026" },
+    { id: "46-ASHOK DHIMAN", name: "MR. ASHOK DHIMAN", pass: "dav@2026" },
+    { id: "47-SHAGUN THAKUR", name: "MS. SHAGUN THAKUR", pass: "dav@2026" },
+    { id: "48-SHAMMI WALIA", name: "MS. SHAMMI WALIA", pass: "dav@2026" },
+    { id: "49-SHASHI SAINI", name: "MS. SHASHI SAINI", pass: "dav@2026" },
+    { id: "50-SHIV KUMAR", name: "MR. SHIV KUMAR", pass: "dav@2026" },
+    { id: "51-SHIV PARTAP SINGH", name: "MR. SHIV PARTAP SINGH", pass: "dav@2026" },
+    { id: "52-SHIVANGI", name: "MS. SHIVANGI", pass: "dav@20261" },
+    { id: "53-SUDHANSHU", name: "MR. SUDHANSHU", pass: "dav@2026" },
+    { id: "54-SUNAYANI SHARMA", name: "MS. SUNAYANI SHARMA", pass: "dav@2026" },
+    { id: "55-SUNITA", name: "MS. SUNITA", pass: "dav@20261" },
+    { id: "56-SUNITA DEVI", name: "MS. SUNITA DEVI", pass: "dav@2026" },
+    { id: "57-SUPREET", name: "MS. SUPREET", pass: "dav@20261" },
+    { id: "58-SURBHI", name: "MS. SURBHI", pass: "dav@2026" },
+    { id: "59-URMILA DEVI", name: "MS. URMILA DEVI", pass: "dav@2026" },
+    { id: "60-VANDNA SHARMA", name: "MS. VANDNA SHARMA", pass: "dav@2026" },
+    { id: "61-VIJAY LAXMI", name: "MS. VIJAY LAXMI", pass: "dav@2026" },
+    { id: "62-VIKRAM SINGH", name: "MR. VIKRAM SINGH", pass: "dav@2026" },
+    { id: "63-YASHASWINI", name: "MS. YASHASWINI", pass: "dav@2026" },
+    { id: "64-SHUBHAM MISHRA", name: "MR. SHUBHAM MISHRA", pass: "dav@20261" },
+    { id: "65-TEACHER", name: "TEACHER-65", pass: "dav@20262" },
+    { id: "66-TEACHER", name: "TEACHER-66", pass: "dav@20263" },
+    { id: "67-TEACHER", name: "TEACHER-67", pass: "dav@20264" },
+    { id: "68-TEACHER", name: "TEACHER-68", pass: "dav@20265" },
+    { id: "69-TEACHER", name: "TEACHER-69", pass: "dav@20266" },
+    { id: "70-TEACHER", name: "TEACHER-70", pass: "dav@20267" },
+    { id: "71-TEACHER", name: "TEACHER-71", pass: "dav@20268" },
+    { id: "72-TEACHER", name: "TEACHER-72", pass: "dav@20269" },
+    { id: "73-TEACHER", name: "TEACHER-73", pass: "dav@20270" },
+    { id: "74-TEACHER", name: "TEACHER-74", pass: "dav@20271" },
+    { id: "75-TEACHER", name: "TEACHER-75", pass: "dav@20272" }
   ];
 
   var currentTeacher = null;
   var qCount = 0;
   var autoSaveTimer = null;
 
-  // Immediate Loading on Page Load
   window.addEventListener('DOMContentLoaded', function() {
     loadTeachersList();
 
@@ -227,75 +286,49 @@
 
   function loadTeachersList() {
     var select = document.getElementById('loginUserSelect');
-    
-    // First attempt to load from Master List
-    renderOptions(select, TEACHERS_MASTER);
-
-    // Try fetching updated list from Sheet via Apps Script
-    if (typeof google !== 'undefined' && google.script && google.script.run) {
-      google.script.run
-        .withSuccessHandler(function(serverList) {
-          if (serverList && serverList.length > 0) {
-            renderOptions(select, serverList);
-          }
-        })
-        .getTeacherList();
-    }
-  }
-
-  function renderOptions(selectEl, list) {
-    selectEl.innerHTML = '<option value="">-- Select Your Name / ID --</option>';
-    list.forEach(function(teacher) {
+    select.innerHTML = '<option value="">-- Select Your Name / ID --</option>';
+    TEACHERS_MASTER.forEach(function(t) {
       var opt = document.createElement('option');
-      opt.value = teacher;
-      opt.textContent = teacher;
-      selectEl.appendChild(opt);
+      opt.value = t.id;
+      opt.textContent = t.id + " (" + t.name + ")";
+      select.appendChild(opt);
     });
   }
 
+  // 🚀 INSTANT DIRECT CLIENT-SIDE LOGIN
   function handleLogin() {
     var u = document.getElementById('loginUserSelect').value;
     var p = document.getElementById('loginPass').value;
     var err = document.getElementById('loginErr');
-    var btn = document.getElementById('loginBtn');
     
     if (!u || u.trim() === '') {
       err.innerText = "Kripya Dropdown se apna Naam/ID select karein!";
       return;
     }
-    
-    btn.innerText = "Authenticating...";
-    btn.disabled = true;
-    err.innerText = "";
 
-    google.script.run
-      .withSuccessHandler(function(res) {
-        btn.innerText = "Login to Portal";
-        btn.disabled = false;
-        if (res && res.success) {
-          currentTeacher = res.username;
-          var displayName = res.teacherName || res.username;
-          
-          try {
-            localStorage.setItem('cbse_portal_user', currentTeacher);
-            localStorage.setItem('cbse_portal_teacher_name', displayName);
-          } catch(e) {}
+    var foundTeacher = TEACHERS_MASTER.find(function(t) {
+      return t.id === u;
+    });
 
-          document.getElementById('teacherNameSpan').innerText = displayName;
-          document.getElementById('loginBox').style.display = 'none';
-          document.getElementById('appPortal').style.display = 'block';
-          err.innerText = "";
-          loadDraftData();
-        } else {
-          err.innerText = (res && res.message) ? res.message : "Invalid Username/Password!";
-        }
-      })
-      .withFailureHandler(function(e) {
-        btn.innerText = "Login to Portal";
-        btn.disabled = false;
-        err.innerText = "Server Error: " + e.message;
-      })
-      .loginUser(u.trim(), p);
+    if (foundTeacher) {
+      if (foundTeacher.pass === p.trim()) {
+        currentTeacher = foundTeacher.id;
+        try {
+          localStorage.setItem('cbse_portal_user', currentTeacher);
+          localStorage.setItem('cbse_portal_teacher_name', foundTeacher.name);
+        } catch(e) {}
+
+        document.getElementById('teacherNameSpan').innerText = foundTeacher.name;
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('appPortal').style.display = 'block';
+        err.innerText = "";
+        loadDraftData();
+      } else {
+        err.innerText = "❌ Galat Password!";
+      }
+    } else {
+      err.innerText = "Teacher ID nahi mili!";
+    }
   }
 
   function logout() {
@@ -326,20 +359,16 @@
     }
   }
 
+  // REFRESH-PROOF LOCALPERSISTENCE
   function triggerAutoSave() {
     if (!currentTeacher) return;
-
     var payload = getFormData();
     try { localStorage.setItem('draft_' + currentTeacher, JSON.stringify(payload)); } catch(e){}
 
+    var tag = document.getElementById('statusTag');
+    tag.style.display = 'block';
     clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(function() {
-      google.script.run.withSuccessHandler(function() {
-        var tag = document.getElementById('statusTag');
-        tag.style.display = 'block';
-        setTimeout(function() { tag.style.display = 'none'; }, 2000);
-      }).saveDraft(currentTeacher, payload);
-    }, 1000);
+    autoSaveTimer = setTimeout(function() { tag.style.display = 'none'; }, 1500);
   }
 
   function calculateLiveMarks() {
@@ -447,13 +476,7 @@
     if (localDraft && localDraft.questions) {
       populateDraftFields(localDraft);
     } else {
-      google.script.run.withSuccessHandler(function(res) {
-        if (res && res.success && res.draft) {
-          populateDraftFields(res.draft);
-        } else {
-          addQuestionCard();
-        }
-      }).loadDraft(currentTeacher);
+      addQuestionCard();
     }
   }
 
@@ -685,25 +708,27 @@
     resultArea.style.display = 'none';
     generateBtn.disabled = true;
 
-    google.script.run
-      .withSuccessHandler(function(response) {
-        loader.style.display = 'none';
-        generateBtn.disabled = false;
-        if (response) {
-          document.getElementById('pdfLink').href = response.pdfUrl;
-          document.getElementById('docLink').href = response.docUrl;
-          document.getElementById('ansPdfLink').href = response.ansPdfUrl;
-          document.getElementById('ansDocLink').href = response.ansDocUrl;
-          resultArea.style.display = 'block';
-          resultArea.scrollIntoView({ behavior: 'smooth' });
-        }
-      })
-      .withFailureHandler(function(err) {
-        loader.style.display = 'none';
-        generateBtn.disabled = false;
-        alert("Error: " + err.message);
-      })
-      .createQuestionPaper(payload, currentTeacher);
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler(function(response) {
+          loader.style.display = 'none';
+          generateBtn.disabled = false;
+          if (response) {
+            document.getElementById('pdfLink').href = response.pdfUrl;
+            document.getElementById('docLink').href = response.docUrl;
+            document.getElementById('ansPdfLink').href = response.ansPdfUrl;
+            document.getElementById('ansDocLink').href = response.ansDocUrl;
+            resultArea.style.display = 'block';
+            resultArea.scrollIntoView({ behavior: 'smooth' });
+          }
+        })
+        .withFailureHandler(function(err) {
+          loader.style.display = 'none';
+          generateBtn.disabled = false;
+          alert("Error: " + err.message);
+        })
+        .createQuestionPaper(payload, currentTeacher);
+    }
   }
 </script>
 
