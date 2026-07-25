@@ -1,6 +1,6 @@
 const GOOGLE_DRIVE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySjz8FdbEwywn3stjX--ThZvAQNOYM1iXvXpcE-tmLth7SoGyMUmIK-20JZhyJOnMq/exec";
 
-// 📋 Authorized Teachers Database (All 75 Teachers Included)
+// 📋 Authorized Teachers Database
 const TEACHER_DATABASE = [
     { id: "1-MOHIT CHUG", name: "MR. MOHIT CHUG", pass: "dav@2026" },
     { id: "2-AASHA KUMARI", name: "MS. AASHA KUMARI", pass: "dav@2026" },
@@ -117,7 +117,6 @@ window.onload = () => {
     }
 };
 
-// Helper for Image Base64 Conversion
 function fileToBase64(file) {
     return new Promise((resolve) => {
         if (!file) resolve(null);
@@ -159,11 +158,11 @@ async function addQuestionToPaper(e) {
     currentPaperQuestions.push(newQ);
     renderPaperUI();
 
-    // Reset fields
     document.getElementById('newQuestionText').value = "";
     document.getElementById('qDiagram').value = "";
 }
 
+// Borderless tables for clean rendering
 function renderPaperUI() {
     updatePaperHeader();
     const container = document.getElementById('questionsList');
@@ -178,26 +177,26 @@ function renderPaperUI() {
         }
 
         let qHTML = `<div style="margin-bottom: 12px;">
-            <table style="width:100%; font-size:11pt; color:#000;">
-                <tr>
-                    <td style="width: 25px; vertical-align: top; font-weight: bold;">${idx + 1}.</td>
-                    <td style="vertical-align: top; text-align: left;">
+            <table style="width:100%; font-size:11pt; color:#000; border:none !important; border-collapse:collapse;">
+                <tr style="border:none !important;">
+                    <td style="width: 25px; vertical-align: top; font-weight: bold; border:none !important;">${idx + 1}.</td>
+                    <td style="vertical-align: top; text-align: left; border:none !important;">
                         ${q.question}
                         ${q.diagram ? `<br><img src="${q.diagram}" style="max-height:150px; margin-top:5px;">` : ''}
                     </td>
-                    <td style="width: 40px; vertical-align: top; text-align: right; font-weight: bold;">(${q.marks})</td>
+                    <td style="width: 40px; vertical-align: top; text-align: right; font-weight: bold; border:none !important;">(${q.marks})</td>
                 </tr>
             </table>`;
 
         if (q.type === 'MCQ' && q.options) {
-            qHTML += `<table style="width:90%; margin-left: 25px; margin-top: 5px; font-size:10pt; color:#000;">
-                <tr>
-                    <td style="width:50%;">(a) ${q.options[0].text} ${q.options[0].img ? `<br><img src="${q.options[0].img}" style="max-height:80px;">` : ''}</td>
-                    <td style="width:50%;">(b) ${q.options[1].text} ${q.options[1].img ? `<br><img src="${q.options[1].img}" style="max-height:80px;">` : ''}</td>
+            qHTML += `<table style="width:90%; margin-left: 25px; margin-top: 5px; font-size:10pt; color:#000; border:none !important; border-collapse:collapse;">
+                <tr style="border:none !important;">
+                    <td style="width:50%; border:none !important;">(a) ${q.options[0].text} ${q.options[0].img ? `<br><img src="${q.options[0].img}" style="max-height:80px;">` : ''}</td>
+                    <td style="width:50%; border:none !important;">(b) ${q.options[1].text} ${q.options[1].img ? `<br><img src="${q.options[1].img}" style="max-height:80px;">` : ''}</td>
                 </tr>
-                <tr>
-                    <td style="width:50%;">(c) ${q.options[2].text} ${q.options[2].img ? `<br><img src="${q.options[2].img}" style="max-height:80px;">` : ''}</td>
-                    <td style="width:50%;">(d) ${q.options[3].text} ${q.options[3].img ? `<br><img src="${q.options[3].img}" style="max-height:80px;">` : ''}</td>
+                <tr style="border:none !important;">
+                    <td style="width:50%; border:none !important;">(c) ${q.options[2].text} ${q.options[2].img ? `<br><img src="${q.options[2].img}" style="max-height:80px;">` : ''}</td>
+                    <td style="width:50%; border:none !important;">(d) ${q.options[3].text} ${q.options[3].img ? `<br><img src="${q.options[3].img}" style="max-height:80px;">` : ''}</td>
                 </tr>
             </table>`;
         }
@@ -217,7 +216,24 @@ function updatePaperHeader() {
     document.getElementById('paperMaxMarks').innerText = `Max Marks: ${document.getElementById('maxMarksInput').value}`;
 }
 
-// 📄 GENERATE & SAVE BOTH WORD + PDF TO GOOGLE DRIVE
+// 📥 INSTANT LOCAL PDF DOWNLOAD FUNCTION
+function downloadLocalPDF() {
+    const element = document.getElementById('paperContainer');
+    const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
+    const filename = `DAV_Paper_${teacherName.replace(/ /g, '_')}_${Date.now()}.pdf`;
+
+    const opt = {
+        margin:       0.5,
+        filename:     filename,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+
+// ☁️ DRIVE BACKUP SAVE
 function saveAndSyncDrive() {
     const paperElement = document.getElementById('paperContainer');
     const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
@@ -230,7 +246,7 @@ function saveAndSyncDrive() {
           body { font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.3; color: #000000; }
           h2 { font-size: 16pt; font-weight: bold; text-align: center; margin: 0; }
           h3 { font-size: 12pt; font-weight: bold; text-align: center; margin: 4px 0; }
-          table { width: 100%; border-collapse: collapse; }
+          table, td, tr { border: none !important; border-collapse: collapse !important; }
           td { vertical-align: top; }
         </style>
       </head>
@@ -246,7 +262,7 @@ function saveAndSyncDrive() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ htmlContent: htmlContent, fileName: fileName })
     })
-    .then(() => alert("🚀 Success! Question Paper saved in Google Drive as BOTH Word (.doc) and PDF (.pdf) files!"))
+    .then(() => alert("🚀 Success! Saved to Google Drive!"))
     .catch(() => alert("Error syncing to Drive!"));
 }
 
