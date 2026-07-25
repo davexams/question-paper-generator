@@ -732,7 +732,7 @@
     closeBankModal();
   }
 
-  // RENDER PREVIEW WITH 1:1 SYMMETRY MATCHING BACKEND
+  // RENDER PREVIEW (NO ITALICS, 42px SYMMETRY)
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     var html = `
@@ -753,7 +753,7 @@
     if (data.instructions) {
       html += `<div style="font-weight:bold; font-size:12pt;">General Instructions:</div>`;
       data.instructions.split('\n').forEach(function(line) {
-        if (line.trim()) html += `<div style="font-size:11pt; font-style:italic; margin-left:15px;">${line}</div>`;
+        if (line.trim()) html += `<div style="font-size:11pt; font-style:normal; margin-left:15px;">${line}</div>`;
       });
       html += `<br>`;
     }
@@ -770,7 +770,7 @@
         html += `
           <div class="preview-q-row" style="display:flex;">
             <div style="min-width:42px; font-weight:bold;">Q.${qNum}.</div>
-            <div style="flex-grow:1; text-align:justify;">
+            <div style="flex-grow:1; text-align:justify; font-style:normal;">
               ${q.text}
               ${q.qImg ? `<br><img src="${q.qImg}" style="max-height:100px; margin-top:5px;">` : ''}
             </div>
@@ -778,14 +778,14 @@
           </div>
         `;
 
-        // Sub Questions Output (Symmetry Matched at 42px)
+        // Sub Questions Output (Symmetry Matched at 42px, Normal Style)
         if (q.type === 'CASE_STUDY' && q.subQuestions && q.subQuestions.length > 0) {
           q.subQuestions.forEach(function(subObj, idx) {
             var subTxt = typeof subObj === 'string' ? subObj : subObj.text;
             var subImg = typeof subObj === 'string' ? '' : subObj.img;
             
             html += `
-              <div class="preview-sub-q" style="margin-left:42px; margin-top:4px;">
+              <div class="preview-sub-q" style="margin-left:42px; margin-top:4px; font-style:normal;">
                 <b>${toRoman(idx + 1)}</b> ${subTxt}
                 ${subImg ? `<br><img src="${subImg}" style="max-height:80px; margin-top:4px;">` : ''}
               </div>
@@ -793,10 +793,10 @@
           });
         }
 
-        // MCQ Options Output (Symmetry Matched at 42px)
+        // MCQ Options Output (Symmetry Matched at 42px, Normal Style)
         if (q.type === 'MCQ' && q.options) {
           html += `
-            <div class="preview-opts" style="margin-left:42px; display:grid; grid-template-columns:1fr 1fr; margin-top:4px;">
+            <div class="preview-opts" style="margin-left:42px; display:grid; grid-template-columns:1fr 1fr; margin-top:4px; font-style:normal;">
               <div>(a) ${q.options[0]||''} ${q.optImgs && q.optImgs[0] ? `<br><img src="${q.optImgs[0]}" style="max-height:60px;">` : ''}</div>
               <div>(b) ${q.options[1]||''} ${q.optImgs && q.optImgs[1] ? `<br><img src="${q.optImgs[1]}" style="max-height:60px;">` : ''}</div>
               <div>(c) ${q.options[2]||''} ${q.optImgs && q.optImgs[2] ? `<br><img src="${q.optImgs[2]}" style="max-height:60px;">` : ''}</div>
@@ -805,7 +805,7 @@
           `;
         } else if (q.type === 'AR') {
           html += `
-            <div style="margin-left:42px; font-size:12pt; color:#333;">
+            <div style="margin-left:42px; font-size:12pt; color:#333; font-style:normal;">
               (a) Both A and R are true and R is correct explanation.<br>
               (b) Both A and R are true but R is NOT correct explanation.<br>
               (c) A is true but R is false.<br>
