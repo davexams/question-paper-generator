@@ -151,11 +151,10 @@
     🚀 Generate Paper & Download PDF
   </button>
 
-  <div id="loader">⏳ Processing PDF Download & Auto-saving to Google Drive... Please Wait</div>
+  <div id="loader">⏳ Generating PDF Download & Saving to Google Drive... Please Wait</div>
 
   <div id="resultArea">
     <h3 style="color:#28a745; margin-bottom:15px; text-align:center;">✅ Question Paper Downloaded & Saved to Drive!</h3>
-    
     <div class="paper-preview" id="paperPreviewBox"></div>
   </div>
 </div>
@@ -255,7 +254,7 @@
     { id: "68-TEACHER", name: "TEACHER-68", pass: "dav@20265" },
     { id: "69-TEACHER", name: "TEACHER-69", pass: "dav@20266" },
     { id: "70-TEACHER", name: "TEACHER-70", pass: "dav@20267" },
-    { id: "71-TEACHER", name: "TEACHER-71", pass: "dav@20272" },
+    { id: "71-TEACHER", name: "TEACHER-71", pass: "dav@20268" },
     { id: "72-TEACHER", name: "TEACHER-72", pass: "dav@20269" },
     { id: "73-TEACHER", name: "TEACHER-73", pass: "dav@20270" },
     { id: "74-TEACHER", name: "TEACHER-74", pass: "dav@20271" },
@@ -690,22 +689,22 @@
     box.innerHTML = html;
   }
 
-  // 🎯 SINGLE CLICK ACTION ENGINE
+  // 🎯 SINGLE CLICK LIGHTWEIGHT ENGINE
   function submitSingleClickAction() {
     var loader = document.getElementById('loader');
     var resultArea = document.getElementById('resultArea');
     var generateBtn = document.getElementById('generateBtn');
 
-    var payload = getFormData();
+    var rawPayload = getFormData();
     
-    renderPreview(payload);
+    renderPreview(rawPayload);
 
     loader.style.display = 'block';
     resultArea.style.display = 'block';
     generateBtn.disabled = true;
     resultArea.scrollIntoView({ behavior: 'smooth' });
 
-    // 1. Guaranteed Local PDF Download
+    // 1. Local PDF Download
     setTimeout(function() {
       var element = document.getElementById('paperPreviewBox');
       var cls = document.getElementById('className').value;
@@ -723,7 +722,9 @@
       html2pdf().set(opt).from(element).save();
     }, 400);
 
-    // 2. Direct Drive Backup Creation
+    // 2. Optimized Safe Stringified Transport to Google Apps Script
+    var jsonString = JSON.stringify(rawPayload);
+
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       google.script.run
         .withSuccessHandler(function(response) {
@@ -734,7 +735,7 @@
           loader.style.display = 'none';
           generateBtn.disabled = false;
         })
-        .createQuestionPaper(payload, currentTeacher);
+        .createQuestionPaper(jsonString, currentTeacher);
     } else {
       loader.style.display = 'none';
       generateBtn.disabled = false;
@@ -744,4 +745,3 @@
 
 </body>
 </html>
-
