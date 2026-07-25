@@ -50,7 +50,6 @@
 
     .live-counter-bar { background: #e8f0fe; border: 1px solid #aecbfa; padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: bold; color: #174ea6; }
 
-    /* Modal Styling */
     .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
     .modal-content { background: white; margin: 5% auto; padding: 20px; width: 80%; max-width: 700px; border-radius: 8px; max-height: 80vh; overflow-y: auto; }
   </style>
@@ -66,7 +65,7 @@
     <div class="form-group">
       <label>Select Teacher User ID:</label>
       <select id="loginUserSelect" required>
-        <option value="">-- Select Your Name / ID --</option>
+        <option value="">-- Loading Teachers List... --</option>
       </select>
     </div>
     <div class="form-group">
@@ -186,8 +185,8 @@
 </div>
 
 <script>
-  // Complete Teacher List Backup Array
-  const FALLBACK_TEACHER_LIST = [
+  // Complete 75 Teachers Master Database
+  const TEACHERS_MASTER = [
     "1-MOHIT CHUG", "2-AASHA KUMARI", "3-ALANKAR KAUNDAL", "4-AMAN THAKUR", "5-ANIRUDH SHARMA",
     "6-ANJNA", "7-ANU THAKUR", "8-ANUPAM THAKUR", "9-ASHA CHANDEL", "10-BHARTI",
     "11-BHARTI RANA", "12-CHANDRESH SHARMA", "13-CHHAVI SHARMA", "14-DEEPAK AGNIHOTRI", "15-DINESH GUPTA",
@@ -209,8 +208,9 @@
   var qCount = 0;
   var autoSaveTimer = null;
 
-  window.onload = function() {
-    populateTeacherDropdown();
+  // Immediate Loading on Page Load
+  window.addEventListener('DOMContentLoaded', function() {
+    loadTeachersList();
 
     try {
       var savedUser = localStorage.getItem('cbse_portal_user');
@@ -223,33 +223,32 @@
         loadDraftData();
       }
     } catch(e) {}
-  };
+  });
 
-  // Populate Dropdown reliably
-  function populateTeacherDropdown() {
+  function loadTeachersList() {
     var select = document.getElementById('loginUserSelect');
     
-    // First try fetching from Google Apps Script server template
-    google.script.run
-      .withSuccessHandler(function(teachers) {
-        if (teachers && teachers.length > 0) {
-          fillDropdownOptions(select, teachers);
-        } else {
-          fillDropdownOptions(select, FALLBACK_TEACHER_LIST);
-        }
-      })
-      .withFailureHandler(function() {
-        fillDropdownOptions(select, FALLBACK_TEACHER_LIST);
-      })
-      .getTeacherList();
+    // First attempt to load from Master List
+    renderOptions(select, TEACHERS_MASTER);
+
+    // Try fetching updated list from Sheet via Apps Script
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler(function(serverList) {
+          if (serverList && serverList.length > 0) {
+            renderOptions(select, serverList);
+          }
+        })
+        .getTeacherList();
+    }
   }
 
-  function fillDropdownOptions(selectEl, teacherArray) {
+  function renderOptions(selectEl, list) {
     selectEl.innerHTML = '<option value="">-- Select Your Name / ID --</option>';
-    teacherArray.forEach(function(t) {
+    list.forEach(function(teacher) {
       var opt = document.createElement('option');
-      opt.value = t;
-      opt.innerText = t;
+      opt.value = teacher;
+      opt.textContent = teacher;
       selectEl.appendChild(opt);
     });
   }
