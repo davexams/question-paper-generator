@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DAV Question Paper Creator & Assessment Portal</title>
+    <title>DAV Question Paper & PDF Generator Portal</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- MathJax for Math & Chemistry Equations -->
@@ -46,179 +46,180 @@
     </div>
 
     <!-- 🚀 MAIN APP PLATFORM -->
-    <div id="mainPlatform" class="hidden max-w-6xl mx-auto p-4 md:p-8">
+    <div id="mainPlatform" class="hidden max-w-5xl mx-auto p-4 md:p-6">
         
-        <!-- Header Nav -->
-        <div class="no-print flex justify-between items-center bg-white p-4 rounded-xl shadow-md mb-6">
-            <div class="flex items-center gap-3">
-                <span class="text-2xl">📝</span>
-                <div>
-                    <h1 class="text-lg font-bold text-slate-800">DAV Direct Question Paper Creator</h1>
-                    <p class="text-xs text-indigo-600 font-semibold" id="teacherWelcome">Logged in</p>
-                </div>
-            </div>
+        <!-- Top Nav -->
+        <div class="no-print flex justify-between items-center bg-white p-4 rounded-xl shadow-sm mb-6 border">
+            <h1 class="text-lg font-bold text-blue-600" id="teacherWelcome">Welcome, Teacher!</h1>
             <div class="flex gap-2">
-                <button onclick="switchTab('create')" id="btnTabCreate" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow">✏️ Create Paper</button>
-                <button onclick="switchTab('bank')" id="btnTabBank" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold">📚 Question Bank Manager</button>
-                <button onclick="logout()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-2 rounded-lg text-sm font-semibold ml-2">🚪 Logout</button>
+                <button onclick="location.reload()" class="bg-amber-500 text-white px-3 py-1.5 rounded text-sm font-semibold hover:bg-amber-600">+ New Paper</button>
+                <button onclick="logout()" class="bg-slate-600 text-white px-3 py-1.5 rounded text-sm font-semibold hover:bg-slate-700">Logout</button>
             </div>
         </div>
 
-        <!-- TAB 1: CREATE PAPER DIRECTLY -->
-        <div id="createSection" class="no-print space-y-6">
+        <!-- FORM ENGINE -->
+        <div class="no-print space-y-6">
             
-            <!-- HEADER CONFIGURATION -->
-            <div class="bg-white p-6 rounded-xl shadow-md">
-                <h2 class="text-md font-bold text-slate-800 mb-4">⚙️ Step 1: Exam Header Details</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- HEADER SETTINGS -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold mb-1">School Name:</label>
+                    <input type="text" id="schoolNameInput" value="DAV PUBLIC SCHOOL, SUNDER NAGAR" oninput="updatePaperHeader()" class="w-full border p-2 rounded text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold mb-1">School Name</label>
-                        <input type="text" id="schoolNameInput" value="DAV PUBLIC SCHOOL, SUNDER NAGAR" oninput="updatePaperHeader()" class="w-full border p-2 rounded-lg text-sm">
+                        <label class="block text-xs font-semibold mb-1">Class (e.g. 10):</label>
+                        <input type="text" id="classInput" value="10" oninput="updatePaperHeader()" class="w-full border p-2 rounded text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold mb-1">Class & Subject Header</label>
-                        <input type="text" id="examHeaderInput" value="Class X - SCIENCE - Periodic Test - II" oninput="updatePaperHeader()" class="w-full border p-2 rounded-lg text-sm">
+                        <label class="block text-xs font-semibold mb-1">Subject (e.g. Science):</label>
+                        <input type="text" id="subjectInput" value="Science" oninput="updatePaperHeader()" class="w-full border p-2 rounded text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">Exam Title (e.g. Annual Exam):</label>
+                        <input type="text" id="examHeaderInput" value="PT-3 Examination" oninput="updatePaperHeader()" class="w-full border p-2 rounded text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold mb-1">General Instructions</label>
-                        <input type="text" id="instructionsInput" value="INSTRUCTIONS: All questions are compulsory" oninput="updatePaperHeader()" class="w-full border p-2 rounded-lg text-sm">
+                        <label class="block text-xs font-semibold mb-1">Session Year (e.g. 2026):</label>
+                        <input type="text" id="sessionInput" value="2026" oninput="updatePaperHeader()" class="w-full border p-2 rounded text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">Time Allowed:</label>
+                        <input type="text" id="timeInput" value="3 Hours" oninput="updatePaperHeader()" class="w-full border p-2 rounded text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold mb-1">Time Limit</label>
-                        <input type="text" id="timeInput" value="Time: 2 hour" oninput="updatePaperHeader()" class="w-full border p-2 rounded-lg text-sm">
+                        <label class="block text-xs font-semibold mb-1">Max Marks:</label>
+                        <input type="text" id="maxMarksInput" value="80" oninput="updatePaperHeader()" class="w-full border p-2 rounded text-sm">
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Class Select</label>
-                        <select id="classSelect" class="w-full border p-2 rounded-lg text-sm"><option value="10">Class 10</option><option value="9">Class 9</option></select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Subject Select</label>
-                        <select id="subjectSelect" class="w-full border p-2 rounded-lg text-sm"><option value="Science">Science</option><option value="Mathematics">Mathematics</option><option value="English">English</option></select>
-                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1">General Instructions:</label>
+                    <textarea id="instructionsInput" rows="3" oninput="updatePaperHeader()" class="w-full border p-2 rounded text-sm">1. The question paper contains 5 sections A, B, C, D and E.
+2. Section A consists of Multiple Choice Questions carrying 1 mark each.
+3. All questions are compulsory.</textarea>
                 </div>
             </div>
 
-            <!-- TYPE QUESTIONS & ADD DIRECTLY TO PAPER -->
-            <div class="bg-white p-6 rounded-xl shadow-md">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-md font-bold text-slate-800">➕ Step 2: Add Question to Paper (Auto-saves to Bank)</h2>
-                    <button onclick="toggleBankSelector()" class="text-xs bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-3 py-1.5 rounded-lg hover:bg-indigo-100">
-                        🔍 Need Question from Bank? Click Here
-                    </button>
-                </div>
+            <!-- QUESTIONS ENGINE -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <h2 class="text-center text-lg font-bold text-blue-600 mb-4">Questions Engine</h2>
 
-                <!-- OPTIONAL QUESTION BANK SELECTOR ACCORDION -->
-                <div id="bankSelectorBox" class="hidden mb-6 p-4 bg-indigo-50/50 border border-indigo-200 rounded-xl">
-                    <h3 class="text-xs font-bold text-indigo-900 mb-2">📥 Choose Question from Bank to Insert:</h3>
-                    <div id="bankQuestionsList" class="max-h-48 overflow-y-auto space-y-2 border p-2 rounded bg-white text-xs">
-                        <!-- Dynamic Bank Questions -->
-                    </div>
-                </div>
-
-                <!-- QUESTION FORM -->
                 <form onsubmit="addQuestionToPaper(event)" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold mb-1">Section Tag</label>
-                            <select id="newSectionTag" class="w-full border p-2 rounded-lg text-sm">
-                                <option value="SECTION - A">SECTION - A</option>
-                                <option value="SECTION - B">SECTION - B</option>
-                                <option value="SECTION - C">SECTION - C</option>
-                                <option value="SECTION - D">SECTION - D</option>
+                            <label class="block text-xs font-semibold mb-1">Section Title:</label>
+                            <input type="text" id="newSectionTag" value="SECTION A" class="w-full border p-2 rounded text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1">Question Type:</label>
+                            <select id="newType" onchange="handleTypeChange()" class="w-full border p-2 rounded text-sm">
+                                <option value="MCQ">MCQ (4 Options)</option>
+                                <option value="Short">Short Answer</option>
+                                <option value="Long">Long Answer</option>
                             </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold mb-1">Question Type</label>
-                            <select id="newType" onchange="handleTypeChange()" class="w-full border p-2 rounded-lg text-sm">
-                                <option value="Short">Short Answer Question</option>
-                                <option value="MCQ">Multiple Choice Question (MCQ)</option>
-                                <option value="Long">Long Answer Question</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold mb-1">Marks</label>
-                            <input type="number" id="newMarks" min="1" max="20" value="1" class="w-full border p-2 rounded-lg text-sm" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold mb-1">Chapter Name</label>
-                            <input type="text" id="newChapter" placeholder="e.g. Light / Chemical Reactions" class="w-full border p-2 rounded-lg text-sm" required>
                         </div>
                     </div>
 
-                    <!-- EQUATION & SYMBOL TOOLBAR -->
+                    <!-- Formula Helper Bar -->
                     <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-xs font-semibold">Question Text</label>
-                            <span class="text-[10px] text-slate-500">Click symbol to insert</span>
-                        </div>
-                        <div class="flex flex-wrap gap-1 p-2 bg-slate-100 border border-b-0 rounded-t-lg text-xs">
-                            <button type="button" onclick="insertSymbol('newQuestionText', '\\( \\frac{a}{b} \\)')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\frac{a}{b}$</button>
-                            <button type="button" onclick="insertSymbol('newQuestionText', 'x^2')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$x^2$</button>
-                            <button type="button" onclick="insertSymbol('newQuestionText', 'H_2O')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$X_2$</button>
-                            <button type="button" onclick="insertSymbol('newQuestionText', '\\( \\sqrt{x} \\)')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\sqrt{x}$</button>
-                            <button type="button" onclick="insertSymbol('newQuestionText', '\\rightarrow')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\rightarrow$</button>
-                            <button type="button" onclick="insertSymbol('newQuestionText', '^\\circ')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$^\circ$</button>
-                            <button type="button" onclick="insertSymbol('newQuestionText', '\\theta')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\theta$</button>
-                            <button type="button" onclick="insertSymbol('newQuestionText', '\\alpha')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\alpha$</button>
-                            <button type="button" onclick="insertSymbol('newQuestionText', '\\beta')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\beta$</button>
-                            <button type="button" onclick="insertSymbol('newQuestionText', '\\pi')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\pi$</button>
-                        </div>
-                        <textarea id="newQuestionText" rows="3" placeholder="Type question text or use symbol toolbar above..." class="w-full border p-2.5 rounded-b-lg text-sm focus:outline-none" required></textarea>
-                    </div>
-
-                    <!-- MCQ OPTIONS (IF MCQ IS SELECTED) -->
-                    <div id="mcqBlock" class="hidden space-y-2 bg-slate-50 p-4 rounded-lg border">
-                        <span class="text-xs font-bold text-slate-700">MCQ Options:</span>
-                        <div class="grid grid-cols-2 gap-3">
-                            <input type="text" id="optA" placeholder="Option A" class="border p-2 rounded text-sm">
-                            <input type="text" id="optB" placeholder="Option B" class="border p-2 rounded text-sm">
-                            <input type="text" id="optC" placeholder="Option C" class="border p-2 rounded text-sm">
-                            <input type="text" id="optD" placeholder="Option D" class="border p-2 rounded text-sm">
+                        <label class="block text-xs font-semibold mb-1 text-slate-600">Maths & Chemistry Formulas / Symbols Helper:</label>
+                        <div class="flex flex-wrap gap-1 p-2 bg-blue-50 border rounded text-xs">
+                            <button type="button" onclick="insertSymbol('newQuestionText', '√')" class="px-2 py-0.5 bg-white border rounded">√</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '÷')" class="px-2 py-0.5 bg-white border rounded">÷</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', 'x²')" class="px-2 py-0.5 bg-white border rounded">x²</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '½')" class="px-2 py-0.5 bg-white border rounded">½</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', 'π')" class="px-2 py-0.5 bg-white border rounded">π</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', 'θ')" class="px-2 py-0.5 bg-white border rounded">θ</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', 'Δ')" class="px-2 py-0.5 bg-white border rounded">Δ</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', 'α')" class="px-2 py-0.5 bg-white border rounded">α</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', 'β')" class="px-2 py-0.5 bg-white border rounded">β</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', 'γ')" class="px-2 py-0.5 bg-white border rounded">γ</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '∞')" class="px-2 py-0.5 bg-white border rounded">∞</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '±')" class="px-2 py-0.5 bg-white border rounded">±</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '°')" class="px-2 py-0.5 bg-white border rounded">°</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '→')" class="px-2 py-0.5 bg-white border rounded">→</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', 'H₂O')" class="px-2 py-0.5 bg-white border rounded">H₂O</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', 'CO₂')" class="px-2 py-0.5 bg-white border rounded">CO₂</button>
                         </div>
                     </div>
 
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg text-sm font-semibold shadow">
-                        📌 Add Question to Paper & Save to Bank
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">Question Text:</label>
+                        <textarea id="newQuestionText" rows="3" placeholder="Enter question or click symbols above..." class="w-full border p-2 rounded text-sm" required></textarea>
+                    </div>
+
+                    <!-- Diagram Attachment -->
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">Attach Question Diagram (Optional):</label>
+                        <input type="file" id="qDiagram" accept="image/*" class="w-full text-xs border p-1 rounded">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">Marks:</label>
+                        <input type="number" id="newMarks" value="1" min="1" max="20" class="w-full border p-2 rounded text-sm" required>
+                    </div>
+
+                    <!-- MCQ Options Block -->
+                    <div id="mcqBlock" class="grid grid-cols-2 gap-4 p-3 bg-slate-50 border rounded">
+                        <div>
+                            <label class="block text-xs font-semibold mb-1">(a) Option A</label>
+                            <input type="text" id="optA" placeholder="(a) Option A" class="w-full border p-1.5 rounded text-xs mb-1">
+                            <input type="file" id="optImgA" accept="image/*" class="text-[10px]">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1">(b) Option B</label>
+                            <input type="text" id="optB" placeholder="(b) Option B" class="w-full border p-1.5 rounded text-xs mb-1">
+                            <input type="file" id="optImgB" accept="image/*" class="text-[10px]">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1">(c) Option C</label>
+                            <input type="text" id="optC" placeholder="(c) Option C" class="w-full border p-1.5 rounded text-xs mb-1">
+                            <input type="file" id="optImgC" accept="image/*" class="text-[10px]">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1">(d) Option D</label>
+                            <input type="text" id="optD" placeholder="(d) Option D" class="w-full border p-1.5 rounded text-xs mb-1">
+                            <input type="file" id="optImgD" accept="image/*" class="text-[10px]">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded font-bold text-sm transition">
+                        + Add Question
                     </button>
                 </form>
             </div>
 
-            <!-- EXPORT ACTIONS -->
-            <div class="flex flex-wrap gap-3 bg-white p-4 rounded-xl shadow-md">
-                <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow">🖨️ Print / Save PDF</button>
-                <button onclick="downloadAsDocx()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow">📝 Download DOCX (Word & Sync Drive)</button>
-            </div>
+            <!-- EXPORT ACTION BUTTON -->
+            <button onclick="saveAndSyncDrive()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold text-sm shadow">
+                📄 Generate Paper & Save to Google Drive (PDF + Word)
+            </button>
         </div>
 
-        <!-- TAB 2: QUESTION BANK MANAGER -->
-        <div id="bankSection" class="no-print bg-white p-6 rounded-xl shadow-md mb-8 hidden">
-            <h2 class="text-lg font-bold text-slate-800 mb-4">📚 Question Bank Manager (Edit / Delete Bank Questions)</h2>
-            <div id="fullQuestionBankList" class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-                <!-- Loaded via JS -->
-            </div>
-        </div>
-
-        <!-- GENERATED PAPER PRINT AREA (REAL-TIME PAPER PREVIEW) -->
-        <div id="paperContainer" class="print-area cbse-font bg-white p-10 rounded-xl shadow-lg border border-slate-200 mt-6">
-            <!-- HEADER -->
+        <!-- GENERATED PAPER PREVIEW -->
+        <div id="paperContainer" class="print-area cbse-font bg-white p-8 rounded-xl shadow border mt-8">
             <div style="text-align: center; margin-bottom: 20px;">
-                <h2 id="paperSchoolName" style="font-size: 20pt; font-weight: bold; text-transform: uppercase; margin: 0; color: #000;">DAV PUBLIC SCHOOL, SUNDER NAGAR</h2>
-                <h3 id="paperExamHeader" style="font-size: 14pt; font-weight: bold; margin: 5px 0 0 0; color: #000;">Class X - SCIENCE - Periodic Test - II</h3>
+                <h2 id="paperSchoolName" style="font-size: 18pt; font-weight: bold; margin: 0;">DAV PUBLIC SCHOOL, SUNDER NAGAR</h2>
+                <h3 id="paperExamHeader" style="font-size: 13pt; font-weight: bold; margin: 5px 0;">Class 10 - Science - PT-3 Examination (2026)</h3>
                 
-                <table style="width: 100%; margin-top: 15px; border-bottom: 1px solid #000; font-weight: bold; font-size: 11pt;">
+                <table style="width: 100%; margin-top: 10px; border-bottom: 1px solid #000; font-weight: bold; font-size: 11pt;">
                     <tr>
-                        <td id="paperTime" style="text-align: left;">Time: 2 hour</td>
-                        <td id="paperMaxMarks" style="text-align: right;">Maximum Marks: 0</td>
+                        <td id="paperTime" style="text-align: left;">Time Allowed: 3 Hours</td>
+                        <td id="paperMaxMarks" style="text-align: right;">Max Marks: 80</td>
                     </tr>
                 </table>
-                <div style="text-align: left; margin-top: 5px; font-size: 10pt; font-weight: bold; text-transform: uppercase;">
-                    <span id="paperInstructions">INSTRUCTIONS: All questions are compulsory</span>
+                <div style="text-align: left; margin-top: 5px; font-size: 10pt; white-space: pre-line;">
+                    <span id="paperInstructions">1. The question paper contains 5 sections A, B, C, D and E.
+2. Section A consists of Multiple Choice Questions carrying 1 mark each.
+3. All questions are compulsory.</span>
                 </div>
             </div>
 
-            <!-- LIVE QUESTIONS LIST -->
-            <div id="questionsList" class="space-y-6 text-black">
-                <p class="text-slate-400 text-center italic no-print">Type your questions above to start building the paper...</p>
+            <div id="questionsList" class="space-y-4">
+                <p class="text-slate-400 text-center italic no-print">Questions added will appear here in real-time...</p>
             </div>
         </div>
 
