@@ -689,22 +689,22 @@
     box.innerHTML = html;
   }
 
-  // 🎯 SINGLE CLICK LIGHTWEIGHT ENGINE
+  // 🎯 REAL-TIME DRIVE VERIFYING ENGINE
   function submitSingleClickAction() {
     var loader = document.getElementById('loader');
     var resultArea = document.getElementById('resultArea');
     var generateBtn = document.getElementById('generateBtn');
 
     var rawPayload = getFormData();
-    
     renderPreview(rawPayload);
 
     loader.style.display = 'block';
+    loader.innerHTML = "⏳ Step 1: Downloading Local PDF...";
     resultArea.style.display = 'block';
     generateBtn.disabled = true;
     resultArea.scrollIntoView({ behavior: 'smooth' });
 
-    // 1. Local PDF Download
+    // 1. Instant Local PDF Download
     setTimeout(function() {
       var element = document.getElementById('paperPreviewBox');
       var cls = document.getElementById('className').value;
@@ -720,25 +720,34 @@
       };
 
       html2pdf().set(opt).from(element).save();
+      
+      loader.innerHTML = "⏳ Step 2: Saving Doc & PDF to Google Drive Folder...";
     }, 400);
 
-    // 2. Optimized Safe Stringified Transport to Google Apps Script
+    // 2. Direct Explicit Drive Sync
     var jsonString = JSON.stringify(rawPayload);
 
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       google.script.run
-        .withSuccessHandler(function(response) {
+        .withSuccessHandler(function(res) {
           loader.style.display = 'none';
           generateBtn.disabled = false;
+          if(res && res.success) {
+            alert("✅ SUCCESS: File Google Drive me save ho gayi hai!\n\nDocument Name: " + res.fileName);
+          } else {
+            alert("❌ DRIVE ERROR: " + (res ? res.message : "Unknown backend failure"));
+          }
         })
         .withFailureHandler(function(err) {
           loader.style.display = 'none';
           generateBtn.disabled = false;
+          alert("❌ EXECUTION FAILED: " + err.toString());
         })
         .createQuestionPaper(jsonString, currentTeacher);
     } else {
       loader.style.display = 'none';
       generateBtn.disabled = false;
+      alert("⚠️ Standalone mode: Running outside Google Apps Script web container.");
     }
   }
 </script>
