@@ -1,0 +1,33 @@
+[
+  {
+    "id": 1,
+    "class": "10",
+    "subject": "Science",
+    "chapter": "Light",
+    "type": "MCQ",
+    "marks": 1,
+    "question": "Which of the following materials cannot be used to make a lens?",
+    "options": ["Water", "Glass", "Plastic", "Clay"],
+    "answer": "Clay"
+  },
+  {
+    "id": 2,
+    "class": "10",
+    "subject": "Science",
+    "chapter": "Electricity",
+    "type": "Short",
+    "marks": 2,
+    "question": "State Ohm's Law and write its mathematical formula.",
+    "answer": "V = IR"
+  },
+  {
+    "id": 3,
+    "class": "10",
+    "subject": "Science",
+    "chapter": "Light",
+    "type": "Numerical",
+    "marks": 3,
+    "question": "A concave mirror produces three times magnified real image of an object placed at 10 cm in front of it. Where is the image located?",
+    "answer": "-30 cm"
+  }
+]

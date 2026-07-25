@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Paper Generator</title>
+    <!-- Tailwind CSS CDN for instant modern design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-area { width: 100%; border: none !important; shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Controls Section (No-Print) -->
+        <div class="no-print bg-white p-6 rounded-xl shadow-md mb-8">
+            <h1 class="text-2xl font-bold text-slate-800 mb-4">📜 Instant Question Paper Generator</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Class</label>
+                    <select id="classSelect" class="w-full border p-2 rounded-lg">
+                        <option value="10">Class 10</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Subject</label>
+                    <select id="subjectSelect" class="w-full border p-2 rounded-lg">
+                        <option value="Science">Science</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">School Name</label>
+                    <input type="text" id="schoolNameInput" value="DAV PUBLIC SCHOOL" class="w-full border p-2 rounded-lg">
+                </div>
+            </div>
+
+            <div class="flex gap-4">
+                <button onclick="generatePaper()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold shadow">
+                    ✨ Generate Paper
+                </button>
+                <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-semibold shadow">
+                    🖨️ Save as PDF / Print
+                </button>
+            </div>
+        </div>
+
+        <!-- Generated Paper View -->
+        <div id="paperContainer" class="print-area bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+            <!-- Paper Header -->
+            <div class="text-center border-b-2 border-slate-800 pb-4 mb-6">
+                <h2 id="paperSchoolName" class="text-2xl font-bold uppercase tracking-wide">DAV PUBLIC SCHOOL</h2>
+                <h3 class="text-lg font-semibold text-slate-700">PERIODIC TEST / PRACTICE PAPER</h3>
+                <div class="flex justify-between mt-4 text-sm font-medium text-slate-600">
+                    <span>Class: <strong id="paperClass">10</strong></span>
+                    <span>Subject: <strong id="paperSubject">Science</strong></span>
+                    <span>Max Marks: <strong id="paperTotalMarks">0</strong></span>
+                </div>
+            </div>
+
+            <!-- Questions List -->
+            <div id="questionsList" class="space-y-4">
+                <p class="text-slate-500 text-center italic">Generate button par click karke paper banayein...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
