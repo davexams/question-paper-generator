@@ -20,7 +20,6 @@
     .mcq-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
     .mcq-opt-box { background: #ffffff; border: 1px solid #dee2e6; padding: 8px; border-radius: 4px; }
 
-    /* Sub Questions Container Styling */
     .sub-q-container { background: #eef2f7; border: 1px dashed #4a90e2; padding: 12px; border-radius: 6px; margin-top: 10px; }
     .sub-q-card { background: #ffffff; border: 1px solid #ced4da; border-radius: 5px; padding: 10px; margin-bottom: 10px; }
     .sub-q-row { display: flex; gap: 8px; align-items: center; }
@@ -51,8 +50,8 @@
     .preview-header { text-align: center; font-weight: bold; }
     .preview-table { width: 100%; margin: 10px 0; border-collapse: collapse; font-weight: bold; font-size: 12pt; }
     .preview-q-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12pt; font-weight: normal; text-align: justify; }
-    .preview-sub-q { margin-left: 25px; margin-top: 4px; font-size: 12pt; font-weight: normal; text-align: left; }
-    .preview-opts { display: grid; grid-template-columns: 1fr 1fr; margin-left: 45px; margin-top: 4px; font-size: 12pt; font-weight: normal; text-align: left !important; }
+    .preview-sub-q { margin-left: 28px; margin-top: 4px; font-size: 12pt; font-weight: normal; text-align: left; }
+    .preview-opts { display: grid; grid-template-columns: 1fr 1fr; margin-left: 28px; margin-top: 4px; font-size: 12pt; font-weight: normal; text-align: left !important; }
 
     .live-counter-bar { background: #e8f0fe; border: 1px solid #aecbfa; padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: bold; color: #174ea6; }
 
@@ -156,7 +155,6 @@
 
   <button type="button" class="btn btn-add" onclick="addQuestionCard()">+ Add Question Card</button>
   
-  <!-- SINGLE ALL-IN-ONE BUTTON -->
   <button type="button" class="btn" id="generateBtn" onclick="submitSingleClickAction()" style="padding:16px; font-size:16px; background:#1a73e8;">
     🚀 Generate Paper & Download PDF
   </button>
@@ -196,7 +194,6 @@
 </div>
 
 <script>
-  // Master Teacher Database
   const TEACHERS_MASTER = [
     { id: "1-MOHIT CHUG", name: "MR. MOHIT CHUG", pass: "dav@2026" },
     { id: "2-AASHA KUMARI", name: "MS. AASHA KUMARI", pass: "dav@2026" },
@@ -626,7 +623,6 @@
         </div>
       </div>
 
-      <!-- DYNAMIC SUB-QUESTIONS CONTAINER -->
       <div class="sub-q-container" id="subQBox_${qCount}" style="display: ${q.type==='CASE_STUDY'?'block':'none'};">
         <label style="color:#1a73e8; font-size:14px; margin-bottom:8px;">📌 Sub-Questions with Optional Diagrams (Auto-Numbered):</label>
         <div id="subQList_${qCount}"></div>
@@ -771,8 +767,9 @@
 
         html += `
           <div class="preview-q-row">
+            <div style="min-width:35px; font-weight:bold;">Q.${qNum}.</div>
             <div style="flex-grow:1;">
-              <b>Q.${qNum}.</b> ${q.text}
+              ${q.text}
               ${q.qImg ? `<br><img src="${q.qImg}" style="max-height:100px; margin-top:5px;">` : ''}
             </div>
             <div style="font-weight:bold; min-width:40px; text-align:right;">[${q.marks}]</div>
@@ -804,7 +801,7 @@
           `;
         } else if (q.type === 'AR') {
           html += `
-            <div style="margin-left:45px; font-size:12pt; color:#333;">
+            <div style="margin-left:35px; font-size:12pt; color:#333;">
               (a) Both A and R are true and R is correct explanation.<br>
               (b) Both A and R are true but R is NOT correct explanation.<br>
               (c) A is true but R is false.<br>
