@@ -20,6 +20,13 @@
     .mcq-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
     .mcq-opt-box { background: #ffffff; border: 1px solid #dee2e6; padding: 8px; border-radius: 4px; }
 
+    /* Sub Questions Container Styling */
+    .sub-q-container { background: #eef2f7; border: 1px dashed #4a90e2; padding: 12px; border-radius: 6px; margin-top: 10px; }
+    .sub-q-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .sub-q-num { font-weight: bold; min-width: 35px; color: #1a73e8; font-size: 13px; }
+    .btn-sub-add { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; margin-top: 5px; }
+    .btn-sub-del { background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 12px; cursor: pointer; }
+
     .sym-toolbar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; background: #e9ecef; padding: 6px; border-radius: 4px; }
     .sym-btn { background: #ffffff; border: 1px solid #ced4da; border-radius: 3px; padding: 2px 8px; font-size: 12px; font-weight: bold; cursor: pointer; color: #0d6efd; }
     .sym-btn:hover { background: #0d6efd; color: white; }
@@ -174,14 +181,14 @@
     </div>
     <p style="font-size:12px; color:#666;">Click on any sample question below to import into your exam paper:</p>
     <div id="bankList" style="margin-top:15px;">
-      <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;" onclick="importBankQuestion('SECTION A', 'MCQ', 'What is the SI unit of Electric Current?', 1, ['Ampere', 'Volt', 'Ohm', 'Watt'])">
+      <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;" onclick="importBankQuestion('SECTION A', 'MCQ', 'What is the SI unit of Electric Current?', 1, ['Ampere', 'Volt', 'Ohm', 'Watt'], [])">
         <b>[1 Mark - MCQ]</b> What is the SI unit of Electric Current?
       </div>
-      <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;" onclick="importBankQuestion('SECTION B', 'DESCRIPTIVE', 'State Ohm\'s Law and derive its mathematical formula.', 2, [])">
+      <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;" onclick="importBankQuestion('SECTION B', 'DESCRIPTIVE', 'State Ohm\'s Law and derive its mathematical formula.', 2, [], [])">
         <b>[2 Marks - Short]</b> State Ohm's Law and derive its mathematical formula.
       </div>
-      <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;" onclick="importBankQuestion('SECTION E', 'CASE_STUDY', 'Read the passage and answer the questions:\nPhotosynthesis is the process by which green plants manufacture food.\n[sub](i) Name the organelle where it occurs.[/sub]\n[sub](ii) Write balanced chemical equation.[/sub]', 4, [])">
-        <b>[4 Marks - Case Study]</b> Read the passage and answer sub-questions.
+      <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;" onclick="importBankQuestion('SECTION E', 'CASE_STUDY', 'Read the passage and answer the questions:\nPhotosynthesis is the process by which green plants manufacture food using sunlight and chlorophyll.', 4, [], ['Name the organelle where it occurs.', 'Write balanced chemical equation.'])">
+        <b>[4 Marks - Case Study]</b> Read passage and answer sub-questions.
       </div>
     </div>
   </div>
@@ -270,6 +277,12 @@
   var currentTeacher = null;
   var qCount = 0;
   var autoSaveTimer = null;
+
+  // Roman Numeral Helper
+  function toRoman(num) {
+    const map = { 1:'(i)', 2:'(ii)', 3:'(iii)', 4:'(iv)', 5:'(v)', 6:'(vi)', 7:'(vii)', 8:'(viii)', 9:'(ix)', 10:'(x)' };
+    return map[num] || '(' + num + ')';
+  }
 
   window.addEventListener('DOMContentLoaded', function() {
     loadTeachersList();
@@ -441,6 +454,13 @@
         card.querySelectorAll('.q-opt').forEach(function(o) { opts.push(o.value); });
         card.querySelectorAll('.opt-img-input').forEach(function(oi) { optImgs.push(oi.getAttribute('data-base64') || ''); });
       }
+
+      var subQs = [];
+      if (type === 'CASE_STUDY') {
+        card.querySelectorAll('.sub-q-input').forEach(function(sq) {
+          if (sq.value.trim()) subQs.push(sq.value.trim());
+        });
+      }
       
       qData.push({ 
         section: sec, 
@@ -451,7 +471,8 @@
         marks: parseInt(marks)||1, 
         qImg: qImg,
         options: opts,
-        optImgs: optImgs 
+        optImgs: optImgs,
+        subQuestions: subQs
       });
     });
 
@@ -505,7 +526,7 @@
     card.className = 'q-card';
     card.id = 'qCard_' + qCount;
 
-    q = q || { section: 'SECTION A', type: 'MCQ', diff: 'Easy', text: '', solution: '', marks: 1, qImg: '', options: ['','','',''], optImgs: ['','','',''] };
+    q = q || { section: 'SECTION A', type: 'MCQ', diff: 'Easy', text: '', solution: '', marks: 1, qImg: '', options: ['','','',''], optImgs: ['','','',''], subQuestions: [] };
 
     var textId = 'qText_' + qCount;
     var solId = 'qSol_' + qCount;
@@ -541,7 +562,7 @@
         </div>
         
         <div class="form-group full-width">
-          <label>Question Text (Maths & Chem Symbols Toolbar - Sub-Questions wrap in [sub](i)...[/sub]):</label>
+          <label id="lblQText_${qCount}">${q.type==='CASE_STUDY'?'Passage / Main Paragraph Text:':'Question Text:'}</label>
           <div class="sym-toolbar">
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '_{2}')">x₂ (Sub)</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '^{2}')">x² (Super)</button>
@@ -557,9 +578,8 @@
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '\\\\rightarrow')">→</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '\\\\rightleftharpoons')">⇌</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '\\\\pm')">±</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '[sub](i) [/sub]')">Sub-Q (i)</button>
           </div>
-          <textarea id="${textId}" class="q-text" placeholder="Enter question text..." oninput="triggerAutoSave()">${q.text}</textarea>
+          <textarea id="${textId}" class="q-text" placeholder="${q.type==='CASE_STUDY'?'Enter main passage or paragraph here...':'Enter question text...'}" oninput="triggerAutoSave()">${q.text}</textarea>
         </div>
 
         <div class="form-group full-width">
@@ -574,6 +594,7 @@
         </div>
       </div>
 
+      <!-- MCQ OPTIONS -->
       <div class="mcq-options" id="mcqOpts_${qCount}" style="display: ${q.type==='MCQ'?'grid':'none'};">
         <div class="mcq-opt-box">
           <label>Option A Text & Image:</label>
@@ -600,10 +621,62 @@
           <img id="optPrevD_${qCount}" class="img-preview" src="${q.optImgs ? q.optImgs[3]||'' : ''}" style="display:${q.optImgs && q.optImgs[3] ? 'block' : 'none'};">
         </div>
       </div>
+
+      <!-- DYNAMIC SUB-QUESTIONS CONTAINER FOR CASE STUDY -->
+      <div class="sub-q-container" id="subQBox_${qCount}" style="display: ${q.type==='CASE_STUDY'?'block':'none'};">
+        <label style="color:#1a73e8; font-size:14px; margin-bottom:8px;">📌 Sub-Questions (Auto-Numbered):</label>
+        <div id="subQList_${qCount}"></div>
+        <button type="button" class="btn-sub-add" onclick="addSubQuestionRow('${qCount}')">+ Add Sub-Question</button>
+      </div>
     `;
     container.appendChild(card);
+
+    // Populate existing sub-questions if available
+    if (q.type === 'CASE_STUDY' && q.subQuestions && q.subQuestions.length > 0) {
+      q.subQuestions.forEach(function(subTxt) {
+        addSubQuestionRow(qCount, subTxt);
+      });
+    } else if (q.type === 'CASE_STUDY') {
+      addSubQuestionRow(qCount);
+      addSubQuestionRow(qCount);
+    }
+
     calculateLiveMarks();
     triggerAutoSave();
+  }
+
+  function addSubQuestionRow(cardNum, val) {
+    val = val || '';
+    var list = document.getElementById('subQList_' + cardNum);
+    if (!list) return;
+
+    var subIndex = list.children.length + 1;
+    var row = document.createElement('div');
+    row.className = 'sub-q-row';
+    
+    row.innerHTML = `
+      <span class="sub-q-num">${toRoman(subIndex)}</span>
+      <input type="text" class="sub-q-input" placeholder="Enter sub-question..." value="${val}" oninput="triggerAutoSave()">
+      <button type="button" class="btn-sub-del" onclick="removeSubQuestionRow(this, '${cardNum}')">X</button>
+    `;
+    list.appendChild(row);
+    reindexSubQuestions(cardNum);
+    triggerAutoSave();
+  }
+
+  function removeSubQuestionRow(btn, cardNum) {
+    btn.parentElement.remove();
+    reindexSubQuestions(cardNum);
+    triggerAutoSave();
+  }
+
+  function reindexSubQuestions(cardNum) {
+    var list = document.getElementById('subQList_' + cardNum);
+    if (!list) return;
+    var rows = list.querySelectorAll('.sub-q-row');
+    rows.forEach(function(r, idx) {
+      r.querySelector('.sub-q-num').innerText = toRoman(idx + 1);
+    });
   }
 
   function removeQuestion(id) {
@@ -614,20 +687,39 @@
   }
 
   function toggleType(selectEl, id) {
+    var val = selectEl.value;
     var optsDiv = document.getElementById('mcqOpts_' + id);
-    optsDiv.style.display = (selectEl.value === 'MCQ') ? 'grid' : 'none';
+    var subBox = document.getElementById('subQBox_' + id);
+    var lblText = document.getElementById('lblQText_' + id);
+    var qText = document.getElementById('qText_' + id);
+
+    optsDiv.style.display = (val === 'MCQ') ? 'grid' : 'none';
+    subBox.style.display = (val === 'CASE_STUDY') ? 'block' : 'none';
+
+    if (val === 'CASE_STUDY') {
+      lblText.innerText = "Passage / Main Paragraph Text:";
+      qText.placeholder = "Enter main passage or paragraph here...";
+      var subList = document.getElementById('subQList_' + id);
+      if (subList && subList.children.length === 0) {
+        addSubQuestionRow(id);
+        addSubQuestionRow(id);
+      }
+    } else {
+      lblText.innerText = "Question Text:";
+      qText.placeholder = "Enter question text...";
+    }
   }
 
   function openBankModal() { document.getElementById('bankModal').style.display = 'block'; }
   function closeBankModal() { document.getElementById('bankModal').style.display = 'none'; }
-  function importBankQuestion(sec, type, text, marks, opts) {
+  function importBankQuestion(sec, type, text, marks, opts, subQs) {
     addQuestionCard({
-      section: sec, type: type, diff: 'Medium', text: text, solution: '', marks: marks, qImg: '', options: opts, optImgs: ['','','','']
+      section: sec, type: type, diff: 'Medium', text: text, solution: '', marks: marks, qImg: '', options: opts, optImgs: ['','','',''], subQuestions: subQs || []
     });
     closeBankModal();
   }
 
-  // 📌 RENDER EXACT PREVIEW WITH JUSTIFIED MAIN PARAGRAPH & INDENTED SUB-QUESTIONS
+  // 📌 RENDER PREVIEW WITH JUSTIFIED MAIN PARAGRAPH & AUTOMATIC SUB QUESTIONS
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     var html = `
@@ -662,20 +754,22 @@
           html += `<div style="text-align:center; font-weight:bold; margin:15px 0 8px 0; font-size:14px;">${currentSec}</div>`;
         }
 
-        // Format [sub] tag for HTML preview
-        var qBodyHtml = q.text
-          .replace(/\[sub\]/g, '<div class="preview-sub-q">')
-          .replace(/\[\/sub\]/g, '</div>');
-
         html += `
           <div class="preview-q-row">
             <div style="flex-grow:1;">
-              <b>Q.${qNum}.</b> ${qBodyHtml}
+              <b>Q.${qNum}.</b> ${q.text}
               ${q.qImg ? `<br><img src="${q.qImg}" style="max-height:100px; margin-top:5px;">` : ''}
             </div>
             <div style="font-weight:bold; min-width:40px; text-align:right;">[${q.marks}]</div>
           </div>
         `;
+
+        // Sub Questions Output
+        if (q.type === 'CASE_STUDY' && q.subQuestions && q.subQuestions.length > 0) {
+          q.subQuestions.forEach(function(subTxt, idx) {
+            html += `<div class="preview-sub-q"><b>${toRoman(idx + 1)}</b> ${subTxt}</div>`;
+          });
+        }
 
         if (q.type === 'MCQ' && q.options) {
           html += `
