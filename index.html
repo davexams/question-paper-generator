@@ -40,7 +40,6 @@
     #loader { display: none; text-align: center; margin-top: 15px; color: #1a73e8; font-weight: bold; }
     #resultArea { display: none; margin-top: 25px; }
 
-    /* Clean Paper Canvas CSS */
     .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; line-height: 1.4; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; }
     .paper-preview table, .paper-preview tr, .paper-preview td { border: none !important; border-collapse: collapse !important; }
     .preview-header { text-align: center; font-weight: bold; }
@@ -157,7 +156,6 @@
   <div id="resultArea">
     <h3 style="color:#28a745; margin-bottom:15px; text-align:center;">✅ Question Paper Downloaded & Saved to Drive!</h3>
     
-    <!-- Clean Live Paper Preview -->
     <div class="paper-preview" id="paperPreviewBox"></div>
   </div>
 </div>
@@ -725,7 +723,7 @@
       html2pdf().set(opt).from(element).save();
     }, 400);
 
-    // 2. Drive Backup Creation & Public Access Sync
+    // 2. Direct Drive Backup Creation
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       google.script.run
         .withSuccessHandler(function(response) {
