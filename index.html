@@ -161,10 +161,12 @@
   <div id="loader">⏳ Generating Exact PDF & Saving to Google Drive... Please Wait</div>
 
   <div id="resultArea">
-    <h3 style="color:#28a745; margin-bottom:15px; text-align:center;">✅ Question Paper Generated & Saved to Google Drive!</h3>
-    <div id="actionButtons" style="display:flex; gap:10px; justify-content:center; margin-bottom:15px;">
-      <a id="btnPdfLink" class="btn" style="background:#dc3545; width:auto; padding:10px 20px;" target="_blank">📄 Open / Download PDF</a>
-      <a id="btnDocLink" class="btn" style="background:#28a745; width:auto; padding:10px 20px;" target="_blank">📝 Open Google Doc</a>
+    <h3 style="color:#28a745; margin-bottom:15px; text-align:center;">✅ Question Paper & Answer Key Generated & Saved in Google Drive!</h3>
+    <div id="actionButtons" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:15px;">
+      <a id="btnPdfLink" class="btn" style="background:#dc3545; width:auto; padding:10px 18px;" target="_blank">📄 Download Question Paper PDF</a>
+      <a id="btnDocLink" class="btn" style="background:#28a745; width:auto; padding:10px 18px;" target="_blank">📝 Open Question Paper Doc</a>
+      <a id="btnAnsPdfLink" class="btn" style="background:#6f42c1; width:auto; padding:10px 18px;" target="_blank">🔑 Download Answer Key PDF</a>
+      <a id="btnAnsDocLink" class="btn" style="background:#fd7e14; width:auto; padding:10px 18px;" target="_blank">🔑 Open Answer Key Doc</a>
     </div>
     <div class="paper-preview" id="paperPreviewBox"></div>
   </div>
@@ -860,9 +862,13 @@
         
         var pdfLink = document.getElementById('btnPdfLink');
         var docLink = document.getElementById('btnDocLink');
+        var ansPdfLink = document.getElementById('btnAnsPdfLink');
+        var ansDocLink = document.getElementById('btnAnsDocLink');
         
         if (pdfLink && response.pdfUrl) pdfLink.href = response.pdfUrl;
         if (docLink && response.docUrl) docLink.href = response.docUrl;
+        if (ansPdfLink && response.ansPdfUrl) ansPdfLink.href = response.ansPdfUrl;
+        if (ansDocLink && response.ansDocUrl) ansDocLink.href = response.ansDocUrl;
 
         if (response.pdfUrl) {
           window.open(response.pdfUrl, '_blank');
