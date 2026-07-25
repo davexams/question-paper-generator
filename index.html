@@ -2,6 +2,8 @@
 <html>
 <head>
   <base target="_top">
+  <!-- html2pdf.js library for Instant Local PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; color: #333; }
     .container { max-width: 950px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
@@ -42,7 +44,9 @@
     #loader { display: none; text-align: center; margin-top: 15px; color: #1a73e8; font-weight: bold; }
     #resultArea { display: none; margin-top: 25px; }
 
-    .paper-preview { background: #ffffff; border: 1px solid #d3d3d3; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: Arial, sans-serif; line-height: 1.4; color: #000; margin-bottom: 20px; }
+    /* Borderless CSS fix for Google Drive / Preview */
+    .paper-preview { background: #ffffff; border: 1px solid #d3d3d3; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; line-height: 1.4; color: #000; margin-bottom: 20px; }
+    .paper-preview table, .paper-preview tr, .paper-preview td { border: none !important; border-collapse: collapse !important; }
     .preview-header { text-align: center; font-weight: bold; }
     .preview-table { width: 100%; margin: 10px 0; border-collapse: collapse; font-weight: bold; font-size: 14px; }
     .preview-q-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 14px; }
@@ -146,18 +150,18 @@
   <div id="questionsContainer"></div>
 
   <button type="button" class="btn btn-add" onclick="addQuestionCard()">+ Add Question Card</button>
-  <button type="button" class="btn" id="generateBtn" onclick="submitPaper()">📄 Generate Paper, Solution & Live Preview</button>
+  <button type="button" class="btn" id="generateBtn" onclick="submitPaper()">🚀 Generate Paper, Solution & Live Preview</button>
 
-  <div id="loader">⏳ Generating Google Docs & PDF Files...</div>
+  <div id="loader">⏳ Generating Google Docs & PDF Files... Please Wait</div>
 
   <div id="resultArea">
     <h3 style="color:#28a745; margin-bottom:15px;">📖 Question Paper & Answer Key Ready!</h3>
     <div class="paper-preview" id="paperPreviewBox"></div>
     <div class="btn-action-group">
-      <a id="pdfLink" href="#" target="_blank" class="btn btn-pdf">📥 View/Download Question Paper PDF</a>
-      <a id="docLink" href="#" target="_blank" class="btn btn-doc">✏️ Open Editable Paper Doc (Google Docs)</a>
-      <a id="ansPdfLink" href="#" target="_blank" class="btn btn-pdf" style="background:#0275d8;">🗝️ View Answer Key PDF</a>
-      <a id="ansDocLink" href="#" target="_blank" class="btn btn-doc" style="background:#5bc0de;">📝 Open Answer Key Doc (Google Docs)</a>
+      <button onclick="downloadLocalPDF()" class="btn btn-pdf">📥 Instant Download Local PDF</button>
+      <a id="docLink" href="#" target="_blank" class="btn btn-doc">✏️ Open Editable Doc (Google Drive)</a>
+      <a id="pdfLink" href="#" target="_blank" class="btn btn-pdf" style="background:#0275d8;">🌐 Open PDF (Google Drive)</a>
+      <a id="ansDocLink" href="#" target="_blank" class="btn btn-doc" style="background:#5bc0de;">📝 Open Answer Key Doc</a>
     </div>
   </div>
 </div>
@@ -185,7 +189,7 @@
 </div>
 
 <script>
-  // 📋 75 Authorized Teachers Direct Master Database
+  // Master Teacher Database
   const TEACHERS_MASTER = [
     { id: "1-MOHIT CHUG", name: "MR. MOHIT CHUG", pass: "dav@2026" },
     { id: "2-AASHA KUMARI", name: "MS. AASHA KUMARI", pass: "dav@2026" },
@@ -295,7 +299,6 @@
     });
   }
 
-  // 🚀 INSTANT DIRECT CLIENT-SIDE LOGIN
   function handleLogin() {
     var u = document.getElementById('loginUserSelect').value;
     var p = document.getElementById('loginPass').value;
@@ -306,9 +309,7 @@
       return;
     }
 
-    var foundTeacher = TEACHERS_MASTER.find(function(t) {
-      return t.id === u;
-    });
+    var foundTeacher = TEACHERS_MASTER.find(function(t) { return t.id === u; });
 
     if (foundTeacher) {
       if (foundTeacher.pass === p.trim()) {
@@ -359,7 +360,6 @@
     }
   }
 
-  // REFRESH-PROOF LOCALPERSISTENCE
   function triggerAutoSave() {
     if (!currentTeacher) return;
     var payload = getFormData();
@@ -368,7 +368,7 @@
     var tag = document.getElementById('statusTag');
     tag.style.display = 'block';
     clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(function() { tag.style.display = 'none'; }, 1500);
+    autoSaveTimer = setTimeout(function() { tag.style.display = 'none'; }, 1200);
   }
 
   function calculateLiveMarks() {
@@ -696,6 +696,25 @@
     box.innerHTML = html;
   }
 
+  // 📥 Instant Local PDF Generation Fix
+  function downloadLocalPDF() {
+    var element = document.getElementById('paperPreviewBox');
+    var cls = document.getElementById('className').value;
+    var sub = document.getElementById('subject').value;
+    var filename = `DAV_Question_Paper_Class_${cls}_${sub}_${Date.now()}.pdf`;
+
+    var opt = {
+      margin:       [0.4, 0.4, 0.4, 0.4],
+      filename:     filename,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+  }
+
+  // 🚀 FAIL-SAFE HYBRID PAPER GENERATOR
   function submitPaper() {
     var loader = document.getElementById('loader');
     var resultArea = document.getElementById('resultArea');
@@ -705,30 +724,44 @@
     renderPreview(payload);
 
     loader.style.display = 'block';
-    resultArea.style.display = 'none';
+    resultArea.style.display = 'block';
     generateBtn.disabled = true;
 
+    // Direct Local Render Display
+    resultArea.scrollIntoView({ behavior: 'smooth' });
+
+    var isServerDone = false;
+
+    // Call Google Apps Script Backend to save in Drive
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       google.script.run
         .withSuccessHandler(function(response) {
+          isServerDone = true;
           loader.style.display = 'none';
           generateBtn.disabled = false;
-          if (response) {
+          if (response && response.success) {
             document.getElementById('pdfLink').href = response.pdfUrl;
             document.getElementById('docLink').href = response.docUrl;
-            document.getElementById('ansPdfLink').href = response.ansPdfUrl;
             document.getElementById('ansDocLink').href = response.ansDocUrl;
-            resultArea.style.display = 'block';
-            resultArea.scrollIntoView({ behavior: 'smooth' });
+          } else {
+            console.log("Drive Save Error:", response ? response.message : "Unknown");
           }
         })
         .withFailureHandler(function(err) {
+          isServerDone = true;
           loader.style.display = 'none';
           generateBtn.disabled = false;
-          alert("Error: " + err.message);
         })
         .createQuestionPaper(payload, currentTeacher);
     }
+
+    // Safety Timeout: Release Loader after 5s so UI is never stuck
+    setTimeout(function() {
+      if (!isServerDone) {
+        loader.style.display = 'none';
+        generateBtn.disabled = false;
+      }
+    }, 5000);
   }
 </script>
 
