@@ -22,7 +22,8 @@
 
     /* Sub Questions Container Styling */
     .sub-q-container { background: #eef2f7; border: 1px dashed #4a90e2; padding: 12px; border-radius: 6px; margin-top: 10px; }
-    .sub-q-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .sub-q-card { background: #ffffff; border: 1px solid #ced4da; border-radius: 5px; padding: 10px; margin-bottom: 10px; }
+    .sub-q-row { display: flex; gap: 8px; align-items: center; }
     .sub-q-num { font-weight: bold; min-width: 35px; color: #1a73e8; font-size: 13px; }
     .btn-sub-add { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; margin-top: 5px; }
     .btn-sub-del { background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 12px; cursor: pointer; }
@@ -187,7 +188,7 @@
       <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;" onclick="importBankQuestion('SECTION B', 'DESCRIPTIVE', 'State Ohm\'s Law and derive its mathematical formula.', 2, [], [])">
         <b>[2 Marks - Short]</b> State Ohm's Law and derive its mathematical formula.
       </div>
-      <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;" onclick="importBankQuestion('SECTION E', 'CASE_STUDY', 'Read the passage and answer the questions:\nPhotosynthesis is the process by which green plants manufacture food using sunlight and chlorophyll.', 4, [], ['Name the organelle where it occurs.', 'Write balanced chemical equation.'])">
+      <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;" onclick="importBankQuestion('SECTION E', 'CASE_STUDY', 'Read the passage and answer the questions:\nPhotosynthesis is the process by which green plants manufacture food using sunlight and chlorophyll.', 4, [], [{text:'Name the organelle where it occurs.', img:''},{text:'Write balanced chemical equation.', img:''}])">
         <b>[4 Marks - Case Study]</b> Read passage and answer sub-questions.
       </div>
     </div>
@@ -457,8 +458,12 @@
 
       var subQs = [];
       if (type === 'CASE_STUDY') {
-        card.querySelectorAll('.sub-q-input').forEach(function(sq) {
-          if (sq.value.trim()) subQs.push(sq.value.trim());
+        card.querySelectorAll('.sub-q-card').forEach(function(sCard) {
+          var sTxt = sCard.querySelector('.sub-q-input').value;
+          var sImg = sCard.querySelector('.sub-img-input') ? sCard.querySelector('.sub-img-input').getAttribute('data-base64') || '' : '';
+          if (sTxt.trim() || sImg) {
+            subQs.push({ text: sTxt.trim(), img: sImg });
+          }
         });
       }
       
@@ -622,9 +627,9 @@
         </div>
       </div>
 
-      <!-- DYNAMIC SUB-QUESTIONS CONTAINER FOR CASE STUDY -->
+      <!-- DYNAMIC SUB-QUESTIONS CONTAINER WITH IMAGE SUPPORT FOR CASE STUDY -->
       <div class="sub-q-container" id="subQBox_${qCount}" style="display: ${q.type==='CASE_STUDY'?'block':'none'};">
-        <label style="color:#1a73e8; font-size:14px; margin-bottom:8px;">📌 Sub-Questions (Auto-Numbered):</label>
+        <label style="color:#1a73e8; font-size:14px; margin-bottom:8px;">📌 Sub-Questions with Optional Diagrams (Auto-Numbered):</label>
         <div id="subQList_${qCount}"></div>
         <button type="button" class="btn-sub-add" onclick="addSubQuestionRow('${qCount}')">+ Add Sub-Question</button>
       </div>
@@ -633,8 +638,12 @@
 
     // Populate existing sub-questions if available
     if (q.type === 'CASE_STUDY' && q.subQuestions && q.subQuestions.length > 0) {
-      q.subQuestions.forEach(function(subTxt) {
-        addSubQuestionRow(qCount, subTxt);
+      q.subQuestions.forEach(function(subObj) {
+        if (typeof subObj === 'string') {
+          addSubQuestionRow(qCount, { text: subObj, img: '' });
+        } else {
+          addSubQuestionRow(qCount, subObj);
+        }
       });
     } else if (q.type === 'CASE_STUDY') {
       addSubQuestionRow(qCount);
@@ -645,27 +654,36 @@
     triggerAutoSave();
   }
 
-  function addSubQuestionRow(cardNum, val) {
-    val = val || '';
+  function addSubQuestionRow(cardNum, subData) {
+    subData = subData || { text: '', img: '' };
     var list = document.getElementById('subQList_' + cardNum);
     if (!list) return;
 
     var subIndex = list.children.length + 1;
-    var row = document.createElement('div');
-    row.className = 'sub-q-row';
+    var subRowId = 'subImgPrev_' + cardNum + '_' + Date.now() + '_' + Math.floor(Math.random()*1000);
     
-    row.innerHTML = `
-      <span class="sub-q-num">${toRoman(subIndex)}</span>
-      <input type="text" class="sub-q-input" placeholder="Enter sub-question..." value="${val}" oninput="triggerAutoSave()">
-      <button type="button" class="btn-sub-del" onclick="removeSubQuestionRow(this, '${cardNum}')">X</button>
+    var card = document.createElement('div');
+    card.className = 'sub-q-card';
+    
+    card.innerHTML = `
+      <div class="sub-q-row">
+        <span class="sub-q-num">${toRoman(subIndex)}</span>
+        <input type="text" class="sub-q-input" placeholder="Enter sub-question text..." value="${subData.text || ''}" oninput="triggerAutoSave()">
+        <button type="button" class="btn-sub-del" onclick="removeSubQuestionRow(this, '${cardNum}')">X</button>
+      </div>
+      <div style="margin-top:6px; margin-left:35px;">
+        <label style="font-size:11px; color:#666; font-weight:600;">🖼️ Sub-Question Diagram (Optional):</label>
+        <input type="file" class="sub-img-input" accept="image/*" data-base64="${subData.img || ''}" onchange="handleImageUpload(this, '${subRowId}')">
+        <img id="${subRowId}" class="img-preview" src="${subData.img || ''}" style="display:${subData.img ? 'block' : 'none'};">
+      </div>
     `;
-    list.appendChild(row);
+    list.appendChild(card);
     reindexSubQuestions(cardNum);
     triggerAutoSave();
   }
 
   function removeSubQuestionRow(btn, cardNum) {
-    btn.parentElement.remove();
+    btn.closest('.sub-q-card').remove();
     reindexSubQuestions(cardNum);
     triggerAutoSave();
   }
@@ -673,9 +691,9 @@
   function reindexSubQuestions(cardNum) {
     var list = document.getElementById('subQList_' + cardNum);
     if (!list) return;
-    var rows = list.querySelectorAll('.sub-q-row');
-    rows.forEach(function(r, idx) {
-      r.querySelector('.sub-q-num').innerText = toRoman(idx + 1);
+    var cards = list.querySelectorAll('.sub-q-card');
+    cards.forEach(function(c, idx) {
+      c.querySelector('.sub-q-num').innerText = toRoman(idx + 1);
     });
   }
 
@@ -719,7 +737,7 @@
     closeBankModal();
   }
 
-  // 📌 RENDER PREVIEW WITH JUSTIFIED MAIN PARAGRAPH & AUTOMATIC SUB QUESTIONS
+  // 📌 RENDER PREVIEW WITH JUSTIFIED MAIN PARAGRAPH & SUB QUESTIONS WITH IMAGES
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     var html = `
@@ -764,10 +782,18 @@
           </div>
         `;
 
-        // Sub Questions Output
+        // Sub Questions Output with Image Preview
         if (q.type === 'CASE_STUDY' && q.subQuestions && q.subQuestions.length > 0) {
-          q.subQuestions.forEach(function(subTxt, idx) {
-            html += `<div class="preview-sub-q"><b>${toRoman(idx + 1)}</b> ${subTxt}</div>`;
+          q.subQuestions.forEach(function(subObj, idx) {
+            var subTxt = typeof subObj === 'string' ? subObj : subObj.text;
+            var subImg = typeof subObj === 'string' ? '' : subObj.img;
+            
+            html += `
+              <div class="preview-sub-q">
+                <b>${toRoman(idx + 1)}</b> ${subTxt}
+                ${subImg ? `<br><img src="${subImg}" style="max-height:80px; margin-top:4px;">` : ''}
+              </div>
+            `;
           });
         }
 
