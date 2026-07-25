@@ -100,13 +100,8 @@
       <input type="text" id="schoolName" value="DAV PUBLIC SCHOOL" oninput="triggerAutoSave()">
     </div>
     <div class="form-group">
-      <label>Class (Select 9th to 12th):</label>
-      <select id="className" onchange="triggerAutoSave()">
-        <option value="9">Class 9th</option>
-        <option value="10" selected>Class 10th</option>
-        <option value="11">Class 11th</option>
-        <option value="12">Class 12th</option>
-      </select>
+      <label>Class:</label>
+      <input type="text" id="className" value="10th" placeholder="e.g. 3rd, 5th-A, 10th-B" oninput="triggerAutoSave()">
     </div>
     <div class="form-group">
       <label>Subject (e.g. Science / Physics / Maths):</label>
@@ -353,7 +348,7 @@
   function resetForNewPaper() {
     if (confirm("Kya aap naya paper shuru karna chahte hain? Purana unsaved data clear ho jayega.")) {
       document.getElementById('schoolName').value = 'DAV PUBLIC SCHOOL';
-      document.getElementById('className').value = '10';
+      document.getElementById('className').value = '10th';
       document.getElementById('subject').value = 'Science';
       document.getElementById('examTitle').value = 'Annual Exam';
       document.getElementById('session').value = '2026';
@@ -504,7 +499,7 @@
 
   function populateDraftFields(d) {
     document.getElementById('schoolName').value = d.schoolName || 'DAV PUBLIC SCHOOL';
-    document.getElementById('className').value = d.className || '10';
+    document.getElementById('className').value = d.className || '10th';
     document.getElementById('subject').value = d.subject || 'Science';
     document.getElementById('examTitle').value = d.examTitle || 'Annual Exam';
     document.getElementById('session').value = d.session || '2026';
@@ -820,7 +815,7 @@
     html += `
       <div class="preview-footer">
         <hr class="preview-footer-line">
-        <div>${data.examTitle || 'PT-3 Examination'} | CLASS ${data.className || '10'} (${(data.subject || 'SCIENCE').toUpperCase()}) | Page 1</div>
+        <div>${data.examTitle || 'PT-3 Examination'} | CLASS ${data.className || '10th'} (${(data.subject || 'SCIENCE').toUpperCase()}) | Page 1</div>
       </div>
     `;
 
