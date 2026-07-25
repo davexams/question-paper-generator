@@ -11,12 +11,19 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <!-- HTML to DOCX Converter -->
     <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.min.js"></script>
+    <!-- HTML to PDF Converter for Instant Local Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @media print {
             .no-print { display: none !important; }
             .print-area { width: 100%; border: none !important; box-shadow: none !important; padding: 0 !important; font-family: 'Times New Roman', Times, serif; }
         }
         .cbse-font { font-family: 'Times New Roman', Times, serif; }
+        /* Table border fix for Word and Drive */
+        #paperContainer table, #paperContainer td, #paperContainer tr {
+            border: none !important;
+            border-collapse: collapse !important;
+        }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800">
@@ -193,25 +200,30 @@
                 </form>
             </div>
 
-            <!-- EXPORT ACTION BUTTON -->
-            <button onclick="saveAndSyncDrive()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold text-sm shadow">
-                📄 Generate Paper & Save to Google Drive (PDF + Word)
-            </button>
+            <!-- EXPORT ACTION BUTTONS -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <button onclick="downloadLocalPDF()" class="bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-bold text-sm shadow">
+                    📥 Download PDF (Local Device)
+                </button>
+                <button onclick="saveAndSyncDrive()" class="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold text-sm shadow">
+                    ☁️ Save to Google Drive (PDF + Word)
+                </button>
+            </div>
         </div>
 
         <!-- GENERATED PAPER PREVIEW -->
         <div id="paperContainer" class="print-area cbse-font bg-white p-8 rounded-xl shadow border mt-8">
             <div style="text-align: center; margin-bottom: 20px;">
-                <h2 id="paperSchoolName" style="font-size: 18pt; font-weight: bold; margin: 0;">DAV PUBLIC SCHOOL, SUNDER NAGAR</h2>
-                <h3 id="paperExamHeader" style="font-size: 13pt; font-weight: bold; margin: 5px 0;">Class 10 - Science - PT-3 Examination (2026)</h3>
+                <h2 id="paperSchoolName" style="font-size: 18pt; font-weight: bold; margin: 0; color:#000;">DAV PUBLIC SCHOOL, SUNDER NAGAR</h2>
+                <h3 id="paperExamHeader" style="font-size: 13pt; font-weight: bold; margin: 5px 0; color:#000;">Class 10 - Science - PT-3 Examination (2026)</h3>
                 
-                <table style="width: 100%; margin-top: 10px; border-bottom: 1px solid #000; font-weight: bold; font-size: 11pt;">
+                <table style="width: 100%; margin-top: 10px; border-bottom: 1px solid #000 !important; border-top: none !important; border-left: none !important; border-right: none !important; font-weight: bold; font-size: 11pt;">
                     <tr>
-                        <td id="paperTime" style="text-align: left;">Time Allowed: 3 Hours</td>
-                        <td id="paperMaxMarks" style="text-align: right;">Max Marks: 80</td>
+                        <td id="paperTime" style="text-align: left; border: none !important;">Time Allowed: 3 Hours</td>
+                        <td id="paperMaxMarks" style="text-align: right; border: none !important;">Max Marks: 80</td>
                     </tr>
                 </table>
-                <div style="text-align: left; margin-top: 5px; font-size: 10pt; white-space: pre-line;">
+                <div style="text-align: left; margin-top: 5px; font-size: 10pt; white-space: pre-line; color:#000;">
                     <span id="paperInstructions">1. The question paper contains 5 sections A, B, C, D and E.
 2. Section A consists of Multiple Choice Questions carrying 1 mark each.
 3. All questions are compulsory.</span>
