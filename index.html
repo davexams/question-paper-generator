@@ -2,6 +2,8 @@
 <html>
 <head>
   <base target="_top">
+  <!-- Viewport for Mobile Responsiveness -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; color: #333; }
     .container { max-width: 950px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
@@ -34,7 +36,7 @@
     .btn-sub-del { background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 12px; cursor: pointer; }
 
     .sym-toolbar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; background: #e9ecef; padding: 6px; border-radius: 4px; }
-    .sym-btn { background: #ffffff; border: 1px solid #ced4da; border-radius: 3px; padding: 2px 8px; font-size: 12px; font-weight: bold; cursor: pointer; color: #0d6efd; }
+    .sym-btn { background: #ffffff; border: 1px solid #ced4da; border-radius: 3px; padding: 4px 8px; font-size: 12px; font-weight: bold; cursor: pointer; color: #0d6efd; }
     .sym-btn:hover { background: #0d6efd; color: white; }
 
     .btn { background-color: #1a73e8; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 15px; font-weight: bold; width: 100%; text-decoration: none; display: inline-block; text-align: center; box-sizing: border-box; }
@@ -45,25 +47,55 @@
     .btn-bank:hover { background-color: #593196; }
     .btn-del { background-color: #ea4335; width: auto; padding: 4px 8px; font-size: 12px; position: absolute; right: 10px; top: 10px; }
 
-    .img-preview { max-height: 80px; margin-top: 5px; display: block; border: 1px solid #ddd; border-radius: 3px; }
+    .img-preview { max-height: 80px; margin-top: 5px; display: block; border: 1px solid #ddd; border-radius: 3px; max-width: 100%; object-fit: contain; }
 
-    #statusTag { position: fixed; top: 15px; right: 15px; background: #e6f4ea; color: #137333; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ceead6; display: none; }
+    #statusTag { position: fixed; top: 15px; right: 15px; background: #e6f4ea; color: #137333; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ceead6; display: none; z-index: 1000; }
     #loader { display: none; text-align: center; margin-top: 15px; color: #1a73e8; font-weight: bold; }
     #resultArea { display: none; margin-top: 25px; }
 
-    .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.3; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; }
+    .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.3; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; overflow-x: auto; }
     .paper-preview table, .paper-preview tr, .paper-preview td { border: none !important; border-collapse: collapse !important; }
     .preview-header { text-align: center; font-weight: bold; }
     .preview-table { width: 100%; margin: 10px 0; border-collapse: collapse; font-weight: bold; font-size: 12pt; }
     .preview-q-row { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12pt; font-weight: normal; text-align: justify; }
 
-    .live-counter-bar { background: #e8f0fe; border: 1px solid #aecbfa; padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: bold; color: #174ea6; }
+    .live-counter-bar { background: #e8f0fe; border: 1px solid #aecbfa; padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: bold; color: #174ea6; flex-wrap: wrap; gap: 8px; }
 
     .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-    .modal-content { background: white; margin: 5% auto; padding: 20px; width: 80%; max-width: 700px; border-radius: 8px; max-height: 80vh; overflow-y: auto; }
+    .modal-content { background: white; margin: 5% auto; padding: 20px; width: 90%; max-width: 700px; border-radius: 8px; max-height: 80vh; overflow-y: auto; box-sizing: border-box; }
 
     .preview-footer { margin-top: 30px; text-align: center; font-size: 10pt; font-weight: bold; color: #555; }
     .preview-footer-line { border: 0; border-top: 1px solid #888; margin-bottom: 6px; }
+
+    /* =========================================================
+       📱 MOBILE RESPONSIVE MEDIA QUERIES (ADDITIONS)
+       ========================================================= */
+    @media screen and (max-width: 768px) {
+      body { padding: 10px; }
+      .container { padding: 15px; }
+      #loginBox { margin: 30px auto; padding: 20px; width: 100%; box-sizing: border-box; }
+      
+      .form-grid { grid-template-columns: 1fr; gap: 10px; }
+      .full-width { grid-column: span 1; }
+      
+      .mcq-options { grid-template-columns: 1fr; gap: 10px; }
+      
+      .header-portal-bar { flex-direction: column; align-items: flex-start !important; gap: 10px; }
+      .header-portal-bar > div { width: 100%; justify-content: space-between; }
+      
+      .section-header-bar { flex-direction: column; align-items: stretch !important; gap: 10px; }
+      .btn-bank { width: 100%; text-align: center; margin-bottom: 10px; }
+      
+      .paper-preview { padding: 15px; font-size: 11pt; }
+      
+      .live-counter-bar { flex-direction: column; align-items: flex-start; }
+      
+      .sub-q-row { flex-wrap: wrap; }
+      .sub-q-input { width: 100%; }
+      
+      #actionButtons { flex-direction: column; }
+      #actionButtons .btn { width: 100% !important; }
+    }
   </style>
 </head>
 <body>
@@ -91,7 +123,7 @@
 
 <!-- MAIN PORTAL CONTAINER -->
 <div class="container" id="appPortal" style="display:none;">
-  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #eee; padding-bottom:10px; margin-bottom:20px;">
+  <div class="header-portal-bar" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #eee; padding-bottom:10px; margin-bottom:20px;">
     <h3 style="margin:0;">Welcome, <span id="teacherNameSpan">Teacher</span>!</h3>
     <div style="display:flex; gap:10px;">
       <button class="btn" style="width:auto; padding:6px 15px; background:#17a2b8;" onclick="resetForNewPaper()">➕ New Paper</button>
@@ -157,7 +189,7 @@
     <span id="statCurrentMarksBadge">Current Total: <span id="statCurrentMarks">0</span> / <span id="statTargetMarks2">80</span></span>
   </div>
 
-  <div style="display:flex; justify-content:space-between; align-items:center;">
+  <div class="section-header-bar" style="display:flex; justify-content:space-between; align-items:center;">
     <h3>Questions Engine & Marking Scheme Setup</h3>
     <button type="button" class="btn btn-bank" onclick="openBankModal()">📚 Insert from Question Bank</button>
   </div>
