@@ -44,7 +44,6 @@
     #loader { display: none; text-align: center; margin-top: 15px; color: #1a73e8; font-weight: bold; }
     #resultArea { display: none; margin-top: 25px; }
 
-    /* Borderless CSS fix for Google Drive / Preview */
     .paper-preview { background: #ffffff; border: 1px solid #d3d3d3; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; line-height: 1.4; color: #000; margin-bottom: 20px; }
     .paper-preview table, .paper-preview tr, .paper-preview td { border: none !important; border-collapse: collapse !important; }
     .preview-header { text-align: center; font-weight: bold; }
@@ -150,18 +149,24 @@
   <div id="questionsContainer"></div>
 
   <button type="button" class="btn btn-add" onclick="addQuestionCard()">+ Add Question Card</button>
-  <button type="button" class="btn" id="generateBtn" onclick="submitPaper()">🚀 Generate Paper, Solution & Live Preview</button>
+  
+  <!-- SINGLE ACTION BUTTON -->
+  <button type="button" class="btn" id="generateBtn" onclick="submitSingleClickAction()" style="padding:16px; font-size:16px; background:#1a73e8;">
+    🚀 Generate Paper, Download Local PDF & Save to Drive
+  </button>
 
-  <div id="loader">⏳ Generating Google Docs & PDF Files... Please Wait</div>
+  <div id="loader">⏳ Generating Paper, Local PDF & Drive Files... Please Wait</div>
 
   <div id="resultArea">
-    <h3 style="color:#28a745; margin-bottom:15px;">📖 Question Paper & Answer Key Ready!</h3>
+    <h3 style="color:#28a745; margin-bottom:15px;">📖 Question Paper & Drive Backups Ready!</h3>
     <div class="paper-preview" id="paperPreviewBox"></div>
-    <div class="btn-action-group">
-      <button onclick="downloadLocalPDF()" class="btn btn-pdf">📥 Instant Download Local PDF</button>
-      <a id="docLink" href="#" target="_blank" class="btn btn-doc">✏️ Open Editable Doc (Google Drive)</a>
-      <a id="pdfLink" href="#" target="_blank" class="btn btn-pdf" style="background:#0275d8;">🌐 Open PDF (Google Drive)</a>
-      <a id="ansDocLink" href="#" target="_blank" class="btn btn-doc" style="background:#5bc0de;">📝 Open Answer Key Doc</a>
+    
+    <!-- WORKING DIRECT LINKS -->
+    <div class="btn-action-group" id="linksContainer">
+      <a id="docLink" href="#" target="_blank" class="btn btn-doc" style="pointer-events:none; opacity:0.6;">✏️ Open Editable Paper Doc (Google Drive)</a>
+      <a id="pdfLink" href="#" target="_blank" class="btn btn-pdf" style="pointer-events:none; opacity:0.6; background:#0275d8;">🌐 Open Paper PDF (Google Drive)</a>
+      <a id="ansDocLink" href="#" target="_blank" class="btn btn-doc" style="pointer-events:none; opacity:0.6; background:#5bc0de;">📝 Open Answer Key Doc (Google Drive)</a>
+      <a id="ansPdfLink" href="#" target="_blank" class="btn btn-pdf" style="pointer-events:none; opacity:0.6; background:#6c757d;">🗝️ Open Answer Key PDF (Google Drive)</a>
     </div>
   </div>
 </div>
@@ -696,26 +701,8 @@
     box.innerHTML = html;
   }
 
-  // 📥 Instant Local PDF Generation Fix
-  function downloadLocalPDF() {
-    var element = document.getElementById('paperPreviewBox');
-    var cls = document.getElementById('className').value;
-    var sub = document.getElementById('subject').value;
-    var filename = `DAV_Question_Paper_Class_${cls}_${sub}_${Date.now()}.pdf`;
-
-    var opt = {
-      margin:       [0.4, 0.4, 0.4, 0.4],
-      filename:     filename,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, logging: false },
-      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(element).save();
-  }
-
-  // 🚀 FAIL-SAFE HYBRID PAPER GENERATOR
-  function submitPaper() {
+  // 🎯 ALL-IN-ONE SINGLE CLICK ENGINE
+  function submitSingleClickAction() {
     var loader = document.getElementById('loader');
     var resultArea = document.getElementById('resultArea');
     var generateBtn = document.getElementById('generateBtn');
@@ -726,42 +713,62 @@
     loader.style.display = 'block';
     resultArea.style.display = 'block';
     generateBtn.disabled = true;
-
-    // Direct Local Render Display
     resultArea.scrollIntoView({ behavior: 'smooth' });
 
-    var isServerDone = false;
+    // 1. Instant Local PDF Download Trigger
+    var element = document.getElementById('paperPreviewBox');
+    var cls = document.getElementById('className').value;
+    var sub = document.getElementById('subject').value;
+    var filename = `DAV_Paper_Class_${cls}_${sub}_${Date.now()}.pdf`;
 
-    // Call Google Apps Script Backend to save in Drive
+    var opt = {
+      margin:       [0.4, 0.4, 0.4, 0.4],
+      filename:     filename,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    // Download Local PDF
+    html2pdf().set(opt).from(element).save().then(function() {
+      console.log("Local PDF Downloaded!");
+    });
+
+    // 2. Drive Sync Trigger via Backend Apps Script
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       google.script.run
         .withSuccessHandler(function(response) {
-          isServerDone = true;
           loader.style.display = 'none';
           generateBtn.disabled = false;
           if (response && response.success) {
-            document.getElementById('pdfLink').href = response.pdfUrl;
-            document.getElementById('docLink').href = response.docUrl;
-            document.getElementById('ansDocLink').href = response.ansDocUrl;
+            enableDriveLink('docLink', response.docUrl);
+            enableDriveLink('pdfLink', response.pdfUrl);
+            enableDriveLink('ansDocLink', response.ansDocUrl);
+            enableDriveLink('ansPdfLink', response.ansPdfUrl);
+            alert("🚀 Success! Local PDF Downloaded & Drive Backups Generated!");
           } else {
-            console.log("Drive Save Error:", response ? response.message : "Unknown");
+            alert("⚠️ Local PDF downloaded! Drive Error: " + (response ? response.message : "Access error"));
           }
         })
         .withFailureHandler(function(err) {
-          isServerDone = true;
           loader.style.display = 'none';
           generateBtn.disabled = false;
+          alert("⚠️ Local PDF downloaded! Drive Error: " + err.message);
         })
         .createQuestionPaper(payload, currentTeacher);
+    } else {
+      loader.style.display = 'none';
+      generateBtn.disabled = false;
     }
+  }
 
-    // Safety Timeout: Release Loader after 5s so UI is never stuck
-    setTimeout(function() {
-      if (!isServerDone) {
-        loader.style.display = 'none';
-        generateBtn.disabled = false;
-      }
-    }, 5000);
+  function enableDriveLink(elementId, url) {
+    var el = document.getElementById(elementId);
+    if (el && url) {
+      el.href = url;
+      el.style.pointerEvents = 'auto';
+      el.style.opacity = '1';
+    }
   }
 </script>
 
