@@ -1,4 +1,4 @@
-// ☁️ Google Apps Script Deployed URL
+// ☁️ Google Apps Script Deployed Web App URL
 const GOOGLE_DRIVE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySjz8FdbEwywn3stjX--ThZvAQNOYM1iXvXpcE-tmLth7SoGyMUmIK-20JZhyJOnMq/exec";
 
 // 📋 Authorized Teachers Database (All 75 Teachers Included)
@@ -83,7 +83,7 @@ const TEACHER_DATABASE = [
 let loggedInTeacher = null;
 let questionBank = [];
 
-// 🔒 AUTHENTICATION
+// 🔒 AUTHENTICATION SYSTEM
 function handleLogin(e) {
     e.preventDefault();
     const enteredId = document.getElementById('loginId').value.trim().toUpperCase();
@@ -102,7 +102,7 @@ function handleLogin(e) {
         sessionStorage.setItem('teacherSession', JSON.stringify(teacher));
         loadQuestionBank();
     } else {
-        alert("❌ Invalid Teacher ID or Password!");
+        alert("❌ Invalid Teacher ID/Username or Password!");
     }
 }
 
@@ -111,6 +111,7 @@ function logout() {
     location.reload();
 }
 
+// Keep login state active on refresh
 window.onload = () => {
     const saved = sessionStorage.getItem('teacherSession');
     if (saved) {
@@ -122,22 +123,22 @@ window.onload = () => {
     }
 };
 
-// 📂 LOAD QUESTION BANK
+// 📂 LOAD INITIAL QUESTION BANK
 function loadQuestionBank() {
     fetch('questions.json')
         .then(res => res.json())
         .then(data => questionBank = data)
-        .catch(() => console.log("Starting with dynamic bank"));
+        .catch(() => console.log("Starting with empty or dynamic question bank"));
 }
 
-// 🔀 UI HANDLERS
+// 🔀 UI TYPE CHANGE HANDLER
 function handleTypeChange() {
     const type = document.getElementById('newType').value;
     document.getElementById('mcqBlock').classList.toggle('hidden', type !== 'MCQ');
     document.getElementById('arBlock').classList.toggle('hidden', type !== 'AR');
 }
 
-// ➕ ADD QUESTION
+// ➕ ADD NEW QUESTION & AUTO-SYNC BANK TO GOOGLE DRIVE
 function addNewQuestion(e) {
     e.preventDefault();
     const qType = document.getElementById('newType').value;
@@ -165,13 +166,30 @@ function addNewQuestion(e) {
         newQ.reason = document.getElementById('reasonText').value;
     }
 
+    // Add to Local Array
     questionBank.push(newQ);
-    alert("✅ Question Saved! Total in bank: " + questionBank.length);
+
+    // ☁️ Auto Sync Question Bank to Google Drive
+    const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
+    const bankData = JSON.stringify(questionBank, null, 2);
+
+    fetch(GOOGLE_DRIVE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            htmlContent: bankData,
+            fileName: `Question_Bank_Backup_By_${teacherName.replace(/ /g, '_')}`
+        })
+    })
+    .then(() => alert("✅ Question Saved locally & Bank Backup Synced to Google Drive!"))
+    .catch(() => alert("✅ Question Saved locally!"));
+
     e.target.reset();
     handleTypeChange();
 }
 
-// 📄 GENERATE PAPER
+// 📄 GENERATE QUESTION PAPER
 function generatePaper() {
     const selectedClass = document.getElementById('classSelect').value;
     const selectedSubject = document.getElementById('subjectSelect').value;
@@ -184,7 +202,7 @@ function generatePaper() {
     const filtered = questionBank.filter(q => q.class === selectedClass && q.subject === selectedSubject);
 
     if (filtered.length === 0) {
-        alert("No questions found for this class/subject!");
+        alert("No questions found for this class and subject selection!");
         return;
     }
 
@@ -214,39 +232,40 @@ function generatePaper() {
 
     document.getElementById('paperTotalMarks').innerText = totalMarks;
 
+    // Trigger MathJax equation rendering
     if (window.MathJax) MathJax.typesetPromise();
 }
 
-// 📥 DOWNLOAD DOCX & AUTO SYNC GOOGLE DRIVE
+// 📥 DOWNLOAD DOCX & AUTO SYNC PAPER TO GOOGLE DRIVE
 function downloadAsDocx() {
     const paperElement = document.getElementById('paperContainer');
     const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
     const className = document.getElementById('paperClass').innerText;
     const subjectName = document.getElementById('paperSubject').innerText;
     
-    const fileName = `${subjectName}_Class${className}_${teacherName.replace(/ /g, '_')}`;
+    const fileName = `${subjectName}_Class${className}_${teacherName.replace(/ /g, '_')}_Paper`;
 
     const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><title>Question Paper</title><style>body{font-family:Arial, sans-serif;}</style></head><body>";
     const footer = "</body></html>";
     const htmlContent = header + paperElement.innerHTML + footer;
 
-    // 1. Local Word Download
+    // 1. Local Word Document (.docx) Download
     const converted = htmlDocx.asBlob(htmlContent);
     const link = document.createElement('a');
     link.href = URL.createObjectURL(converted);
     link.download = `${fileName}.docx`;
     link.click();
 
-    // 2. Google Drive Sync
+    // 2. Background Google Drive Sync
     fetch(GOOGLE_DRIVE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ htmlContent: htmlContent, fileName: fileName })
-    }).then(() => alert("✅ Downloaded locally & Auto-saved to School Google Drive!"));
+    }).then(() => alert("✅ Paper Downloaded & Saved to School Google Drive!"));
 }
 
-// EXPORT BANK JSON
+// EXPORT QUESTION BANK JSON MANUALLY
 function downloadQuestionBank() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questionBank, null, 2));
     const dl = document.createElement('a');
@@ -257,7 +276,19 @@ function downloadQuestionBank() {
     dl.remove();
 }
 
+// TAB SWITCHER
 function switchTab(tab) {
     document.getElementById('paperSection').classList.toggle('hidden', tab !== 'paper');
     document.getElementById('addSection').classList.toggle('hidden', tab !== 'add');
+    
+    const btnPaper = document.getElementById('btnTabPaper');
+    const btnAdd = document.getElementById('btnTabAdd');
+
+    if (tab === 'paper') {
+        btnPaper.className = "bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow";
+        btnAdd.className = "bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold";
+    } else {
+        btnAdd.className = "bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow";
+        btnPaper.className = "bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold";
+    }
 }
