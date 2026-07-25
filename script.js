@@ -162,7 +162,6 @@ async function addQuestionToPaper(e) {
     document.getElementById('qDiagram').value = "";
 }
 
-// Borderless tables for clean rendering
 function renderPaperUI() {
     updatePaperHeader();
     const container = document.getElementById('questionsList');
@@ -216,54 +215,71 @@ function updatePaperHeader() {
     document.getElementById('paperMaxMarks').innerText = `Max Marks: ${document.getElementById('maxMarksInput').value}`;
 }
 
-// 📥 INSTANT LOCAL PDF DOWNLOAD FUNCTION
-function downloadLocalPDF() {
-    const element = document.getElementById('paperContainer');
-    const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
-    const filename = `DAV_Paper_${teacherName.replace(/ /g, '_')}_${Date.now()}.pdf`;
+// 🎯 SINGLE CLICK MULTI-TASKING FUNCTION (LOCAL DOWNLOAD + DRIVE SYNC)
+async function processAllInOneAction() {
+    if (currentPaperQuestions.length === 0) {
+        alert("⚠️ Please add at least one question before generating the paper!");
+        return;
+    }
 
-    const opt = {
-        margin:       0.5,
-        filename:     filename,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
+    const btn = document.getElementById('mainActionBtn');
+    btn.disabled = true;
+    btn.innerText = "⏳ Generating & Syncing... Please Wait";
 
-    html2pdf().set(opt).from(element).save();
-}
+    // 1. Ensure MathJax is fully rendered
+    if (window.MathJax) {
+        await MathJax.typesetPromise();
+    }
 
-// ☁️ DRIVE BACKUP SAVE
-function saveAndSyncDrive() {
     const paperElement = document.getElementById('paperContainer');
     const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
-    
-    const header = `
-      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head>
-        <meta charset='utf-8'>
-        <style>
-          body { font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.3; color: #000000; }
-          h2 { font-size: 16pt; font-weight: bold; text-align: center; margin: 0; }
-          h3 { font-size: 12pt; font-weight: bold; text-align: center; margin: 4px 0; }
-          table, td, tr { border: none !important; border-collapse: collapse !important; }
-          td { vertical-align: top; }
-        </style>
-      </head>
-      <body>`;
-    const footer = "</body></html>";
-    const htmlContent = header + paperElement.innerHTML + footer;
-
     const fileName = `DAV_Paper_${teacherName.replace(/ /g, '_')}_${Date.now()}`;
 
-    fetch(GOOGLE_DRIVE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ htmlContent: htmlContent, fileName: fileName })
-    })
-    .then(() => alert("🚀 Success! Saved to Google Drive!"))
-    .catch(() => alert("Error syncing to Drive!"));
+    // 2. Local PDF Download Setup (Fix Blank Page)
+    const opt = {
+        margin: [0.4, 0.4, 0.4, 0.4],
+        filename: `${fileName}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Trigger Local Download
+    html2pdf().set(opt).from(paperElement).save().then(() => {
+        
+        // 3. Drive Sync (PDF + Word HTML Content)
+        const header = `
+          <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+          <head>
+            <meta charset='utf-8'>
+            <style>
+              body { font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.3; color: #000000; }
+              h2 { font-size: 16pt; font-weight: bold; text-align: center; margin: 0; }
+              h3 { font-size: 12pt; font-weight: bold; text-align: center; margin: 4px 0; }
+              table, td, tr { border: none !important; border-collapse: collapse !important; }
+              td { vertical-align: top; }
+            </style>
+          </head>
+          <body>`;
+        const footer = "</body></html>";
+        const htmlContent = header + paperElement.innerHTML + footer;
+
+        fetch(GOOGLE_DRIVE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ htmlContent: htmlContent, fileName: fileName })
+        }).then(() => {
+            btn.disabled = false;
+            btn.innerText = "🚀 Generate Paper, Download PDF & Save to Drive";
+            alert("✅ Done! Paper Downloaded on Local Device & Backup Saved to Google Drive (PDF + Word)!");
+        }).catch(() => {
+            btn.disabled = false;
+            btn.innerText = "🚀 Generate Paper, Download PDF & Save to Drive";
+            alert("✅ Downloaded locally! Drive sync encountered an issue.");
+        });
+
+    });
 }
 
 function insertSymbol(textareaId, symbolText) {
