@@ -49,6 +49,9 @@
 
     .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
     .modal-content { background: white; margin: 5% auto; padding: 20px; width: 80%; max-width: 700px; border-radius: 8px; max-height: 80vh; overflow-y: auto; }
+
+    .preview-footer { margin-top: 40px; text-align: center; font-size: 12px; font-weight: bold; color: #555; }
+    .preview-footer-line { border: 0; border-top: 1px solid #888; margin-bottom: 6px; }
   </style>
 </head>
 <body>
@@ -622,18 +625,19 @@
     closeBankModal();
   }
 
+  // 📌 RENDER EXACT PREVIEW WITH FOOTER AND PAGE NUMBER
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     var html = `
       <div class="preview-header">
         <div style="font-size:18px;">${(data.schoolName || '').toUpperCase()}</div>
-        <div style="font-size:15px; margin-top:3px;">${data.examTitle || ''}</div>
+        <div style="font-size:15px; margin-top:3px;">${(data.examTitle || 'PT-3 EXAMINATION').toUpperCase()} (SESSION: ${data.session || '2026'})</div>
         <div style="font-size:15px; margin-top:3px;">CLASS ${data.className || ''} - ${(data.subject || '').toUpperCase()}</div>
       </div>
       <table class="preview-table">
         <tr>
-          <td style="text-align:left;">TIME ALLOWED: ${data.timeAllowed || ''}</td>
-          <td style="text-align:right;">MAX MARKS: ${data.maxMarks || ''}</td>
+          <td style="text-align:left; width:50%;">TIME ALLOWED: ${data.timeAllowed || ''}</td>
+          <td style="text-align:right; width:50%;">MAX MARKS: ${data.maxMarks || ''}</td>
         </tr>
       </table>
       <hr style="border:0; border-top:1px solid #000; margin:5px 0 15px 0;">
@@ -688,6 +692,15 @@
         qNum++;
       });
     }
+
+    // 📌 ATTACH FOOTER LINE & PAGE NUMBER IN PREVIEW TOO
+    html += `
+      <div class="preview-footer">
+        <hr class="preview-footer-line">
+        <div>${data.examTitle || 'PT-3 Examination'} | CLASS ${data.className || '10'} (${(data.subject || 'SCIENCE').toUpperCase()}) | Page 1</div>
+      </div>
+    `;
+
     box.innerHTML = html;
   }
 
