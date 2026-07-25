@@ -1,3 +1,4 @@
+// ☁️ Deployed Google Apps Script Web App URL
 const GOOGLE_DRIVE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySjz8FdbEwywn3stjX--ThZvAQNOYM1iXvXpcE-tmLth7SoGyMUmIK-20JZhyJOnMq/exec";
 
 // 📋 Authorized Teachers Database (All 75 Teachers Included)
@@ -83,7 +84,7 @@ let loggedInTeacher = null;
 let currentPaperQuestions = [];
 let globalQuestionBank = [];
 
-// 🔒 AUTHENTICATION
+// 🔒 LOGIN MANAGEMENT
 function handleLogin(e) {
     e.preventDefault();
     const enteredId = document.getElementById('loginId').value.trim().toUpperCase();
@@ -128,7 +129,7 @@ function loadQuestionBank() {
         .catch(() => globalQuestionBank = []);
 }
 
-// ➕ ADD QUESTION DIRECTLY TO PAPER & BACKGROUND AUTO-SAVE TO BANK
+// ➕ ADD QUESTION TO PAPER & BACKGROUND DRIVE SYNC
 function addQuestionToPaper(e) {
     e.preventDefault();
     const qType = document.getElementById('newType').value;
@@ -153,15 +154,14 @@ function addQuestionToPaper(e) {
         ];
     }
 
-    // 1. Add to Current Active Paper
+    // Add to Active Paper & Global Question Bank
     currentPaperQuestions.push(newQ);
-    renderPaperUI();
-
-    // 2. Add to Global Question Bank and Auto-Sync to Google Drive
     globalQuestionBank.push(newQ);
+
+    renderPaperUI();
     syncBankToDrive();
 
-    // Reset Form
+    // Reset Input Fields
     document.getElementById('newQuestionText').value = "";
     document.getElementById('optA').value = "";
     document.getElementById('optB').value = "";
@@ -169,7 +169,7 @@ function addQuestionToPaper(e) {
     document.getElementById('optD').value = "";
 }
 
-// RENDER REAL-TIME QUESTION PAPER
+// 📄 RENDER EXAM PAPER
 function renderPaperUI() {
     updatePaperHeader();
     const container = document.getElementById('questionsList');
@@ -183,18 +183,17 @@ function renderPaperUI() {
 
         if (q.section && q.section !== currentSection) {
             currentSection = q.section;
-            container.innerHTML += `<div class="text-center font-bold text-lg my-4 tracking-wider border-b pb-1">${currentSection}</div>`;
+            container.innerHTML += `<div class="text-center font-bold text-lg my-4 tracking-wider border-b pb-1 text-black">${currentSection}</div>`;
         }
 
         let qHTML = `<div class="relative group mb-4" id="q-block-${idx}">
             
-            <!-- HOVER EDIT & DELETE BUTTONS -->
             <div class="no-print absolute -top-3 right-0 hidden group-hover:flex gap-1 bg-white border p-1 rounded shadow text-xs">
                 <button onclick="editPaperQuestion(${idx})" class="bg-amber-500 text-white px-2 py-0.5 rounded hover:bg-amber-600">✏️ Edit</button>
                 <button onclick="deletePaperQuestion(${idx})" class="bg-rose-500 text-white px-2 py-0.5 rounded hover:bg-rose-600">🗑️ Delete</button>
             </div>
 
-            <div class="flex justify-between items-start font-bold">
+            <div class="flex justify-between items-start font-bold text-black">
                 <div class="flex gap-2">
                     <span>${idx + 1}.</span>
                     <div>${q.question}</div>
@@ -203,7 +202,7 @@ function renderPaperUI() {
             </div>`;
 
         if (q.type === 'MCQ' && q.options) {
-            qHTML += `<div class="grid grid-cols-2 gap-2 mt-2 ml-6 text-sm">`;
+            qHTML += `<div class="grid grid-cols-2 gap-2 mt-2 ml-6 text-sm text-black">`;
             q.options.forEach((opt, oIdx) => {
                 qHTML += `<div>(${String.fromCharCode(65 + oIdx)}) ${opt}</div>`;
             });
@@ -225,7 +224,7 @@ function updatePaperHeader() {
     document.getElementById('paperTime').innerText = document.getElementById('timeInput').value;
 }
 
-// EDIT QUESTION IN ACTIVE PAPER
+// EDIT & DELETE
 function editPaperQuestion(idx) {
     const q = currentPaperQuestions[idx];
     const newText = prompt("Edit Question Text:", q.question);
@@ -238,13 +237,12 @@ function editPaperQuestion(idx) {
     }
 }
 
-// DELETE QUESTION FROM ACTIVE PAPER
 function deletePaperQuestion(idx) {
     currentPaperQuestions.splice(idx, 1);
     renderPaperUI();
 }
 
-// OPTIONAL QUESTION BANK SELECTOR
+// 📥 IMPORT FROM BANK
 function toggleBankSelector() {
     const box = document.getElementById('bankSelectorBox');
     box.classList.toggle('hidden');
@@ -285,7 +283,7 @@ function insertFromBankToPaper(qId) {
     }
 }
 
-// GOOGLE DRIVE AUTO SYNC FOR QUESTION BANK
+// ☁️ SYNC BANK TO DRIVE
 function syncBankToDrive() {
     const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
     fetch(GOOGLE_DRIVE_SCRIPT_URL, {
@@ -299,7 +297,35 @@ function syncBankToDrive() {
     });
 }
 
-// TOOLBAR SYMBOL INSERTION HELPER
+// 📝 DOWNLOAD DOCX & SAVE PAPER TO GOOGLE DRIVE
+function downloadAsDocx() {
+    const paperElement = document.getElementById('paperContainer');
+    const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
+    const header = "<html><head><style>body{font-family:'Times New Roman';}</style></head><body>";
+    const footer = "</body></html>";
+    const htmlContent = header + paperElement.innerHTML + footer;
+
+    const fileName = `DAV_Paper_${teacherName.replace(/ /g, '_')}_${Date.now()}`;
+
+    // Local Download
+    const converted = htmlDocx.asBlob(htmlContent);
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(converted);
+    link.download = `${fileName}.docx`;
+    link.click();
+
+    // Google Drive Sync
+    fetch(GOOGLE_DRIVE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ htmlContent: htmlContent, fileName: fileName })
+    })
+    .then(() => alert("✅ Paper Downloaded Locally & Saved to Google Drive Folder!"))
+    .catch(() => alert("✅ Paper Downloaded Locally!"));
+}
+
+// TOOLBAR HELPER
 function insertSymbol(textareaId, symbolText) {
     const txtArea = document.getElementById(textareaId);
     if (!txtArea) return;
@@ -312,21 +338,6 @@ function insertSymbol(textareaId, symbolText) {
     txtArea.focus();
     txtArea.selectionStart = startPos + symbolText.length;
     txtArea.selectionEnd = startPos + symbolText.length;
-}
-
-// DOCX DOWNLOAD
-function downloadAsDocx() {
-    const paperElement = document.getElementById('paperContainer');
-    const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
-    const header = "<html><head><style>body{font-family:'Times New Roman';}</style></head><body>";
-    const footer = "</body></html>";
-    const htmlContent = header + paperElement.innerHTML + footer;
-
-    const converted = htmlDocx.asBlob(htmlContent);
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(converted);
-    link.download = `DAV_Question_Paper_${teacherName.replace(/ /g, '_')}.docx`;
-    link.click();
 }
 
 function handleTypeChange() {
