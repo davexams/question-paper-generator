@@ -1,4 +1,3 @@
-// ☁️ Deployed Google Apps Script Web App URL
 const GOOGLE_DRIVE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySjz8FdbEwywn3stjX--ThZvAQNOYM1iXvXpcE-tmLth7SoGyMUmIK-20JZhyJOnMq/exec";
 
 // 📋 Authorized Teachers Database (All 75 Teachers Included)
@@ -82,9 +81,7 @@ const TEACHER_DATABASE = [
 
 let loggedInTeacher = null;
 let currentPaperQuestions = [];
-let globalQuestionBank = [];
 
-// 🔒 AUTHENTICATION
 function handleLogin(e) {
     e.preventDefault();
     const enteredId = document.getElementById('loginId').value.trim().toUpperCase();
@@ -98,11 +95,10 @@ function handleLogin(e) {
         loggedInTeacher = teacher;
         document.getElementById('loginOverlay').classList.add('hidden');
         document.getElementById('mainPlatform').classList.remove('hidden');
-        document.getElementById('teacherWelcome').innerText = `Logged in as: ${teacher.name}`;
+        document.getElementById('teacherWelcome').innerText = `Welcome, ${teacher.name}!`;
         sessionStorage.setItem('teacherSession', JSON.stringify(teacher));
-        loadQuestionBank();
     } else {
-        alert("❌ Invalid Teacher Username or Password!");
+        alert("❌ Invalid Credentials!");
     }
 }
 
@@ -117,84 +113,78 @@ window.onload = () => {
         loggedInTeacher = JSON.parse(saved);
         document.getElementById('loginOverlay').classList.add('hidden');
         document.getElementById('mainPlatform').classList.remove('hidden');
-        document.getElementById('teacherWelcome').innerText = `Logged in as: ${loggedInTeacher.name}`;
-        loadQuestionBank();
+        document.getElementById('teacherWelcome').innerText = `Welcome, ${loggedInTeacher.name}!`;
     }
 };
 
-function loadQuestionBank() {
-    fetch('questions.json')
-        .then(res => res.json())
-        .then(data => globalQuestionBank = data)
-        .catch(() => globalQuestionBank = []);
+// Helper for Image Base64 Conversion
+function fileToBase64(file) {
+    return new Promise((resolve) => {
+        if (!file) resolve(null);
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+    });
 }
 
-// ➕ ADD QUESTION & BACKGROUND DRIVE SYNC
-function addQuestionToPaper(e) {
+async function addQuestionToPaper(e) {
     e.preventDefault();
     const qType = document.getElementById('newType').value;
+    const diagFile = document.getElementById('qDiagram').files[0];
+    const diagBase64 = await fileToBase64(diagFile);
 
     const newQ = {
         id: Date.now(),
-        class: document.getElementById('classSelect').value,
-        subject: document.getElementById('subjectSelect').value,
         section: document.getElementById('newSectionTag').value,
-        chapter: document.getElementById('newChapter').value,
         type: qType,
         marks: parseInt(document.getElementById('newMarks').value),
-        question: document.getElementById('newQuestionText').value
+        question: document.getElementById('newQuestionText').value,
+        diagram: diagBase64
     };
 
     if (qType === 'MCQ') {
+        const imgA = await fileToBase64(document.getElementById('optImgA').files[0]);
+        const imgB = await fileToBase64(document.getElementById('optImgB').files[0]);
+        const imgC = await fileToBase64(document.getElementById('optImgC').files[0]);
+        const imgD = await fileToBase64(document.getElementById('optImgD').files[0]);
+
         newQ.options = [
-            document.getElementById('optA').value || "Option A",
-            document.getElementById('optB').value || "Option B",
-            document.getElementById('optC').value || "Option C",
-            document.getElementById('optD').value || "Option D"
+            { text: document.getElementById('optA').value || "Option A", img: imgA },
+            { text: document.getElementById('optB').value || "Option B", img: imgB },
+            { text: document.getElementById('optC').value || "Option C", img: imgC },
+            { text: document.getElementById('optD').value || "Option D", img: imgD }
         ];
     }
 
     currentPaperQuestions.push(newQ);
-    globalQuestionBank.push(newQ);
-
     renderPaperUI();
-    syncBankToDrive();
 
+    // Reset fields
     document.getElementById('newQuestionText').value = "";
-    document.getElementById('optA').value = "";
-    document.getElementById('optB').value = "";
-    document.getElementById('optC').value = "";
-    document.getElementById('optD').value = "";
+    document.getElementById('qDiagram').value = "";
 }
 
-// 📄 RENDER PAPER
 function renderPaperUI() {
     updatePaperHeader();
     const container = document.getElementById('questionsList');
     container.innerHTML = "";
 
     let currentSection = "";
-    let totalMarks = 0;
 
     currentPaperQuestions.forEach((q, idx) => {
-        totalMarks += parseInt(q.marks);
-
         if (q.section && q.section !== currentSection) {
             currentSection = q.section;
             container.innerHTML += `<div style="text-align:center; font-weight:bold; font-size:12pt; margin: 15px 0 5px 0; border-bottom: 1px solid #000; text-transform:uppercase;">${currentSection}</div>`;
         }
 
-        let qHTML = `<div class="relative group mb-4" id="q-block-${idx}">
-            
-            <div class="no-print absolute -top-3 right-0 hidden group-hover:flex gap-1 bg-white border p-1 rounded shadow text-xs">
-                <button onclick="editPaperQuestion(${idx})" class="bg-amber-500 text-white px-2 py-0.5 rounded hover:bg-amber-600">✏️ Edit</button>
-                <button onclick="deletePaperQuestion(${idx})" class="bg-rose-500 text-white px-2 py-0.5 rounded hover:bg-rose-600">🗑️ Delete</button>
-            </div>
-
+        let qHTML = `<div style="margin-bottom: 12px;">
             <table style="width:100%; font-size:11pt; color:#000;">
                 <tr>
                     <td style="width: 25px; vertical-align: top; font-weight: bold;">${idx + 1}.</td>
-                    <td style="vertical-align: top; text-align: left;">${q.question}</td>
+                    <td style="vertical-align: top; text-align: left;">
+                        ${q.question}
+                        ${q.diagram ? `<br><img src="${q.diagram}" style="max-height:150px; margin-top:5px;">` : ''}
+                    </td>
                     <td style="width: 40px; vertical-align: top; text-align: right; font-weight: bold;">(${q.marks})</td>
                 </tr>
             </table>`;
@@ -202,12 +192,12 @@ function renderPaperUI() {
         if (q.type === 'MCQ' && q.options) {
             qHTML += `<table style="width:90%; margin-left: 25px; margin-top: 5px; font-size:10pt; color:#000;">
                 <tr>
-                    <td style="width:50%;">(A) ${q.options[0]}</td>
-                    <td style="width:50%;">(B) ${q.options[1]}</td>
+                    <td style="width:50%;">(a) ${q.options[0].text} ${q.options[0].img ? `<br><img src="${q.options[0].img}" style="max-height:80px;">` : ''}</td>
+                    <td style="width:50%;">(b) ${q.options[1].text} ${q.options[1].img ? `<br><img src="${q.options[1].img}" style="max-height:80px;">` : ''}</td>
                 </tr>
                 <tr>
-                    <td style="width:50%;">(C) ${q.options[2]}</td>
-                    <td style="width:50%;">(D) ${q.options[3]}</td>
+                    <td style="width:50%;">(c) ${q.options[2].text} ${q.options[2].img ? `<br><img src="${q.options[2].img}" style="max-height:80px;">` : ''}</td>
+                    <td style="width:50%;">(d) ${q.options[3].text} ${q.options[3].img ? `<br><img src="${q.options[3].img}" style="max-height:80px;">` : ''}</td>
                 </tr>
             </table>`;
         }
@@ -216,101 +206,30 @@ function renderPaperUI() {
         container.innerHTML += qHTML;
     });
 
-    document.getElementById('paperMaxMarks').innerText = `Maximum Marks: ${totalMarks}`;
     if (window.MathJax) MathJax.typesetPromise();
 }
 
 function updatePaperHeader() {
     document.getElementById('paperSchoolName').innerText = document.getElementById('schoolNameInput').value;
-    document.getElementById('paperExamHeader').innerText = document.getElementById('examHeaderInput').value;
+    document.getElementById('paperExamHeader').innerText = `Class ${document.getElementById('classInput').value} - ${document.getElementById('subjectInput').value} - ${document.getElementById('examHeaderInput').value} (${document.getElementById('sessionInput').value})`;
     document.getElementById('paperInstructions').innerText = document.getElementById('instructionsInput').value;
-    document.getElementById('paperTime').innerText = document.getElementById('timeInput').value;
+    document.getElementById('paperTime').innerText = `Time Allowed: ${document.getElementById('timeInput').value}`;
+    document.getElementById('paperMaxMarks').innerText = `Max Marks: ${document.getElementById('maxMarksInput').value}`;
 }
 
-function editPaperQuestion(idx) {
-    const q = currentPaperQuestions[idx];
-    const newText = prompt("Edit Question Text:", q.question);
-    const newMarks = prompt("Edit Question Marks:", q.marks);
-
-    if (newText !== null && newMarks !== null) {
-        q.question = newText;
-        q.marks = parseInt(newMarks);
-        renderPaperUI();
-    }
-}
-
-function deletePaperQuestion(idx) {
-    currentPaperQuestions.splice(idx, 1);
-    renderPaperUI();
-}
-
-function toggleBankSelector() {
-    const box = document.getElementById('bankSelectorBox');
-    box.classList.toggle('hidden');
-
-    if (!box.classList.contains('hidden')) {
-        const selClass = document.getElementById('classSelect').value;
-        const selSubject = document.getElementById('subjectSelect').value;
-        const list = document.getElementById('bankQuestionsList');
-
-        const filtered = globalQuestionBank.filter(q => q.class === selClass && q.subject === selSubject);
-
-        if (filtered.length === 0) {
-            list.innerHTML = `<p class="text-slate-400 italic">No existing questions in bank for Class ${selClass} ${selSubject}.</p>`;
-            return;
-        }
-
-        list.innerHTML = "";
-        filtered.forEach(q => {
-            list.innerHTML += `
-                <div class="flex items-start justify-between p-2 hover:bg-slate-50 border-b">
-                    <div>
-                        <span class="font-bold text-indigo-700">[${q.section}] [${q.marks} Marks]</span>
-                        <span>${q.question}</span>
-                    </div>
-                    <button onclick="insertFromBankToPaper(${q.id})" type="button" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs ml-2 hover:bg-indigo-700">➕ Insert</button>
-                </div>
-            `;
-        });
-    }
-}
-
-function insertFromBankToPaper(qId) {
-    const q = globalQuestionBank.find(item => item.id === qId);
-    if (q) {
-        currentPaperQuestions.push({ ...q, id: Date.now() });
-        renderPaperUI();
-        alert("✅ Question inserted into paper!");
-    }
-}
-
-function syncBankToDrive() {
-    const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
-    fetch(GOOGLE_DRIVE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            htmlContent: JSON.stringify(globalQuestionBank, null, 2),
-            fileName: `Question_Bank_Updated_By_${teacherName.replace(/ /g, '_')}`
-        })
-    });
-}
-
-// 📝 DOWNLOAD DOCX & ENHANCED GOOGLE DRIVE SYNC
-function downloadAsDocx() {
+// 📄 GENERATE & SAVE BOTH WORD + PDF TO GOOGLE DRIVE
+function saveAndSyncDrive() {
     const paperElement = document.getElementById('paperContainer');
     const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
     
-    // Formatting optimized for Microsoft Word & Google Drive Docs
     const header = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
       <head>
         <meta charset='utf-8'>
         <style>
           body { font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.3; color: #000000; }
-          h2 { font-size: 18pt; font-weight: bold; text-align: center; margin: 0; }
-          h3 { font-size: 13pt; font-weight: bold; text-align: center; margin: 4px 0; }
+          h2 { font-size: 16pt; font-weight: bold; text-align: center; margin: 0; }
+          h3 { font-size: 12pt; font-weight: bold; text-align: center; margin: 4px 0; }
           table { width: 100%; border-collapse: collapse; }
           td { vertical-align: top; }
         </style>
@@ -321,88 +240,26 @@ function downloadAsDocx() {
 
     const fileName = `DAV_Paper_${teacherName.replace(/ /g, '_')}_${Date.now()}`;
 
-    // Local Download
-    const converted = htmlDocx.asBlob(htmlContent);
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(converted);
-    link.download = `${fileName}.doc`;
-    link.click();
-
-    // Google Drive Sync
     fetch(GOOGLE_DRIVE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ htmlContent: htmlContent, fileName: fileName })
     })
-    .then(() => alert("✅ Paper Downloaded Locally & Saved to Google Drive Folder!"))
-    .catch(() => alert("✅ Paper Downloaded Locally!"));
+    .then(() => alert("🚀 Success! Question Paper saved in Google Drive as BOTH Word (.doc) and PDF (.pdf) files!"))
+    .catch(() => alert("Error syncing to Drive!"));
 }
 
 function insertSymbol(textareaId, symbolText) {
     const txtArea = document.getElementById(textareaId);
     if (!txtArea) return;
-
     const startPos = txtArea.selectionStart;
     const endPos = txtArea.selectionEnd;
-    const currentValue = txtArea.value;
-
-    txtArea.value = currentValue.substring(0, startPos) + symbolText + currentValue.substring(endPos, currentValue.length);
+    txtArea.value = txtArea.value.substring(0, startPos) + symbolText + txtArea.value.substring(endPos);
     txtArea.focus();
-    txtArea.selectionStart = startPos + symbolText.length;
-    txtArea.selectionEnd = startPos + symbolText.length;
 }
 
 function handleTypeChange() {
     const type = document.getElementById('newType').value;
     document.getElementById('mcqBlock').classList.toggle('hidden', type !== 'MCQ');
-}
-
-function switchTab(tab) {
-    document.getElementById('createSection').classList.toggle('hidden', tab !== 'create');
-    document.getElementById('bankSection').classList.toggle('hidden', tab !== 'bank');
-
-    if (tab === 'bank') renderFullBankManager();
-}
-
-function renderFullBankManager() {
-    const container = document.getElementById('fullQuestionBankList');
-    if (globalQuestionBank.length === 0) {
-        container.innerHTML = `<p class="text-slate-400 italic">No questions in Question Bank yet.</p>`;
-        return;
-    }
-
-    container.innerHTML = "";
-    globalQuestionBank.forEach((q, idx) => {
-        container.innerHTML += `
-            <div class="p-3 border rounded-lg bg-slate-50 flex justify-between items-start">
-                <div>
-                    <span class="font-bold text-xs text-indigo-600">[Class ${q.class} - ${q.subject}] [${q.section}] [${q.marks} Marks]</span>
-                    <p class="text-sm font-semibold mt-1">${q.question}</p>
-                </div>
-                <div class="flex gap-1">
-                    <button onclick="editBankItem(${idx})" class="bg-amber-500 text-white px-2 py-1 text-xs rounded hover:bg-amber-600">✏️ Edit</button>
-                    <button onclick="deleteBankItem(${idx})" class="bg-rose-500 text-white px-2 py-1 text-xs rounded hover:bg-rose-600">🗑️ Delete</button>
-                </div>
-            </div>
-        `;
-    });
-}
-
-function editBankItem(idx) {
-    const q = globalQuestionBank[idx];
-    const newText = prompt("Edit Question Text:", q.question);
-    if (newText !== null) {
-        q.question = newText;
-        syncBankToDrive();
-        renderFullBankManager();
-    }
-}
-
-function deleteBankItem(idx) {
-    if (confirm("Delete this question from Question Bank?")) {
-        globalQuestionBank.splice(idx, 1);
-        syncBankToDrive();
-        renderFullBankManager();
-    }
 }
