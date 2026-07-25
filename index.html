@@ -42,8 +42,9 @@
     .paper-preview table, .paper-preview tr, .paper-preview td { border: none !important; border-collapse: collapse !important; }
     .preview-header { text-align: center; font-weight: bold; }
     .preview-table { width: 100%; margin: 10px 0; border-collapse: collapse; font-weight: bold; font-size: 14px; }
-    .preview-q-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 14px; }
-    .preview-opts { display: grid; grid-template-columns: 1fr 1fr; margin-left: 45px; margin-top: 4px; font-size: 13.5px; }
+    .preview-q-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 14px; text-align: justify; }
+    .preview-sub-q { margin-left: 25px; margin-top: 4px; text-align: left; }
+    .preview-opts { display: grid; grid-template-columns: 1fr 1fr; margin-left: 45px; margin-top: 4px; font-size: 13.5px; text-align: left !important; }
 
     .live-counter-bar { background: #e8f0fe; border: 1px solid #aecbfa; padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: bold; color: #174ea6; }
 
@@ -179,8 +180,8 @@
       <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;" onclick="importBankQuestion('SECTION B', 'DESCRIPTIVE', 'State Ohm\'s Law and derive its mathematical formula.', 2, [])">
         <b>[2 Marks - Short]</b> State Ohm's Law and derive its mathematical formula.
       </div>
-      <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;" onclick="importBankQuestion('SECTION C', 'DESCRIPTIVE', 'Explain the process of photosynthesis with a balanced chemical equation.', 3, [])">
-        <b>[3 Marks - Short]</b> Explain the process of photosynthesis with a balanced chemical equation.
+      <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer;" onclick="importBankQuestion('SECTION E', 'CASE_STUDY', 'Read the passage and answer the questions:\nPhotosynthesis is the process by which green plants manufacture food.\n[sub](i) Name the organelle where it occurs.[/sub]\n[sub](ii) Write balanced chemical equation.[/sub]', 4, [])">
+        <b>[4 Marks - Case Study]</b> Read the passage and answer sub-questions.
       </div>
     </div>
   </div>
@@ -522,6 +523,7 @@
           <select class="q-type" onchange="toggleType(this, '${qCount}'); triggerAutoSave();">
             <option value="MCQ" ${q.type==='MCQ'?'selected':''}>MCQ (4 Options)</option>
             <option value="DESCRIPTIVE" ${q.type==='DESCRIPTIVE'?'selected':''}>Descriptive / Theory / Numerical</option>
+            <option value="CASE_STUDY" ${q.type==='CASE_STUDY'?'selected':''}>Case-Study / Passage / Paragraph</option>
             <option value="AR" ${q.type==='AR'?'selected':''}>Assertion-Reason</option>
           </select>
         </div>
@@ -539,7 +541,7 @@
         </div>
         
         <div class="form-group full-width">
-          <label>Question Text (Maths & Chem Symbols Toolbar):</label>
+          <label>Question Text (Maths & Chem Symbols Toolbar - Sub-Questions wrap in [sub](i)...[/sub]):</label>
           <div class="sym-toolbar">
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '_{2}')">x₂ (Sub)</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '^{2}')">x² (Super)</button>
@@ -555,7 +557,7 @@
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '\\\\rightarrow')">→</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '\\\\rightleftharpoons')">⇌</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '\\\\pm')">±</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '\\\\infty')">∞</button>
+            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '[sub](i) [/sub]')">Sub-Q (i)</button>
           </div>
           <textarea id="${textId}" class="q-text" placeholder="Enter question text..." oninput="triggerAutoSave()">${q.text}</textarea>
         </div>
@@ -625,7 +627,7 @@
     closeBankModal();
   }
 
-  // 📌 RENDER EXACT PREVIEW WITH FOOTER AND PAGE NUMBER
+  // 📌 RENDER EXACT PREVIEW WITH JUSTIFIED MAIN PARAGRAPH & INDENTED SUB-QUESTIONS
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     var html = `
@@ -660,10 +662,15 @@
           html += `<div style="text-align:center; font-weight:bold; margin:15px 0 8px 0; font-size:14px;">${currentSec}</div>`;
         }
 
+        // Format [sub] tag for HTML preview
+        var qBodyHtml = q.text
+          .replace(/\[sub\]/g, '<div class="preview-sub-q">')
+          .replace(/\[\/sub\]/g, '</div>');
+
         html += `
           <div class="preview-q-row">
             <div style="flex-grow:1;">
-              <b>Q.${qNum}.</b> ${q.text}
+              <b>Q.${qNum}.</b> ${qBodyHtml}
               ${q.qImg ? `<br><img src="${q.qImg}" style="max-height:100px; margin-top:5px;">` : ''}
             </div>
             <div style="font-weight:bold; min-width:40px; text-align:right;">[${q.marks}]</div>
@@ -693,7 +700,7 @@
       });
     }
 
-    // 📌 ATTACH FOOTER LINE & PAGE NUMBER IN PREVIEW TOO
+    // Attach Footer Line & Page Number
     html += `
       <div class="preview-footer">
         <hr class="preview-footer-line">
