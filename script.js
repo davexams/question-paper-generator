@@ -84,7 +84,7 @@ let loggedInTeacher = null;
 let currentPaperQuestions = [];
 let globalQuestionBank = [];
 
-// 🔒 LOGIN MANAGEMENT
+// 🔒 AUTHENTICATION
 function handleLogin(e) {
     e.preventDefault();
     const enteredId = document.getElementById('loginId').value.trim().toUpperCase();
@@ -129,7 +129,7 @@ function loadQuestionBank() {
         .catch(() => globalQuestionBank = []);
 }
 
-// ➕ ADD QUESTION TO PAPER & BACKGROUND DRIVE SYNC
+// ➕ ADD QUESTION & BACKGROUND DRIVE SYNC
 function addQuestionToPaper(e) {
     e.preventDefault();
     const qType = document.getElementById('newType').value;
@@ -154,14 +154,12 @@ function addQuestionToPaper(e) {
         ];
     }
 
-    // Add to Active Paper & Global Question Bank
     currentPaperQuestions.push(newQ);
     globalQuestionBank.push(newQ);
 
     renderPaperUI();
     syncBankToDrive();
 
-    // Reset Input Fields
     document.getElementById('newQuestionText').value = "";
     document.getElementById('optA').value = "";
     document.getElementById('optB').value = "";
@@ -169,7 +167,7 @@ function addQuestionToPaper(e) {
     document.getElementById('optD').value = "";
 }
 
-// 📄 RENDER EXAM PAPER
+// 📄 RENDER PAPER
 function renderPaperUI() {
     updatePaperHeader();
     const container = document.getElementById('questionsList');
@@ -183,7 +181,7 @@ function renderPaperUI() {
 
         if (q.section && q.section !== currentSection) {
             currentSection = q.section;
-            container.innerHTML += `<div class="text-center font-bold text-lg my-4 tracking-wider border-b pb-1 text-black">${currentSection}</div>`;
+            container.innerHTML += `<div style="text-align:center; font-weight:bold; font-size:12pt; margin: 15px 0 5px 0; border-bottom: 1px solid #000; text-transform:uppercase;">${currentSection}</div>`;
         }
 
         let qHTML = `<div class="relative group mb-4" id="q-block-${idx}">
@@ -193,20 +191,25 @@ function renderPaperUI() {
                 <button onclick="deletePaperQuestion(${idx})" class="bg-rose-500 text-white px-2 py-0.5 rounded hover:bg-rose-600">🗑️ Delete</button>
             </div>
 
-            <div class="flex justify-between items-start font-bold text-black">
-                <div class="flex gap-2">
-                    <span>${idx + 1}.</span>
-                    <div>${q.question}</div>
-                </div>
-                <span class="whitespace-nowrap ml-4">(${q.marks})</span>
-            </div>`;
+            <table style="width:100%; font-size:11pt; color:#000;">
+                <tr>
+                    <td style="width: 25px; vertical-align: top; font-weight: bold;">${idx + 1}.</td>
+                    <td style="vertical-align: top; text-align: left;">${q.question}</td>
+                    <td style="width: 40px; vertical-align: top; text-align: right; font-weight: bold;">(${q.marks})</td>
+                </tr>
+            </table>`;
 
         if (q.type === 'MCQ' && q.options) {
-            qHTML += `<div class="grid grid-cols-2 gap-2 mt-2 ml-6 text-sm text-black">`;
-            q.options.forEach((opt, oIdx) => {
-                qHTML += `<div>(${String.fromCharCode(65 + oIdx)}) ${opt}</div>`;
-            });
-            qHTML += `</div>`;
+            qHTML += `<table style="width:90%; margin-left: 25px; margin-top: 5px; font-size:10pt; color:#000;">
+                <tr>
+                    <td style="width:50%;">(A) ${q.options[0]}</td>
+                    <td style="width:50%;">(B) ${q.options[1]}</td>
+                </tr>
+                <tr>
+                    <td style="width:50%;">(C) ${q.options[2]}</td>
+                    <td style="width:50%;">(D) ${q.options[3]}</td>
+                </tr>
+            </table>`;
         }
 
         qHTML += `</div>`;
@@ -224,7 +227,6 @@ function updatePaperHeader() {
     document.getElementById('paperTime').innerText = document.getElementById('timeInput').value;
 }
 
-// EDIT & DELETE
 function editPaperQuestion(idx) {
     const q = currentPaperQuestions[idx];
     const newText = prompt("Edit Question Text:", q.question);
@@ -242,7 +244,6 @@ function deletePaperQuestion(idx) {
     renderPaperUI();
 }
 
-// 📥 IMPORT FROM BANK
 function toggleBankSelector() {
     const box = document.getElementById('bankSelectorBox');
     box.classList.toggle('hidden');
@@ -283,7 +284,6 @@ function insertFromBankToPaper(qId) {
     }
 }
 
-// ☁️ SYNC BANK TO DRIVE
 function syncBankToDrive() {
     const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
     fetch(GOOGLE_DRIVE_SCRIPT_URL, {
@@ -297,11 +297,25 @@ function syncBankToDrive() {
     });
 }
 
-// 📝 DOWNLOAD DOCX & SAVE PAPER TO GOOGLE DRIVE
+// 📝 DOWNLOAD DOCX & ENHANCED GOOGLE DRIVE SYNC
 function downloadAsDocx() {
     const paperElement = document.getElementById('paperContainer');
     const teacherName = loggedInTeacher ? loggedInTeacher.name : "Teacher";
-    const header = "<html><head><style>body{font-family:'Times New Roman';}</style></head><body>";
+    
+    // Formatting optimized for Microsoft Word & Google Drive Docs
+    const header = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset='utf-8'>
+        <style>
+          body { font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.3; color: #000000; }
+          h2 { font-size: 18pt; font-weight: bold; text-align: center; margin: 0; }
+          h3 { font-size: 13pt; font-weight: bold; text-align: center; margin: 4px 0; }
+          table { width: 100%; border-collapse: collapse; }
+          td { vertical-align: top; }
+        </style>
+      </head>
+      <body>`;
     const footer = "</body></html>";
     const htmlContent = header + paperElement.innerHTML + footer;
 
@@ -311,7 +325,7 @@ function downloadAsDocx() {
     const converted = htmlDocx.asBlob(htmlContent);
     const link = document.createElement('a');
     link.href = URL.createObjectURL(converted);
-    link.download = `${fileName}.docx`;
+    link.download = `${fileName}.doc`;
     link.click();
 
     // Google Drive Sync
@@ -325,7 +339,6 @@ function downloadAsDocx() {
     .catch(() => alert("✅ Paper Downloaded Locally!"));
 }
 
-// TOOLBAR HELPER
 function insertSymbol(textareaId, symbolText) {
     const txtArea = document.getElementById(textareaId);
     if (!txtArea) return;
