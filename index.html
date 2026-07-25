@@ -2,8 +2,6 @@
 <html>
 <head>
   <base target="_top">
-  <!-- html2pdf.js library for Instant Local PDF Generation -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; color: #333; }
     .container { max-width: 950px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
@@ -151,10 +149,14 @@
     🚀 Generate Paper & Download PDF
   </button>
 
-  <div id="loader">⏳ Generating PDF Download & Saving to Google Drive... Please Wait</div>
+  <div id="loader">⏳ Generating Exact PDF & Saving to Google Drive... Please Wait</div>
 
   <div id="resultArea">
-    <h3 style="color:#28a745; margin-bottom:15px; text-align:center;">✅ Question Paper Downloaded & Sent to Google Drive!</h3>
+    <h3 style="color:#28a745; margin-bottom:15px; text-align:center;">✅ Question Paper Generated & Saved to Google Drive!</h3>
+    <div id="actionButtons" style="display:flex; gap:10px; justify-content:center; margin-bottom:15px;">
+      <a id="btnPdfLink" class="btn" style="background:#dc3545; width:auto; padding:10px 20px;" target="_blank">📄 Open / Download PDF</a>
+      <a id="btnDocLink" class="btn" style="background:#28a745; width:auto; padding:10px 20px;" target="_blank">📝 Open Google Doc</a>
+    </div>
     <div class="paper-preview" id="paperPreviewBox"></div>
   </div>
 </div>
@@ -180,9 +182,6 @@
     </div>
   </div>
 </div>
-
-<!-- HIDDEN IFRAME TO PREVENT CORS & REDIRECT ISSUES -->
-<iframe name="hidden_drive_frame" id="hidden_drive_frame" style="display:none;"></iframe>
 
 <script>
   // Master Teacher Database
@@ -695,7 +694,7 @@
   // 🔗 APPS SCRIPT DEPLOYMENT ENDPOINT URL:
   const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxT4PZjFxPvpQ5GNo5pKa3KFiO-dl5opT3PJ1tcQZYWD1OGLqPme171KN-gR0fbKXKL/exec";
 
-  // 🎯 UNSTOPPABLE FORM ACTION POST SUBMISSION
+  // 🎯 NATIVE GOOGLE DOC DIRECT PDF EXPORT SUBMISSION
   function submitSingleClickAction() {
     var loader = document.getElementById('loader');
     var resultArea = document.getElementById('resultArea');
@@ -705,52 +704,51 @@
     renderPreview(rawPayload);
 
     loader.style.display = 'block';
-    loader.innerHTML = "⏳ Step 1: Downloading Local PDF...";
-    resultArea.style.display = 'block';
+    loader.innerHTML = "⏳ Generating Document & Syncing Exact PDF from Google Drive...";
     generateBtn.disabled = true;
-    resultArea.scrollIntoView({ behavior: 'smooth' });
 
-    // 1. Instant Local PDF Download
-    setTimeout(function() {
-      var element = document.getElementById('paperPreviewBox');
-      var cls = document.getElementById('className').value;
-      var sub = document.getElementById('subject').value;
-      var filename = `DAV_Paper_Class_${cls}_${sub}_${Date.now()}.pdf`;
-
-      var opt = {
-        margin:       [0.4, 0.4, 0.4, 0.4],
-        filename:     filename,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-      };
-
-      html2pdf().set(opt).from(element).save();
-      
-      loader.innerHTML = "⏳ Step 2: Saving Doc & PDF to Google Drive Folder...";
-    }, 400);
-
-    // 2. Hidden Form Post Execution (Works 100% reliably from GitHub Pages!)
-    var form = document.createElement("form");
-    form.setAttribute("method", "post");
-    form.setAttribute("action", APPS_SCRIPT_WEB_APP_URL);
-    form.setAttribute("target", "hidden_drive_frame");
-
-    var hiddenField = document.createElement("input");
-    hiddenField.setAttribute("type", "hidden");
-    hiddenField.setAttribute("name", "postData");
-    hiddenField.setAttribute("value", JSON.stringify({ data: rawPayload, username: currentTeacher }));
-
-    form.appendChild(hiddenField);
-    document.body.appendChild(form);
-    form.submit();
-
-    setTimeout(function() {
-      document.body.removeChild(form);
+    // Send Payload to Apps Script via Fetch API
+    fetch(APPS_SCRIPT_WEB_APP_URL, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        "Content-Type": "text/plain"
+      },
+      body: JSON.stringify({
+        data: rawPayload,
+        username: currentTeacher
+      })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(response) {
       loader.style.display = 'none';
       generateBtn.disabled = false;
-      alert("✅ SUCCESS: Request Google Drive ko bhej di gayi hai!\n\n5-10 sec me Google Drive folder refresh karke check karein.");
-    }, 5000);
+
+      if (response && response.success) {
+        resultArea.style.display = 'block';
+        
+        // Bind Direct URLs from Google Docs Engine
+        var pdfLink = document.getElementById('btnPdfLink');
+        var docLink = document.getElementById('btnDocLink');
+        
+        if (pdfLink && response.pdfUrl) pdfLink.href = response.pdfUrl;
+        if (docLink && response.docUrl) docLink.href = response.docUrl;
+
+        // Auto Open Direct PDF in New Tab
+        if (response.pdfUrl) {
+          window.open(response.pdfUrl, '_blank');
+        }
+
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        alert("Error generating paper: " + (response.message || "Unknown Error"));
+      }
+    })
+    .catch(function(err) {
+      loader.style.display = 'none';
+      generateBtn.disabled = false;
+      alert("Network Error: " + err);
+    });
   }
 </script>
 
