@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DAV Question Paper Generator Portal</title>
+    <title>DAV Question Paper Creator & Assessment Portal</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- MathJax for Math & Science Formulas -->
+    <!-- MathJax for Math & Chemistry Equations -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <!-- HTML to DOCX Converter -->
@@ -48,170 +48,175 @@
     <!-- 🚀 MAIN APP PLATFORM -->
     <div id="mainPlatform" class="hidden max-w-6xl mx-auto p-4 md:p-8">
         
-        <!-- Navbar Header -->
+        <!-- Header Nav -->
         <div class="no-print flex justify-between items-center bg-white p-4 rounded-xl shadow-md mb-6">
             <div class="flex items-center gap-3">
-                <span class="text-2xl">📑</span>
+                <span class="text-2xl">📝</span>
                 <div>
-                    <h1 class="text-lg font-bold text-slate-800">DAV Exam Setter & Question Manager</h1>
+                    <h1 class="text-lg font-bold text-slate-800">DAV Direct Question Paper Creator</h1>
                     <p class="text-xs text-indigo-600 font-semibold" id="teacherWelcome">Logged in</p>
                 </div>
             </div>
             <div class="flex gap-2">
-                <button onclick="switchTab('paper')" id="btnTabPaper" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow">📜 Paper Generator</button>
-                <button onclick="switchTab('add')" id="btnTabAdd" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold">➕ Add New Question</button>
+                <button onclick="switchTab('create')" id="btnTabCreate" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow">✏️ Create Paper</button>
+                <button onclick="switchTab('bank')" id="btnTabBank" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold">📚 Question Bank Manager</button>
                 <button onclick="logout()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-2 rounded-lg text-sm font-semibold ml-2">🚪 Logout</button>
             </div>
         </div>
 
-        <!-- TAB 1: PAPER GENERATOR & SELECTOR -->
-        <div id="paperSection" class="no-print bg-white p-6 rounded-xl shadow-md mb-8">
-            <h2 class="text-lg font-bold text-slate-800 mb-4">⚙️ Exam Paper Configuration</h2>
+        <!-- TAB 1: CREATE PAPER DIRECTLY -->
+        <div id="createSection" class="no-print space-y-6">
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                    <label class="block text-xs font-semibold mb-1">School Name</label>
-                    <input type="text" id="schoolNameInput" value="DAV PUBLIC SCHOOL, SUNDER NAGAR" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Class & Subject Header</label>
-                    <input type="text" id="examHeaderInput" value="Class X - ENGLISH - Periodic Test - II" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">General Instructions</label>
-                    <input type="text" id="instructionsInput" value="INSTRUCTIONS: All questions are compulsory" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Time Limit</label>
-                    <input type="text" id="timeInput" value="Time: 2 hour" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Class Select</label>
-                    <select id="classSelect" onchange="renderQuestionPicker()" class="w-full border p-2 rounded-lg text-sm"><option value="10">Class 10</option><option value="9">Class 9</option></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Subject Select</label>
-                    <select id="subjectSelect" onchange="renderQuestionPicker()" class="w-full border p-2 rounded-lg text-sm"><option value="Science">Science</option><option value="English">English</option><option value="Mathematics">Mathematics</option></select>
-                </div>
-            </div>
-
-            <!-- QUESTION PICKER FROM BANK -->
-            <div class="border rounded-xl p-4 bg-slate-50 mb-4">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="font-bold text-sm text-slate-700">📥 Select Questions from Bank:</h3>
-                    <span class="text-xs text-indigo-600 font-semibold" id="selectedCount">0 questions selected</span>
-                </div>
-                <div id="questionPickerList" class="max-h-60 overflow-y-auto space-y-2 border p-3 rounded bg-white text-xs">
-                    <!-- Dynamic Checkboxes loaded here -->
+            <!-- HEADER CONFIGURATION -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-md font-bold text-slate-800 mb-4">⚙️ Step 1: Exam Header Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">School Name</label>
+                        <input type="text" id="schoolNameInput" value="DAV PUBLIC SCHOOL, SUNDER NAGAR" oninput="updatePaperHeader()" class="w-full border p-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">Class & Subject Header</label>
+                        <input type="text" id="examHeaderInput" value="Class X - SCIENCE - Periodic Test - II" oninput="updatePaperHeader()" class="w-full border p-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">General Instructions</label>
+                        <input type="text" id="instructionsInput" value="INSTRUCTIONS: All questions are compulsory" oninput="updatePaperHeader()" class="w-full border p-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">Time Limit</label>
+                        <input type="text" id="timeInput" value="Time: 2 hour" oninput="updatePaperHeader()" class="w-full border p-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">Class Select</label>
+                        <select id="classSelect" class="w-full border p-2 rounded-lg text-sm"><option value="10">Class 10</option><option value="9">Class 9</option></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">Subject Select</label>
+                        <select id="subjectSelect" class="w-full border p-2 rounded-lg text-sm"><option value="Science">Science</option><option value="Mathematics">Mathematics</option><option value="English">English</option></select>
+                    </div>
                 </div>
             </div>
 
-            <!-- ACTIONS -->
-            <div class="flex flex-wrap gap-3 border-t pt-4">
-                <button onclick="generatePaperFromSelection()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow">✨ Build Selected Paper</button>
+            <!-- TYPE QUESTIONS & ADD DIRECTLY TO PAPER -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-md font-bold text-slate-800">➕ Step 2: Add Question to Paper (Auto-saves to Bank)</h2>
+                    <button onclick="toggleBankSelector()" class="text-xs bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold px-3 py-1.5 rounded-lg hover:bg-indigo-100">
+                        🔍 Need Question from Bank? Click Here
+                    </button>
+                </div>
+
+                <!-- OPTIONAL QUESTION BANK SELECTOR ACCORDION -->
+                <div id="bankSelectorBox" class="hidden mb-6 p-4 bg-indigo-50/50 border border-indigo-200 rounded-xl">
+                    <h3 class="text-xs font-bold text-indigo-900 mb-2">📥 Choose Question from Bank to Insert:</h3>
+                    <div id="bankQuestionsList" class="max-h-48 overflow-y-auto space-y-2 border p-2 rounded bg-white text-xs">
+                        <!-- Dynamic Bank Questions -->
+                    </div>
+                </div>
+
+                <!-- QUESTION FORM -->
+                <form onsubmit="addQuestionToPaper(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold mb-1">Section Tag</label>
+                            <select id="newSectionTag" class="w-full border p-2 rounded-lg text-sm">
+                                <option value="SECTION - A">SECTION - A</option>
+                                <option value="SECTION - B">SECTION - B</option>
+                                <option value="SECTION - C">SECTION - C</option>
+                                <option value="SECTION - D">SECTION - D</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1">Question Type</label>
+                            <select id="newType" onchange="handleTypeChange()" class="w-full border p-2 rounded-lg text-sm">
+                                <option value="Short">Short Answer Question</option>
+                                <option value="MCQ">Multiple Choice Question (MCQ)</option>
+                                <option value="Long">Long Answer Question</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1">Marks</label>
+                            <input type="number" id="newMarks" min="1" max="20" value="1" class="w-full border p-2 rounded-lg text-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1">Chapter Name</label>
+                            <input type="text" id="newChapter" placeholder="e.g. Light / Chemical Reactions" class="w-full border p-2 rounded-lg text-sm" required>
+                        </div>
+                    </div>
+
+                    <!-- EQUATION & SYMBOL TOOLBAR -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-semibold">Question Text</label>
+                            <span class="text-[10px] text-slate-500">Click symbol to insert</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1 p-2 bg-slate-100 border border-b-0 rounded-t-lg text-xs">
+                            <button type="button" onclick="insertSymbol('newQuestionText', '\\( \\frac{a}{b} \\)')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\frac{a}{b}$</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', 'x^2')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$x^2$</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', 'H_2O')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$X_2$</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '\\( \\sqrt{x} \\)')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\sqrt{x}$</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '\\rightarrow')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\rightarrow$</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '^\\circ')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$^\circ$</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '\\theta')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\theta$</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '\\alpha')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\alpha$</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '\\beta')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\beta$</button>
+                            <button type="button" onclick="insertSymbol('newQuestionText', '\\pi')" class="px-2 py-1 bg-white border rounded hover:bg-indigo-50 font-semibold">$\pi$</button>
+                        </div>
+                        <textarea id="newQuestionText" rows="3" placeholder="Type question text or use symbol toolbar above..." class="w-full border p-2.5 rounded-b-lg text-sm focus:outline-none" required></textarea>
+                    </div>
+
+                    <!-- MCQ OPTIONS (IF MCQ IS SELECTED) -->
+                    <div id="mcqBlock" class="hidden space-y-2 bg-slate-50 p-4 rounded-lg border">
+                        <span class="text-xs font-bold text-slate-700">MCQ Options:</span>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" id="optA" placeholder="Option A" class="border p-2 rounded text-sm">
+                            <input type="text" id="optB" placeholder="Option B" class="border p-2 rounded text-sm">
+                            <input type="text" id="optC" placeholder="Option C" class="border p-2 rounded text-sm">
+                            <input type="text" id="optD" placeholder="Option D" class="border p-2 rounded text-sm">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg text-sm font-semibold shadow">
+                        📌 Add Question to Paper & Save to Bank
+                    </button>
+                </form>
+            </div>
+
+            <!-- EXPORT ACTIONS -->
+            <div class="flex flex-wrap gap-3 bg-white p-4 rounded-xl shadow-md">
                 <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow">🖨️ Print / Save PDF</button>
                 <button onclick="downloadAsDocx()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow">📝 Download DOCX (Word & Sync Drive)</button>
             </div>
         </div>
 
-        <!-- TAB 2: FRAME NEW QUESTION (With Image Options Support) -->
-        <div id="addSection" class="no-print bg-white p-6 rounded-xl shadow-md mb-8 hidden">
-            <h2 class="text-lg font-bold text-slate-800 mb-4">📝 Add Question to Bank</h2>
-            <form onsubmit="addNewQuestion(event)" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Class</label>
-                        <select id="newClass" class="w-full border p-2 rounded-lg text-sm" required><option value="10">Class 10</option><option value="9">Class 9</option></select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Subject</label>
-                        <select id="newSubject" class="w-full border p-2 rounded-lg text-sm" required><option value="Science">Science</option><option value="English">English</option><option value="Mathematics">Mathematics</option></select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Section</label>
-                        <select id="newSectionTag" class="w-full border p-2 rounded-lg text-sm" required>
-                            <option value="SECTION - A">SECTION - A</option>
-                            <option value="SECTION - B">SECTION - B</option>
-                            <option value="SECTION - C">SECTION - C</option>
-                            <option value="SECTION - D">SECTION - D</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Marks</label>
-                        <input type="number" id="newMarks" min="1" max="20" value="1" class="w-full border p-2 rounded-lg text-sm" required>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Question Type</label>
-                        <select id="newType" onchange="handleTypeChange()" class="w-full border p-2 rounded-lg text-sm" required>
-                            <option value="MCQ">Multiple Choice Question (MCQ)</option>
-                            <option value="Passage">Passage / Reading Question</option>
-                            <option value="Short">Short Answer Question</option>
-                            <option value="Long">Long Answer Question</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Chapter Name</label>
-                        <input type="text" id="newChapter" placeholder="e.g. Reading Skills / Electricity" class="w-full border p-2 rounded-lg text-sm" required>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Question / Passage Text</label>
-                    <textarea id="newQuestionText" rows="3" placeholder="Type main question or passage here..." class="w-full border p-2 rounded-lg text-sm" required></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Main Diagram / Image URL (Optional)</label>
-                    <input type="url" id="newImgUrl" placeholder="https://example.com/diagram.png" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-
-                <!-- DYNAMIC MCQ OPTIONS WITH IMAGE SUPPORT -->
-                <div id="mcqBlock" class="space-y-2 bg-slate-50 p-4 rounded-lg border">
-                    <span class="text-xs font-bold text-slate-700">Options (Text & Image URLs supported):</span>
-                    <div class="grid grid-cols-2 gap-3">
-                        <input type="text" id="optA" placeholder="Option A Text" class="border p-2 rounded text-sm">
-                        <input type="url" id="optAImg" placeholder="Option A Image URL (Optional)" class="border p-2 rounded text-sm bg-white">
-                        
-                        <input type="text" id="optB" placeholder="Option B Text" class="border p-2 rounded text-sm">
-                        <input type="url" id="optBImg" placeholder="Option B Image URL (Optional)" class="border p-2 rounded text-sm bg-white">
-                        
-                        <input type="text" id="optC" placeholder="Option C Text" class="border p-2 rounded text-sm">
-                        <input type="url" id="optCImg" placeholder="Option C Image URL (Optional)" class="border p-2 rounded text-sm bg-white">
-                        
-                        <input type="text" id="optD" placeholder="Option D Text" class="border p-2 rounded text-sm">
-                        <input type="url" id="optDImg" placeholder="Option D Image URL (Optional)" class="border p-2 rounded text-sm bg-white">
-                    </div>
-                </div>
-
-                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-semibold shadow">
-                    💾 Save Question to Bank & Sync Drive
-                </button>
-            </form>
+        <!-- TAB 2: QUESTION BANK MANAGER -->
+        <div id="bankSection" class="no-print bg-white p-6 rounded-xl shadow-md mb-8 hidden">
+            <h2 class="text-lg font-bold text-slate-800 mb-4">📚 Question Bank Manager (Edit / Delete Bank Questions)</h2>
+            <div id="fullQuestionBankList" class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                <!-- Loaded via JS -->
+            </div>
         </div>
 
-        <!-- GENERATED PAPER PRINT CONTAINER (CBSE STANDARD FORMAT LIKE IMAGE) -->
-        <div id="paperContainer" class="print-area cbse-font bg-white p-10 rounded-xl shadow-lg border border-slate-200">
-            
+        <!-- GENERATED PAPER PRINT AREA (REAL-TIME PAPER PREVIEW) -->
+        <div id="paperContainer" class="print-area cbse-font bg-white p-10 rounded-xl shadow-lg border border-slate-200 mt-6">
             <!-- HEADER -->
             <div class="text-center mb-6">
                 <h2 id="paperSchoolName" class="text-2xl font-bold uppercase tracking-wider text-black">DAV PUBLIC SCHOOL, SUNDER NAGAR</h2>
-                <h3 id="paperExamHeader" class="text-lg font-bold text-black mt-1">Class X - ENGLISH - Periodic Test - II</h3>
+                <h3 id="paperExamHeader" class="text-lg font-bold text-black mt-1">Class X - SCIENCE - Periodic Test - II</h3>
                 
                 <div class="flex justify-between items-center mt-4 text-sm font-bold text-black border-b pb-2">
                     <span id="paperTime">Time: 2 hour</span>
-                    <span id="paperMaxMarks">Maximum Marks: 50</span>
+                    <span id="paperMaxMarks">Maximum Marks: 0</span>
                 </div>
                 <div class="text-left mt-2 text-xs font-bold text-black uppercase tracking-wide">
                     <span id="paperInstructions">INSTRUCTIONS: All questions are compulsory</span>
                 </div>
             </div>
 
-            <!-- QUESTIONS DISPLAY AREA -->
+            <!-- LIVE QUESTIONS LIST -->
             <div id="questionsList" class="space-y-6 text-black">
-                <p class="text-slate-400 text-center italic no-print">Select questions from bank above and click "Build Selected Paper"...</p>
+                <p class="text-slate-400 text-center italic no-print">Type your questions above to start building the paper...</p>
             </div>
         </div>
 
