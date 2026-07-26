@@ -4,7 +4,7 @@
   <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- MathLive & MathJax for Client-Side Perfect Render -->
+  <!-- MathLive & MathJax for Client-Side Perfect Inline Render -->
   <script defer src="https://unpkg.com/mathlive"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
 
@@ -143,12 +143,13 @@
     </div>
   </div>
 
-  <!-- TEACHER INSTRUCTIONS GUIDE BOX -->
+  <!-- INSTRUCTIONS GUIDE -->
   <details class="guide-box" open>
-    <summary>💡 Instructions: Visual Math Formula Engine Guide</summary>
+    <summary>💡 Instructions: Inline Math Equations Guide</summary>
     <ul>
-      <li><b>Basic Formulas:</b> Simple terms (e.g. <code>x^{2}</code>, <code>H_{2}O</code>) can be typed directly.</li>
-      <li><b>Complex Math Formulas:</b> Click on <b>"📐 Math Equation Editor"</b>, visually construct your integration/matrix formula, and click <b>"✨ Render & Insert Formula"</b>. It will insert a 100% crystal clear formula directly into your active question card!</li>
+      <li><b>Inline Equations (Sentence ke beech me):</b> Sentence ke beech me equation likhne ke liye use <code>$$</code> tags me wrap karein. Example: <code>Evaluate $$ \int_{0}^{\infty} e^{-x} dx $$ when x > 0.</code></li>
+      <li><b>Options me Equations:</b> Option boxes me bhi <code>$$ \frac{a}{b} $$</code> likhein, wo automatically inline image ban kar fit ho jayegi!</li>
+      <li><b>Math Editor Use:</b> <b>"📐 Math Equation Editor"</b> khol kar formula banaen aur <b>"➕ Insert Inline Code"</b> par click karein.</li>
     </ul>
   </details>
   
@@ -214,7 +215,7 @@
     🚀 Generate Paper & Download PDF
   </button>
 
-  <div id="loader">⏳ Generating Exact PDF & Saving to Google Drive... Please Wait</div>
+  <div id="loader">⏳ Rendering Math Equations & Syncing Exact PDF... Please Wait</div>
 
   <div id="resultArea">
     <h3 style="color:#28a745; margin-bottom:15px; text-align:center;">✅ Question Paper & Answer Key Generated & Saved in Google Drive!</h3>
@@ -267,7 +268,7 @@
 
     <div style="margin-top:15px; display:flex; gap:10px; justify-content:flex-end;">
       <button type="button" class="btn" style="width:auto; background:#6c757d;" onclick="closeEquationModal()">Close</button>
-      <button type="button" class="btn" style="width:auto; background:#28a745;" onclick="renderEquationToActiveCard()">✨ Render & Insert Formula</button>
+      <button type="button" class="btn" style="width:auto; background:#28a745;" onclick="insertEquationCodeToText()">➕ Insert Inline Code ($$)</button>
     </div>
   </div>
 </div>
@@ -354,6 +355,7 @@
   var currentTeacher = null;
   var qCount = 0;
   var autoSaveTimer = null;
+  var activeInputElement = null;
 
   const DEFAULT_BANK = [
     { section: 'SECTION A', type: 'MCQ', text: 'What is the SI unit of Electric Current?', marks: 1, options: ['Ampere', 'Volt', 'Ohm', 'Watt'], subQuestions: [] },
@@ -365,6 +367,13 @@
     const map = { 1:'(i)', 2:'(ii)', 3:'(iii)', 4:'(iv)', 5:'(v)', 6:'(vi)', 7:'(vii)', 8:'(viii)', 9:'(ix)', 10:'(x)' };
     return map[num] || '(' + num + ')';
   }
+
+  // TRACK LAST ACTIVE INPUT FIELD FOR EQUATION INSERTION
+  document.addEventListener('focusin', function(e) {
+    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) {
+      activeInputElement = e.target;
+    }
+  });
 
   window.addEventListener('DOMContentLoaded', function() {
     loadTeachersList();
@@ -925,47 +934,92 @@
     if (mf) mf.insert(latex);
   }
 
-  // 100% FULL-PROOF CLIENT-SIDE SVG MATH RENDERER
-  function renderEquationToActiveCard() {
+  // INSERT INLINE LATEX MARKUP AT CURSOR POSITION IN LAST FOCUSED FIELD
+  function insertEquationCodeToText() {
     var mf = document.getElementById('mathEditorField');
     if (!mf) return;
-    
-    var latexCode = mf.value;
-    if (!latexCode.trim()) return;
+    var latex = mf.value;
+    if (!latex.trim()) return;
 
-    if (window.MathJax && window.MathJax.tex2svg) {
-      try {
-        var svgNode = window.MathJax.tex2svg(latexCode, {em: 16, ex: 8, display: false});
-        var svgEl = svgNode.querySelector('svg');
-        
-        if (svgEl) {
-          svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-          var svgData = new XMLSerializer().serializeToString(svgEl);
-          var svgBase64 = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+    var formattedCode = " $$ " + latex.trim() + " $$ ";
 
-          var targetImgInput = document.querySelector('#qCard_' + qCount + ' .q-img-input');
-          var targetPreview = document.querySelector('#qCard_' + qCount + ' #qImgPrev_' + qCount);
-
-          if (targetImgInput) {
-            targetImgInput.setAttribute('data-base64', svgBase64);
-            if (targetPreview) {
-              targetPreview.src = svgBase64;
-              targetPreview.style.display = 'block';
-            }
-            alert("✨ Formula successfully converted to HD Image and inserted into Question #" + qCount + "!");
-            triggerAutoSave();
-            closeEquationModal();
-            return;
-          }
-        }
-      } catch(e) {
-        console.error(e);
-      }
+    if (activeInputElement) {
+      var start = activeInputElement.selectionStart || 0;
+      var end = activeInputElement.selectionEnd || 0;
+      var val = activeInputElement.value;
+      activeInputElement.value = val.substring(0, start) + formattedCode + val.substring(end);
+      activeInputElement.focus();
+      activeInputElement.selectionStart = activeInputElement.selectionEnd = start + formattedCode.length;
+    } else {
+      var defaultTextarea = document.querySelector('#qCard_' + qCount + ' .q-text');
+      if (defaultTextarea) defaultTextarea.value += formattedCode;
     }
 
-    alert("MathJax loading... Please try clicking the insert button again in 2 seconds.");
+    triggerAutoSave();
+    closeEquationModal();
   }
 
+  // CLIENT-SIDE HIGH-RES LATEX TO PNG CONVERTER FOR INLINE PRE-RENDERING
+  function latexToPngBase64(latex) {
+    return new Promise(function(resolve) {
+      try {
+        if (!window.MathJax || !window.MathJax.tex2svg) {
+          return resolve(null);
+        }
+        var wrapper = window.MathJax.tex2svg(latex, {display: false});
+        var svgEl = wrapper.querySelector('svg');
+        if (!svgEl) return resolve(null);
+
+        svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        var svgData = new XMLSerializer().serializeToString(svgEl);
+        var svgBlob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
+        var url = URL.createObjectURL(svgBlob);
+
+        var img = new Image();
+        img.onload = function() {
+          var canvas = document.createElement("canvas");
+          var scale = 3; // Crisp high DPI render
+          canvas.width = (img.width || 80) * scale;
+          canvas.height = (img.height || 24) * scale;
+          var ctx = canvas.getContext("2d");
+          ctx.scale(scale, scale);
+          ctx.drawImage(img, 0, 0);
+          URL.revokeObjectURL(url);
+          resolve(canvas.toDataURL("image/png"));
+        };
+        img.onerror = function() { resolve(null); };
+        img.src = url;
+      } catch(e) {
+        resolve(null);
+      }
+    });
+  }
+
+  // SCAN STRING AND REPLACE $$ LATEX $$ WITH [[INLINE_MATH:<base64>]] PLACEHOLDERS
+  async function processInlineMathInText(rawStr) {
+    if (!rawStr || rawStr.indexOf("$$") === -1) return rawStr;
+    var parts = rawStr.split("$$");
+    var resultStr = "";
+
+    for (var p = 0; p < parts.length; p++) {
+      if (p % 2 === 1) {
+        var latexCode = parts[p].trim();
+        if (latexCode) {
+          var base64Png = await latexToPngBase64(latexCode);
+          if (base64Png) {
+            resultStr += "[[INLINE_MATH:" + base64Png + "]]";
+          } else {
+            resultStr += parts[p];
+          }
+        }
+      } else {
+        resultStr += parts[p];
+      }
+    }
+    return resultStr;
+  }
+
+  // RENDER PREVIEW
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     var html = `
@@ -1060,19 +1114,45 @@
 
   const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxT4PZjFxPvpQ5GNo5pKa3KFiO-dl5opT3PJ1tcQZYWD1OGLqPme171KN-gR0fbKXKL/exec";
 
-  function submitSingleClickAction() {
+  // ASYNC PRE-PROCESSING OF ALL INLINE MATH EQUATIONS BEFORE SENDING
+  async function submitSingleClickAction() {
     var loader = document.getElementById('loader');
     var resultArea = document.getElementById('resultArea');
     var generateBtn = document.getElementById('generateBtn');
 
-    var rawPayload = getFormData();
-    renderPreview(rawPayload);
+    loader.style.display = 'block';
+    loader.innerHTML = "⏳ Rendering Math Equations & Converting Inline Formulas...";
+    generateBtn.disabled = true;
 
+    var rawPayload = getFormData();
+
+    // Convert Inline Math in all Text Fields
+    if (rawPayload.questions && rawPayload.questions.length > 0) {
+      for (var i = 0; i < rawPayload.questions.length; i++) {
+        var q = rawPayload.questions[i];
+        q.text = await processInlineMathInText(q.text);
+        q.solution = await processInlineMathInText(q.solution);
+
+        if (q.options && q.options.length > 0) {
+          for (var o = 0; o < q.options.length; o++) {
+            q.options[o] = await processInlineMathInText(q.options[o]);
+          }
+        }
+
+        if (q.subQuestions && q.subQuestions.length > 0) {
+          for (var sq = 0; sq < q.subQuestions.length; sq++) {
+            if (typeof q.subQuestions[sq] === 'object') {
+              q.subQuestions[sq].text = await processInlineMathInText(q.subQuestions[sq].text);
+            }
+          }
+        }
+      }
+    }
+
+    renderPreview(rawPayload);
     syncQuestionsToBank(rawPayload.questions);
 
-    loader.style.display = 'block';
     loader.innerHTML = "⏳ Generating Document & Syncing Exact PDF from Google Drive...";
-    generateBtn.disabled = true;
 
     fetch(APPS_SCRIPT_WEB_APP_URL, {
       method: "POST",
@@ -1122,4 +1202,3 @@
 
 </body>
 </html>
-
