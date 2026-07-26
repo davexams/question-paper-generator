@@ -1009,7 +1009,7 @@
     closeEquationModal();
   }
 
-  // HIGH-DPI ACCURATE PROPORTIONAL MATH RENDERER (TEX-EX BALANCED)
+  // MODERATE ACCURATE MATH RENDERER MATCHING 11pt ARIAL
   function latexToPngBase64(latex) {
     return new Promise(function(resolve) {
       try {
@@ -1020,8 +1020,7 @@
         var svgEl = wrapper.querySelector('svg');
         if (!svgEl) return resolve(null);
 
-        var heightEx = parseFloat(svgEl.getAttribute('height')) || 2;
-        var widthEx = parseFloat(svgEl.getAttribute('width')) || 3;
+        var heightEx = parseFloat(svgEl.getAttribute('height')) || 1.8;
 
         svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
         var svgData = new XMLSerializer().serializeToString(svgEl);
@@ -1030,10 +1029,10 @@
 
         var img = new Image();
         img.onload = function() {
-          var scale = 3.0; // High-DPI Crisp Scale
+          var scale = 2.5; // Moderate High-DPI Resolution
           
-          // Calculate proportional target height for 11pt Arial text baseline (20px font equivalent)
-          var targetHeightPx = Math.max(16, Math.min(32, heightEx * 8.5));
+          // TARGET MODERATE HEIGHT MATCHING NORMAL ARIAL TEXT
+          var targetHeightPx = Math.max(14, Math.min(22, heightEx * 5.2));
           var targetWidthPx = (img.width / img.height) * targetHeightPx;
 
           var canvas = document.createElement("canvas");
