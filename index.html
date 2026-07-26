@@ -273,7 +273,7 @@
 
     <div style="margin-top:15px; display:flex; gap:10px; justify-content:flex-end;">
       <button type="button" class="btn" style="width:auto; background:#6c757d;" onclick="closeEquationModal()">Close</button>
-      <button type="button" class="btn" style="width:auto; background:#28a745;" onclick="copyEquationText()">📋 Copy Equation Text</button>
+      <button type="button" class="btn" style="width:auto; background:#28a745;" onclick="copyEquationText()">📋 Copy Clean Equation</button>
     </div>
   </div>
 </div>
@@ -936,15 +936,35 @@
     if (mf) mf.insert(latex);
   }
 
+  // 💡 AUTO UNICODE CONVERTER FOR GOOGLE DOCS COMPATIBILITY
   function copyEquationText() {
     var mf = document.getElementById('mathEditorField');
     if (mf) {
-      var latexText = mf.value;
-      navigator.clipboard.writeText(latexText).then(function() {
-        alert("Equation copied: " + latexText + "\n\nAap ise Question ya Solution box me paste kar sakte hain!");
+      var rawLatex = mf.value;
+      
+      // LaTeX ko pure, clean Unicode text me transform karein
+      var cleanUnicode = rawLatex
+        .replace(/\\int_{([^}]+)}^{([^}]+)}/g, "∫_($1)^($2) ")
+        .replace(/\\int/g, "∫ ")
+        .replace(/\\infty/g, "∞")
+        .replace(/\\frac{([^}]+)}{([^}]+)}/g, "($1 / $2)")
+        .replace(/\\sqrt{([^}]+)}/g, "√($1)")
+        .replace(/\\pm/g, "±")
+        .replace(/\\times/g, "×")
+        .replace(/\\div/g, "÷")
+        .replace(/\\alpha/g, "α")
+        .replace(/\\beta/g, "β")
+        .replace(/\\theta/g, "θ")
+        .replace(/\\pi/g, "π")
+        .replace(/\\Delta/g, "Δ")
+        .replace(/\^{0}/g, "⁰").replace(/\^{1}/g, "¹").replace(/\^{2}/g, "²").replace(/\^{3}/g, "³").replace(/\^{4}/g, "⁴").replace(/\^{5}/g, "⁵").replace(/\^{6}/g, "⁶").replace(/\^{7}/g, "⁷").replace(/\^{8}/g, "⁸").replace(/\^{9}/g, "⁹").replace(/\^{-x}/g, "⁻ˣ")
+        .replace(/_{0}/g, "₀").replace(/_{1}/g, "₁").replace(/_{2}/g, "₂").replace(/_{3}/g, "₃").replace(/_{4}/g, "₄").replace(/_{5}/g, "₅").replace(/_{6}/g, "₆").replace(/_{7}/g, "₇").replace(/_{8}/g, "₈").replace(/_{9}/g, "₉");
+
+      navigator.clipboard.writeText(cleanUnicode).then(function() {
+        alert("Clean Equation Copied!\n\nResult: " + cleanUnicode + "\n\nAap ise Question ya Solution box me Direct Paste kar sakte hain!");
         closeEquationModal();
       }).catch(function() {
-        prompt("Copy this equation text:", latexText);
+        prompt("Copy this equation text:", cleanUnicode);
       });
     }
   }
