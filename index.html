@@ -152,7 +152,7 @@
       <li><b>Chemistry Subscript (नीचे की संख्या):</b> Likhne ke liye <code>_{number}</code> use karein. Example: <code>H_{2}O</code> &rarr; <b>H₂O</b> | <code>CO_{2}</code> &rarr; <b>CO₂</b></li>
       <li><b>Maths Power / Superscript (ऊपर की घात):</b> Likhne ke liye <code>^{power}</code> use karein. Example: <code>x^{2}</code> &rarr; <b>x²</b> | <code>10^{-3}</code> &rarr; <b>10⁻³</b></li>
       <li><b>Chemical Reaction Arrow:</b> Reaction me Teer ke liye <code>-></code> type karein &rarr; <b>&rarr;</b></li>
-      <li><b>Complex Equations:</b> Upar diye gaye <b>"📐 Math Equation Editor"</b> button par click karke Integration, Matrices, ya Fractions visuals se bana kar copy-paste karein! Complex multi-tier formulas ke liye diagram upload use karein.</li>
+      <li><b>Complex Equations:</b> Upar diye gaye <b>"📐 Math Equation Editor"</b> button par click karke Integration, Matrices, ya Fractions visuals se bana kar copy-paste karein! High-definition equation Google Doc & PDF me automatic convert ho jayegi.</li>
     </ul>
   </details>
   
@@ -271,7 +271,7 @@
 
     <div style="margin-top:15px; display:flex; gap:10px; justify-content:flex-end;">
       <button type="button" class="btn" style="width:auto; background:#6c757d;" onclick="closeEquationModal()">Close</button>
-      <button type="button" class="btn" style="width:auto; background:#28a745;" onclick="copyEquationText()">📋 Copy Equation Text</button>
+      <button type="button" class="btn" style="width:auto; background:#28a745;" onclick="copyEquationText()">📋 Copy Equation Code</button>
     </div>
   </div>
 </div>
@@ -934,31 +934,16 @@
     if (mf) mf.insert(latex);
   }
 
+  // UPDATED: AUTO-WRAP WITH $$ FOR HIGH-DPI LATEX IMAGE ENGINE
   function copyEquationText() {
     var mf = document.getElementById('mathEditorField');
     if (mf) {
-      var rawLatex = mf.value;
-      
-      var cleanText = rawLatex
-        .replace(/\\int_{([^}]+)}^{([^}]+)}/g, "∫($1 to $2) ")
-        .replace(/\\int/g, "∫ ")
-        .replace(/\\infty/g, "∞")
-        .replace(/\\frac{([^}]+)}{([^}]+)}/g, "($1/$2)")
-        .replace(/\\sqrt{([^}]+)}/g, "√($1)")
-        .replace(/\\pm/g, "±")
-        .replace(/\\times/g, "×")
-        .replace(/\\alpha/g, "α")
-        .replace(/\\beta/g, "β")
-        .replace(/\\theta/g, "θ")
-        .replace(/\\pi/g, "π")
-        .replace(/\^{2}/g, "²").replace(/\^{3}/g, "³")
-        .replace(/_{2}/g, "₂");
-
-      navigator.clipboard.writeText(cleanText).then(function() {
-        alert("Equation Text Copied!\n\nFormatted: " + cleanText + "\n\nAap ise Question Box me paste kar sakte hain. Complex multi-tier formulas ke liye Diagram/Image option use karein.");
+      var latexText = "$$" + mf.value + "$$";
+      navigator.clipboard.writeText(latexText).then(function() {
+        alert("Equation Code Copied!\n\nResult: " + latexText + "\n\nAap ise Question ya Solution box me paste karein.");
         closeEquationModal();
       }).catch(function() {
-        prompt("Copy this text:", cleanText);
+        prompt("Copy this equation:", latexText);
       });
     }
   }
