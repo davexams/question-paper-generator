@@ -88,7 +88,6 @@
     .preview-table { width: 100%; margin: 10px 0; border-collapse: collapse; font-weight: bold; font-size: 12pt; }
     .preview-q-row { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12pt; font-weight: normal; text-align: justify; }
 
-    /* INDENTATION FOR GENERAL INSTRUCTIONS PREVIEW */
     .ins-row { display: flex; margin-bottom: 2px; }
     .ins-num { min-width: 24px; font-weight: bold; }
     .ins-txt { flex-grow: 1; text-align: justify; }
@@ -178,9 +177,9 @@
   <details class="guide-box" open>
     <summary>💡 Instructions: Smart Features Guide</summary>
     <ul>
-      <li><b>Auto Section Title Carry-Forward:</b> Naya question card add karne par wo automatic pichhle question ka Section Title copy kar lega. Jab aap Section Title badlenge, tabhi aage change hoga.</li>
+      <li><b>Auto Section Title Carry-Forward:</b> Naya question card add karne par wo automatic pichhle question ka Section Title copy kar lega.</li>
       <li><b>Perfect Indented Instructions:</b> Instructions me <code>1. Text</code>, <code>2. Text</code> har line me automatic neatly aligned indentation ke saath aayega.</li>
-      <li><b>Inline Math Equations:</b> Equation ke aage-piche <code>$$</code> wrap karein (e.g. <code>$$ \int_{0}^{\infty} e^{-x} dx $$</code>).</li>
+      <li><b>Inline Math Equations:</b> Text के center Alignment के लिए formula को <code>$$ ... $$</code> me wrap karein.</li>
     </ul>
   </details>
   
@@ -408,7 +407,6 @@
     return map[num] || '(' + num + ')';
   }
 
-  // TRACK LAST ACTIVE INPUT FIELD FOR EQUATION INSERTION
   document.addEventListener('focusin', function(e) {
     if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) {
       activeInputElement = e.target;
@@ -692,7 +690,6 @@
     calculateLiveMarks();
   }
 
-  // SMART AUTO CARRY-FORWARD SECTION TITLE LOGIC
   function getLastSectionTitle() {
     var allSecInputs = document.querySelectorAll('.q-section');
     if (allSecInputs.length > 0) {
@@ -711,7 +708,6 @@
     card.className = 'q-card';
     card.id = 'qCard_' + qCount;
 
-    // Default Section Title automatically carries forward from previous question
     var carriedSecTitle = getLastSectionTitle();
 
     q = q || { section: carriedSecTitle, type: 'MCQ', diff: 'Easy', text: '', solution: '', solImg: '', marks: 1, qImg: '', options: ['','','',''], optImgs: ['','','',''], subQuestions: [] };
@@ -932,7 +928,7 @@
     }
 
     if (savedBank.length === 0) {
-      list.innerHTML = `<div style="padding:15px; color:#888; text-align:center;">Abhi koi questions Question Bank me saved nahi hain. Questions type karne par automatic save honge.</div>`;
+      list.innerHTML = `<div style="padding:15px; color:#888; text-align:center;">Abhi koi questions Question Bank me saved nahi hain.</div>`;
       return;
     }
 
@@ -989,7 +985,6 @@
     if (mf) mf.insert(latex);
   }
 
-  // INSERT INLINE LATEX MARKUP AT CURSOR POSITION IN LAST FOCUSED FIELD
   function insertEquationCodeToText() {
     var mf = document.getElementById('mathEditorField');
     if (!mf) return;
@@ -1014,7 +1009,7 @@
     closeEquationModal();
   }
 
-  // CLIENT-SIDE HIGH-RES LATEX TO PNG CONVERTER FOR INLINE PRE-RENDERING
+  // CENTERED ZERO-PADDING MATH EQUATION RENDERING
   function latexToPngBase64(latex) {
     return new Promise(function(resolve) {
       try {
@@ -1033,9 +1028,9 @@
         var img = new Image();
         img.onload = function() {
           var canvas = document.createElement("canvas");
-          var scale = 3; // Crisp high DPI render
-          canvas.width = (img.width || 80) * scale;
-          canvas.height = (img.height || 24) * scale;
+          var scale = 2.5;
+          canvas.width = (img.width || 70) * scale;
+          canvas.height = (img.height || 16) * scale;
           var ctx = canvas.getContext("2d");
           ctx.scale(scale, scale);
           ctx.drawImage(img, 0, 0);
@@ -1050,7 +1045,6 @@
     });
   }
 
-  // SCAN STRING AND REPLACE $$ LATEX $$ WITH [[INLINE_MATH:<base64>]] PLACEHOLDERS
   async function processInlineMathInText(rawStr) {
     if (!rawStr || rawStr.indexOf("$$") === -1) return rawStr;
     var parts = rawStr.split("$$");
@@ -1074,7 +1068,6 @@
     return resultStr;
   }
 
-  // RENDER PREVIEW WITH INDENTED GENERAL INSTRUCTIONS
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     var html = `
@@ -1182,19 +1175,17 @@
 
   const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxT4PZjFxPvpQ5GNo5pKa3KFiO-dl5opT3PJ1tcQZYWD1OGLqPme171KN-gR0fbKXKL/exec";
 
-  // ASYNC PRE-PROCESSING OF ALL INLINE MATH EQUATIONS BEFORE SENDING
   async function submitSingleClickAction() {
     var loader = document.getElementById('loader');
     var resultArea = document.getElementById('resultArea');
     var generateBtn = document.getElementById('generateBtn');
 
     loader.style.display = 'block';
-    loader.innerHTML = "⏳ Rendering Math Equations & Converting Inline Formulas...";
+    loader.innerHTML = "⏳ Rendering Math Equations & Aligning Text...";
     generateBtn.disabled = true;
 
     var rawPayload = getFormData();
 
-    // Convert Inline Math in all Text Fields
     if (rawPayload.questions && rawPayload.questions.length > 0) {
       for (var i = 0; i < rawPayload.questions.length; i++) {
         var q = rawPayload.questions[i];
