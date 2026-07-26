@@ -83,9 +83,7 @@
       box-sizing: border-box;
     }
 
-    /* =========================================================
-       📱 MOBILE RESPONSIVE MEDIA QUERIES (ADDITIONS)
-       ========================================================= */
+    /* MOBILE RESPONSIVE MEDIA QUERIES */
     @media screen and (max-width: 768px) {
       body { padding: 10px; }
       .container { padding: 15px; }
@@ -147,14 +145,14 @@
     </div>
   </div>
 
-  <!-- 💡 TEACHER INSTRUCTIONS GUIDE BOX -->
+  <!-- TEACHER INSTRUCTIONS GUIDE BOX -->
   <details class="guide-box" open>
     <summary>💡 Instructions: Chemistry Formulas, Maths Equations & Formatting Guide</summary>
     <ul>
       <li><b>Chemistry Subscript (नीचे की संख्या):</b> Likhne ke liye <code>_{number}</code> use karein. Example: <code>H_{2}O</code> &rarr; <b>H₂O</b> | <code>CO_{2}</code> &rarr; <b>CO₂</b></li>
       <li><b>Maths Power / Superscript (ऊपर की घात):</b> Likhne ke liye <code>^{power}</code> use karein. Example: <code>x^{2}</code> &rarr; <b>x²</b> | <code>10^{-3}</code> &rarr; <b>10⁻³</b></li>
       <li><b>Chemical Reaction Arrow:</b> Reaction me Teer ke liye <code>-></code> type karein &rarr; <b>&rarr;</b></li>
-      <li><b>Complex Equations:</b> Upar diye gaye <b>"📐 Math Equation Editor"</b> button par click karke Integration, Matrices, ya Fractions visuals se bana kar copy-paste karein!</li>
+      <li><b>Complex Equations:</b> Upar diye gaye <b>"📐 Math Equation Editor"</b> button par click karke Integration, Matrices, ya Fractions visuals se bana kar copy-paste karein! Complex multi-tier formulas ke liye diagram upload use karein.</li>
     </ul>
   </details>
   
@@ -246,7 +244,7 @@
   </div>
 </div>
 
-<!-- 📐 VISUAL MATH EQUATION EDITOR MODAL -->
+<!-- VISUAL MATH EQUATION EDITOR MODAL -->
 <div id="equationModal" class="modal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -273,7 +271,7 @@
 
     <div style="margin-top:15px; display:flex; gap:10px; justify-content:flex-end;">
       <button type="button" class="btn" style="width:auto; background:#6c757d;" onclick="closeEquationModal()">Close</button>
-      <button type="button" class="btn" style="width:auto; background:#28a745;" onclick="copyEquationText()">📋 Copy Clean Equation</button>
+      <button type="button" class="btn" style="width:auto; background:#28a745;" onclick="copyEquationText()">📋 Copy Equation Text</button>
     </div>
   </div>
 </div>
@@ -864,7 +862,7 @@
     }
   }
 
-  // 📚 OPEN QUESTION BANK MODAL & RENDER SAVED ITEMS
+  // QUESTION BANK MODAL LOGIC
   function openBankModal() {
     var modal = document.getElementById('bankModal');
     var list = document.getElementById('bankList');
@@ -922,7 +920,7 @@
     }
   }
 
-  // 📐 MATH EQUATION EDITOR MODAL LOGIC
+  // MATH EQUATION EDITOR MODAL LOGIC
   function openEquationModal() {
     document.getElementById('equationModal').style.display = 'block';
   }
@@ -936,35 +934,31 @@
     if (mf) mf.insert(latex);
   }
 
-  // 💡 AUTO UNICODE CONVERTER FOR GOOGLE DOCS COMPATIBILITY
   function copyEquationText() {
     var mf = document.getElementById('mathEditorField');
     if (mf) {
       var rawLatex = mf.value;
       
-      // LaTeX ko pure, clean Unicode text me transform karein
-      var cleanUnicode = rawLatex
-        .replace(/\\int_{([^}]+)}^{([^}]+)}/g, "∫_($1)^($2) ")
+      var cleanText = rawLatex
+        .replace(/\\int_{([^}]+)}^{([^}]+)}/g, "∫($1 to $2) ")
         .replace(/\\int/g, "∫ ")
         .replace(/\\infty/g, "∞")
-        .replace(/\\frac{([^}]+)}{([^}]+)}/g, "($1 / $2)")
+        .replace(/\\frac{([^}]+)}{([^}]+)}/g, "($1/$2)")
         .replace(/\\sqrt{([^}]+)}/g, "√($1)")
         .replace(/\\pm/g, "±")
         .replace(/\\times/g, "×")
-        .replace(/\\div/g, "÷")
         .replace(/\\alpha/g, "α")
         .replace(/\\beta/g, "β")
         .replace(/\\theta/g, "θ")
         .replace(/\\pi/g, "π")
-        .replace(/\\Delta/g, "Δ")
-        .replace(/\^{0}/g, "⁰").replace(/\^{1}/g, "¹").replace(/\^{2}/g, "²").replace(/\^{3}/g, "³").replace(/\^{4}/g, "⁴").replace(/\^{5}/g, "⁵").replace(/\^{6}/g, "⁶").replace(/\^{7}/g, "⁷").replace(/\^{8}/g, "⁸").replace(/\^{9}/g, "⁹").replace(/\^{-x}/g, "⁻ˣ")
-        .replace(/_{0}/g, "₀").replace(/_{1}/g, "₁").replace(/_{2}/g, "₂").replace(/_{3}/g, "₃").replace(/_{4}/g, "₄").replace(/_{5}/g, "₅").replace(/_{6}/g, "₆").replace(/_{7}/g, "₇").replace(/_{8}/g, "₈").replace(/_{9}/g, "₉");
+        .replace(/\^{2}/g, "²").replace(/\^{3}/g, "³")
+        .replace(/_{2}/g, "₂");
 
-      navigator.clipboard.writeText(cleanUnicode).then(function() {
-        alert("Clean Equation Copied!\n\nResult: " + cleanUnicode + "\n\nAap ise Question ya Solution box me Direct Paste kar sakte hain!");
+      navigator.clipboard.writeText(cleanText).then(function() {
+        alert("Equation Text Copied!\n\nFormatted: " + cleanText + "\n\nAap ise Question Box me paste kar sakte hain. Complex multi-tier formulas ke liye Diagram/Image option use karein.");
         closeEquationModal();
       }).catch(function() {
-        prompt("Copy this equation text:", cleanUnicode);
+        prompt("Copy this text:", cleanText);
       });
     }
   }
