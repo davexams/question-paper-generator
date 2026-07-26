@@ -179,7 +179,7 @@
     <ul>
       <li><b>Auto Section Title Carry-Forward:</b> Naya question card add karne par wo automatic pichhle question ka Section Title copy kar lega.</li>
       <li><b>Perfect Indented Instructions:</b> Instructions me <code>1. Text</code>, <code>2. Text</code> har line me automatic neatly aligned indentation ke saath aayega.</li>
-      <li><b>Inline Math Equations:</b> Text के saath align karne ke liye formula ko <code>$$ ... $$</code> me wrap karein.</li>
+      <li><b>Inline Math Equations:</b> Text के exact straight alignment ke liye formula ko <code>$$ ... $$</code> me wrap karein.</li>
     </ul>
   </details>
   
@@ -1009,7 +1009,7 @@
     closeEquationModal();
   }
 
-  // HIGH RESOLUTION MATH EQUATION RENDERING WITH CLEAN PROPORTIONAL CANVAS
+  // EXACT 20px MATH EQUATION RENDERING WITH CLEAN PROPORTIONAL CANVAS
   function latexToPngBase64(latex) {
     return new Promise(function(resolve) {
       try {
@@ -1028,9 +1028,9 @@
         var img = new Image();
         img.onload = function() {
           var canvas = document.createElement("canvas");
-          var scale = 3.0; // High resolution crispness
-          canvas.width = (img.width || 80) * scale;
-          canvas.height = (img.height || 22) * scale;
+          var scale = 3.0; // Crisp high resolution
+          canvas.width = (img.width || 75) * scale;
+          canvas.height = (img.height || 20) * scale;
           var ctx = canvas.getContext("2d");
           ctx.scale(scale, scale);
           ctx.drawImage(img, 0, 0);
