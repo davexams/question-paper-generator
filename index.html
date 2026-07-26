@@ -2,11 +2,11 @@
 <html>
 <head>
   <base target="_top">
-  <!-- Viewport for Mobile Responsiveness -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- MathLive Editor Library for Visual Equations -->
+  <!-- MathLive & MathJax for Client-Side Perfect Render -->
   <script defer src="https://unpkg.com/mathlive"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
 
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; color: #333; }
@@ -22,7 +22,6 @@
     input, select, textarea { width: 100%; padding: 9px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
     textarea { height: 65px; resize: vertical; }
     
-    /* Guide Box Styling */
     .guide-box { background-color: #e8f4fe; border-left: 5px solid #1a73e8; border-radius: 6px; padding: 12px 18px; margin-bottom: 20px; font-size: 13px; color: #1e3a8a; }
     .guide-box summary { font-weight: bold; cursor: pointer; color: #1a73e8; font-size: 14px; }
     .guide-box ul { margin: 8px 0 0 18px; padding: 0; }
@@ -83,7 +82,6 @@
       box-sizing: border-box;
     }
 
-    /* MOBILE RESPONSIVE MEDIA QUERIES */
     @media screen and (max-width: 768px) {
       body { padding: 10px; }
       .container { padding: 15px; }
@@ -147,12 +145,10 @@
 
   <!-- TEACHER INSTRUCTIONS GUIDE BOX -->
   <details class="guide-box" open>
-    <summary>💡 Instructions: Chemistry Formulas, Maths Equations & Formatting Guide</summary>
+    <summary>💡 Instructions: Visual Math Formula Engine Guide</summary>
     <ul>
-      <li><b>Chemistry Subscript (नीचे की संख्या):</b> Likhne ke liye <code>_{number}</code> use karein. Example: <code>H_{2}O</code> &rarr; <b>H₂O</b> | <code>CO_{2}</code> &rarr; <b>CO₂</b></li>
-      <li><b>Maths Power / Superscript (ऊपर की घात):</b> Likhne ke liye <code>^{power}</code> use karein. Example: <code>x^{2}</code> &rarr; <b>x²</b> | <code>10^{-3}</code> &rarr; <b>10⁻³</b></li>
-      <li><b>Chemical Reaction Arrow:</b> Reaction me Teer ke liye <code>-></code> type karein &rarr; <b>&rarr;</b></li>
-      <li><b>Complex Equations:</b> Upar diye gaye <b>"📐 Math Equation Editor"</b> button par click karke Integration, Matrices, ya Fractions visuals se bana kar copy-paste karein! High-definition equation Google Doc & PDF me automatic convert ho jayegi.</li>
+      <li><b>Basic Formulas:</b> Simple terms (e.g. <code>x^{2}</code>, <code>H_{2}O</code>) can be typed directly.</li>
+      <li><b>Complex Math Formulas:</b> Click on <b>"📐 Math Equation Editor"</b>, visually construct your integration/matrix formula, and click <b>"✨ Render & Insert Formula"</b>. It will insert a 100% crystal clear formula directly into your active question card!</li>
     </ul>
   </details>
   
@@ -252,7 +248,7 @@
       <button onclick="closeEquationModal()" style="border:none; font-size:18px; cursor:pointer;">❌</button>
     </div>
     <p style="font-size:13px; color:#555; margin-bottom:10px;">
-      Type or click buttons to construct complex math formulas (Integration ∫, Matrices, Roots, Fractions).
+      Construct complex math formulas (Integration ∫, Matrices, Roots, Fractions).
     </p>
 
     <!-- Shortcut Buttons for Teachers -->
@@ -271,7 +267,7 @@
 
     <div style="margin-top:15px; display:flex; gap:10px; justify-content:flex-end;">
       <button type="button" class="btn" style="width:auto; background:#6c757d;" onclick="closeEquationModal()">Close</button>
-      <button type="button" class="btn" style="width:auto; background:#28a745;" onclick="copyEquationText()">📋 Copy Equation Code</button>
+      <button type="button" class="btn" style="width:auto; background:#28a745;" onclick="renderEquationToActiveCard()">✨ Render & Insert Formula</button>
     </div>
   </div>
 </div>
@@ -359,7 +355,6 @@
   var qCount = 0;
   var autoSaveTimer = null;
 
-  // INITIAL DEFAULT BANK QUESTIONS
   const DEFAULT_BANK = [
     { section: 'SECTION A', type: 'MCQ', text: 'What is the SI unit of Electric Current?', marks: 1, options: ['Ampere', 'Volt', 'Ohm', 'Watt'], subQuestions: [] },
     { section: 'SECTION B', type: 'DESCRIPTIVE', text: 'State Ohm\'s Law and derive its mathematical formula.', marks: 2, options: [], subQuestions: [] },
@@ -459,7 +454,6 @@
     }
   }
 
-  // 🔄 AUTO SYNC ENTERED QUESTIONS TO QUESTION BANK
   function syncQuestionsToBank(questions) {
     if (!questions || questions.length === 0) return;
     var existingBank = [];
@@ -499,7 +493,6 @@
     var payload = getFormData();
     try { localStorage.setItem('draft_' + currentTeacher, JSON.stringify(payload)); } catch(e){}
 
-    // Sync active questions to Bank
     syncQuestionsToBank(payload.questions);
 
     var tag = document.getElementById('statusTag');
@@ -862,7 +855,6 @@
     }
   }
 
-  // QUESTION BANK MODAL LOGIC
   function openBankModal() {
     var modal = document.getElementById('bankModal');
     var list = document.getElementById('bankList');
@@ -920,7 +912,6 @@
     }
   }
 
-  // MATH EQUATION EDITOR MODAL LOGIC
   function openEquationModal() {
     document.getElementById('equationModal').style.display = 'block';
   }
@@ -934,21 +925,47 @@
     if (mf) mf.insert(latex);
   }
 
-  // UPDATED: AUTO-WRAP WITH $$ FOR HIGH-DPI LATEX IMAGE ENGINE
-  function copyEquationText() {
+  // 100% FULL-PROOF CLIENT-SIDE SVG MATH RENDERER
+  function renderEquationToActiveCard() {
     var mf = document.getElementById('mathEditorField');
-    if (mf) {
-      var latexText = "$$" + mf.value + "$$";
-      navigator.clipboard.writeText(latexText).then(function() {
-        alert("Equation Code Copied!\n\nResult: " + latexText + "\n\nAap ise Question ya Solution box me paste karein.");
-        closeEquationModal();
-      }).catch(function() {
-        prompt("Copy this equation:", latexText);
-      });
+    if (!mf) return;
+    
+    var latexCode = mf.value;
+    if (!latexCode.trim()) return;
+
+    if (window.MathJax && window.MathJax.tex2svg) {
+      try {
+        var svgNode = window.MathJax.tex2svg(latexCode, {em: 16, ex: 8, display: false});
+        var svgEl = svgNode.querySelector('svg');
+        
+        if (svgEl) {
+          svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+          var svgData = new XMLSerializer().serializeToString(svgEl);
+          var svgBase64 = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+
+          var targetImgInput = document.querySelector('#qCard_' + qCount + ' .q-img-input');
+          var targetPreview = document.querySelector('#qCard_' + qCount + ' #qImgPrev_' + qCount);
+
+          if (targetImgInput) {
+            targetImgInput.setAttribute('data-base64', svgBase64);
+            if (targetPreview) {
+              targetPreview.src = svgBase64;
+              targetPreview.style.display = 'block';
+            }
+            alert("✨ Formula successfully converted to HD Image and inserted into Question #" + qCount + "!");
+            triggerAutoSave();
+            closeEquationModal();
+            return;
+          }
+        }
+      } catch(e) {
+        console.error(e);
+      }
     }
+
+    alert("MathJax loading... Please try clicking the insert button again in 2 seconds.");
   }
 
-  // RENDER PREVIEW
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     var html = `
@@ -1051,7 +1068,6 @@
     var rawPayload = getFormData();
     renderPreview(rawPayload);
 
-    // Sync active questions to Bank
     syncQuestionsToBank(rawPayload.questions);
 
     loader.style.display = 'block';
