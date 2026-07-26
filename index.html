@@ -4,6 +4,10 @@
   <base target="_top">
   <!-- Viewport for Mobile Responsiveness -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- MathLive Editor Library for Visual Equations -->
+  <script defer src="https://unpkg.com/mathlive"></script>
+
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; color: #333; }
     .container { max-width: 950px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
@@ -45,6 +49,8 @@
     .btn-add:hover { background-color: #2d8e47; }
     .btn-bank { background-color: #6f42c1; margin-bottom: 20px; width: auto; font-size: 14px; padding: 10px 16px; }
     .btn-bank:hover { background-color: #593196; }
+    .btn-eq { background-color: #fd7e14; margin-bottom: 20px; width: auto; font-size: 14px; padding: 10px 16px; color: white; }
+    .btn-eq:hover { background-color: #e06d10; }
     .btn-del { background-color: #ea4335; width: auto; padding: 4px 8px; font-size: 12px; position: absolute; right: 10px; top: 10px; }
 
     .img-preview { max-height: 80px; margin-top: 5px; display: block; border: 1px solid #ddd; border-radius: 3px; max-width: 100%; object-fit: contain; }
@@ -67,6 +73,16 @@
     .preview-footer { margin-top: 30px; text-align: center; font-size: 10pt; font-weight: bold; color: #555; }
     .preview-footer-line { border: 0; border-top: 1px solid #888; margin-bottom: 6px; }
 
+    math-field {
+      width: 100%;
+      font-size: 18px;
+      padding: 10px;
+      border: 1px solid #0d6efd;
+      border-radius: 6px;
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+
     /* =========================================================
        📱 MOBILE RESPONSIVE MEDIA QUERIES (ADDITIONS)
        ========================================================= */
@@ -84,7 +100,7 @@
       .header-portal-bar > div { width: 100%; justify-content: space-between; }
       
       .section-header-bar { flex-direction: column; align-items: stretch !important; gap: 10px; }
-      .btn-bank { width: 100%; text-align: center; margin-bottom: 10px; }
+      .btn-bank, .btn-eq { width: 100%; text-align: center; margin-bottom: 8px; }
       
       .paper-preview { padding: 15px; font-size: 11pt; }
       
@@ -138,8 +154,7 @@
       <li><b>Chemistry Subscript (नीचे की संख्या):</b> Likhne ke liye <code>_{number}</code> use karein. Example: <code>H_{2}O</code> &rarr; <b>H₂O</b> | <code>CO_{2}</code> &rarr; <b>CO₂</b></li>
       <li><b>Maths Power / Superscript (ऊपर की घात):</b> Likhne ke liye <code>^{power}</code> use karein. Example: <code>x^{2}</code> &rarr; <b>x²</b> | <code>10^{-3}</code> &rarr; <b>10⁻³</b></li>
       <li><b>Chemical Reaction Arrow:</b> Reaction me Teer ke liye <code>-></code> type karein &rarr; <b>&rarr;</b></li>
-      <li><b>Toolbar Buttons:</b> Question Text, MCQ Options, aur Sub-parts ke upar diye gaye symbol buttons par click karke direct symbols (<code>&alpha;</code>, <code>&beta;</code>, <code>&theta;</code>, <code>&pi;</code>, <code>&radic;</code>, <code>&plusmn;</code>) insert karein.</li>
-      <li><b>Auto Question Bank:</b> Aapka enter kiya hua har question automatic Question Bank me save hota jayega!</li>
+      <li><b>Complex Equations:</b> Upar diye gaye <b>"📐 Math Equation Editor"</b> button par click karke Integration, Matrices, ya Fractions visuals se bana kar copy-paste karein!</li>
     </ul>
   </details>
   
@@ -191,7 +206,10 @@
 
   <div class="section-header-bar" style="display:flex; justify-content:space-between; align-items:center;">
     <h3>Questions Engine & Marking Scheme Setup</h3>
-    <button type="button" class="btn btn-bank" onclick="openBankModal()">📚 Insert from Question Bank</button>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button type="button" class="btn btn-eq" onclick="openEquationModal()">📐 Math Equation Editor</button>
+      <button type="button" class="btn btn-bank" onclick="openBankModal()">📚 Insert from Question Bank</button>
+    </div>
   </div>
 
   <div id="questionsContainer"></div>
@@ -225,6 +243,38 @@
     </div>
     <p style="font-size:12px; color:#666;">Click on any question below to import it directly into your exam paper:</p>
     <div id="bankList" style="margin-top:15px;"></div>
+  </div>
+</div>
+
+<!-- 📐 VISUAL MATH EQUATION EDITOR MODAL -->
+<div id="equationModal" class="modal">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3>📐 Visual Equation & Formula Editor</h3>
+      <button onclick="closeEquationModal()" style="border:none; font-size:18px; cursor:pointer;">❌</button>
+    </div>
+    <p style="font-size:13px; color:#555; margin-bottom:10px;">
+      Type or click buttons to construct complex math formulas (Integration ∫, Matrices, Roots, Fractions).
+    </p>
+
+    <!-- Shortcut Buttons for Teachers -->
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+      <button type="button" class="sym-btn" onclick="insertMathLive('\\int_{a}^{b} x dx')">∫ Integration</button>
+      <button type="button" class="sym-btn" onclick="insertMathLive('\\frac{d}{dx}')">d/dx Derivative</button>
+      <button type="button" class="sym-btn" onclick="insertMathLive('\\frac{a}{b}')">a/b Fraction</button>
+      <button type="button" class="sym-btn" onclick="insertMathLive('\\sqrt{x}')">√ Square Root</button>
+      <button type="button" class="sym-btn" onclick="insertMathLive('\\begin{matrix} a & b \\\\ c & d \\end{matrix}')">[ Matrix ]</button>
+      <button type="button" class="sym-btn" onclick="insertMathLive('\\sum_{i=1}^{n}')">∑ Summation</button>
+      <button type="button" class="sym-btn" onclick="insertMathLive('\\lim_{x \\to 0}')">lim Limit</button>
+    </div>
+
+    <!-- MathLive Interactive Field -->
+    <math-field id="mathEditorField">x^2 + \int_{0}^{\infty} e^{-x} dx</math-field>
+
+    <div style="margin-top:15px; display:flex; gap:10px; justify-content:flex-end;">
+      <button type="button" class="btn" style="width:auto; background:#6c757d;" onclick="closeEquationModal()">Close</button>
+      <button type="button" class="btn" style="width:auto; background:#28a745;" onclick="copyEquationText()">📋 Copy Equation Text</button>
+    </div>
   </div>
 </div>
 
@@ -869,6 +919,33 @@
         subQuestions: q.subQuestions || []
       });
       closeBankModal();
+    }
+  }
+
+  // 📐 MATH EQUATION EDITOR MODAL LOGIC
+  function openEquationModal() {
+    document.getElementById('equationModal').style.display = 'block';
+  }
+
+  function closeEquationModal() {
+    document.getElementById('equationModal').style.display = 'none';
+  }
+
+  function insertMathLive(latex) {
+    var mf = document.getElementById('mathEditorField');
+    if (mf) mf.insert(latex);
+  }
+
+  function copyEquationText() {
+    var mf = document.getElementById('mathEditorField');
+    if (mf) {
+      var latexText = mf.value;
+      navigator.clipboard.writeText(latexText).then(function() {
+        alert("Equation copied: " + latexText + "\n\nAap ise Question ya Solution box me paste kar sakte hain!");
+        closeEquationModal();
+      }).catch(function() {
+        prompt("Copy this equation text:", latexText);
+      });
     }
   }
 
