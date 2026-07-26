@@ -179,7 +179,7 @@
     <ul>
       <li><b>Auto Section Title Carry-Forward:</b> Naya question card add karne par wo automatic pichhle question ka Section Title copy kar lega.</li>
       <li><b>Perfect Indented Instructions:</b> Instructions me <code>1. Text</code>, <code>2. Text</code> har line me automatic neatly aligned indentation ke saath aayega.</li>
-      <li><b>Inline Math Equations:</b> Text के exact straight alignment ke liye formula ko <code>$$ ... $$</code> me wrap karein.</li>
+      <li><b>Inline Math Equations:</b> Text ke exact straight alignment ke liye formula ko <code>$$ ... $$</code> me wrap karein.</li>
     </ul>
   </details>
   
@@ -1009,7 +1009,7 @@
     closeEquationModal();
   }
 
-  // EXACT 20px MATH EQUATION RENDERING WITH CLEAN PROPORTIONAL CANVAS
+  // HIGH-DPI ACCURATE PROPORTIONAL MATH RENDERER (TEX-EX BALANCED)
   function latexToPngBase64(latex) {
     return new Promise(function(resolve) {
       try {
@@ -1020,6 +1020,9 @@
         var svgEl = wrapper.querySelector('svg');
         if (!svgEl) return resolve(null);
 
+        var heightEx = parseFloat(svgEl.getAttribute('height')) || 2;
+        var widthEx = parseFloat(svgEl.getAttribute('width')) || 3;
+
         svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
         var svgData = new XMLSerializer().serializeToString(svgEl);
         var svgBlob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
@@ -1027,13 +1030,20 @@
 
         var img = new Image();
         img.onload = function() {
+          var scale = 3.0; // High-DPI Crisp Scale
+          
+          // Calculate proportional target height for 11pt Arial text baseline (20px font equivalent)
+          var targetHeightPx = Math.max(16, Math.min(32, heightEx * 8.5));
+          var targetWidthPx = (img.width / img.height) * targetHeightPx;
+
           var canvas = document.createElement("canvas");
-          var scale = 3.0; // Crisp high resolution
-          canvas.width = (img.width || 75) * scale;
-          canvas.height = (img.height || 20) * scale;
+          canvas.width = targetWidthPx * scale;
+          canvas.height = targetHeightPx * scale;
+
           var ctx = canvas.getContext("2d");
           ctx.scale(scale, scale);
-          ctx.drawImage(img, 0, 0);
+          ctx.drawImage(img, 0, 0, targetWidthPx, targetHeightPx);
+
           URL.revokeObjectURL(url);
           resolve(canvas.toDataURL("image/png"));
         };
@@ -1261,4 +1271,3 @@
 
 </body>
 </html>
-
