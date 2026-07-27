@@ -801,7 +801,7 @@
     closeEquationModal();
   }
 
-  // Live Preview Renderer Function
+  // Live Preview Renderer Function (Updated Question Text Font size: 12pt)
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     if (!box) return;
@@ -841,12 +841,12 @@
         }
 
         html += `
-          <table style="width:100%; border:none; margin-bottom:2px; font-size:10pt; border-collapse:collapse;">
+          <table style="width:100%; border:none; margin-bottom:2px; font-size:12pt; border-collapse:collapse;">
             <tr style="vertical-align:top;">
               <td style="padding:1px 0; text-align:justify;">
-                <b>Q.${qNum}.   </b><span style="font-weight:normal;">${q.text || ''}</span>
+                <b>Q.${qNum}.   </b><span style="font-weight:normal; font-size:12pt;">${q.text || ''}</span>
               </td>
-              <td style="width:50px; text-align:right; font-weight:bold; padding:1px 0; white-space:nowrap;">
+              <td style="width:50px; text-align:right; font-weight:bold; padding:1px 0; white-space:nowrap; font-size:10pt;">
                 [${q.marks || 1}]
               </td>
             </tr>
@@ -859,7 +859,7 @@
 
         if (q.type === 'MCQ' && q.options && q.options.length > 0) {
           html += `
-            <div style="margin-left:25px; font-size:9.5pt; margin-bottom:4px; font-weight:normal;">
+            <div style="margin-left:25px; font-size:10.5pt; margin-bottom:4px; font-weight:normal;">
               <span style="display:inline-block; min-width:45%;">(a) ${q.options[0]||''}</span>
               <span style="display:inline-block; min-width:45%;">(b) ${q.options[1]||''}</span><br>
               <span style="display:inline-block; min-width:45%;">(c) ${q.options[2]||''}</span>
@@ -872,7 +872,7 @@
           q.subQuestions.forEach(function(sub, sIdx) {
             var sTxt = (typeof sub === 'string') ? sub : sub.text;
             var sImg = (typeof sub === 'string') ? '' : sub.img;
-            html += `<div style="margin-left:25px; font-size:9.5pt; margin-bottom:2px; font-weight:normal;">(${sIdx + 1}) ${sTxt}</div>`;
+            html += `<div style="margin-left:25px; font-size:10.5pt; margin-bottom:2px; font-weight:normal;">(${sIdx + 1}) ${sTxt}</div>`;
             if (sImg) html += `<div style="text-align:center; margin:3px 0;"><img src="${sImg}" style="max-width:300px;"></div>`;
           });
         }
