@@ -790,7 +790,7 @@
     closeEquationModal();
   }
 
-  // Inline Balanced Base64 Generator
+  // Fine-tuned Proportional Inline Equation Converter (2.8x Scale)
   async function renderLatexToImageBase64(latexStr) {
     return new Promise((resolve) => {
       try {
@@ -809,7 +809,7 @@
         var img = new Image();
         img.onload = function() {
           var canvas = document.createElement('canvas');
-          var scale = 3.0;
+          var scale = 2.8;
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
           var ctx = canvas.getContext('2d');
