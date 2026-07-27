@@ -790,7 +790,6 @@
     closeEquationModal();
   }
 
-  // Moderate Sized Moderate Base64 Equation Generator
   async function renderLatexToImageBase64(latexStr) {
     return new Promise((resolve) => {
       try {
@@ -809,7 +808,7 @@
         var img = new Image();
         img.onload = function() {
           var canvas = document.createElement('canvas');
-          var scale = 2.5; // High definition crisp quality
+          var scale = 2.5;
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
           var ctx = canvas.getContext('2d');
@@ -829,7 +828,7 @@
     });
   }
 
-  // Live Symmetrical Preview Renderer with Hanging Indent CSS
+  // 3-Column Symmetrical Live Preview Renderer
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     if (!box) return;
@@ -871,10 +870,11 @@
         html += `
           <table style="width:100%; border:none; margin-bottom:6px; font-size:12pt; border-collapse:collapse;">
             <tr style="vertical-align:top;">
-              <td style="padding:2px 0; text-align:justify; word-wrap:break-word; padding-left:32px; text-indent:-32px;">
-                <b>Q.${qNum}. </b><span style="font-weight:normal; font-size:12pt;">${q.text || ''}</span>
+              <td style="width:35px; padding:2px 0; font-weight:bold;">Q.${qNum}.</td>
+              <td style="padding:2px 0; text-align:justify; word-wrap:break-word;">
+                <span style="font-weight:normal; font-size:12pt;">${q.text || ''}</span>
               </td>
-              <td style="width:55px; text-align:right; font-weight:bold; padding:2px 0; white-space:nowrap; font-size:10pt;">
+              <td style="width:45px; text-align:right; font-weight:bold; padding:2px 0; white-space:nowrap; font-size:10pt;">
                 [${q.marks || 1}]
               </td>
             </tr>
@@ -887,7 +887,7 @@
 
         if (q.type === 'MCQ' && q.options && q.options.length > 0) {
           html += `
-            <div style="margin-left:32px; font-size:10.5pt; margin-bottom:6px; font-weight:normal;">
+            <div style="margin-left:35px; font-size:10.5pt; margin-bottom:6px; font-weight:normal;">
               <span style="display:inline-block; min-width:45%;">(a) ${q.options[0]||''}</span>
               <span style="display:inline-block; min-width:45%;">(b) ${q.options[1]||''}</span><br>
               <span style="display:inline-block; min-width:45%;">(c) ${q.options[2]||''}</span>
@@ -900,7 +900,7 @@
           q.subQuestions.forEach(function(sub, sIdx) {
             var sTxt = (typeof sub === 'string') ? sub : sub.text;
             var sImg = (typeof sub === 'string') ? '' : sub.img;
-            html += `<div style="margin-left:32px; font-size:10.5pt; margin-bottom:3px; font-weight:normal; text-align:justify;">(${sIdx + 1}) ${sTxt}</div>`;
+            html += `<div style="margin-left:35px; font-size:10.5pt; margin-bottom:3px; font-weight:normal; text-align:justify;">(${sIdx + 1}) ${sTxt}</div>`;
             if (sImg) html += `<div style="text-align:center; margin:3px 0;"><img src="${sImg}" style="max-width:300px;"></div>`;
           });
         }
@@ -920,7 +920,7 @@
     var generateBtn = document.getElementById('generateBtn');
 
     loader.style.display = 'block';
-    loader.innerHTML = "⏳ Converting Equations to Moderate Images & Syncing with Google Drive...";
+    loader.innerHTML = "⏳ Converting Equations & Generating Perfect Symmetrical Document...";
     generateBtn.disabled = true;
 
     var rawPayload = getFormData();
