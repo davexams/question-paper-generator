@@ -86,7 +86,7 @@
       box-shadow: 0 6px 20px rgba(0,0,0,0.35);
     }
 
-    .img-preview { max-height: 80px; margin-top: 5px; display: block; border: 1px solid #ddd; border-radius: 3px; max-width: 100%; object-fit: contain; }
+    .img-preview { max-height: 100px; margin-top: 5px; display: block; border: 1px solid #ddd; border-radius: 3px; max-width: 100%; object-fit: contain; }
 
     #statusTag { position: fixed; top: 15px; right: 15px; background: #e6f4ea; color: #137333; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ceead6; display: none; z-index: 1000; }
     #loader { display: none; text-align: center; margin-top: 15px; color: #1a73e8; font-weight: bold; }
@@ -121,7 +121,6 @@
       touch-action: manipulation;
     }
 
-    /* 📱 FIX MATHLIVE VIRTUAL KEYBOARD TOUCH EVENTS FOR MOBILE DEVICES */
     .ML__keyboard, ml-keyboard, div[ML__keyboard], .ML__keyboard-container {
       z-index: 999999 !important;
       pointer-events: auto !important;
@@ -191,7 +190,6 @@
     </div>
   </div>
 
-  <!-- INSTRUCTIONS GUIDE -->
   <details class="guide-box" open>
     <summary>💡 Instructions: Smart Features Guide</summary>
     <ul>
@@ -246,7 +244,6 @@
 
   <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
 
-  <!-- LIVE MARKS COUNTER BAR -->
   <div class="live-counter-bar">
     <span>📊 Total Questions Added: <span id="statQCount">0</span></span>
     <span>🎯 Target Marks: <span id="statTargetMarks">80</span></span>
@@ -282,12 +279,10 @@
   </div>
 </div>
 
-<!-- FLOATING ALWAYS-VISIBLE MATH EDITOR BUTTON -->
 <button type="button" class="btn-eq-floating" onclick="openEquationModal()" title="Open Math Equation Editor">
   📐 Math Editor
 </button>
 
-<!-- QUESTION BANK MODAL WITH CLOUD SYNC SUPPORT -->
 <div id="bankModal" class="modal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -299,7 +294,6 @@
   </div>
 </div>
 
-<!-- VISUAL MATH EQUATION EDITOR MODAL -->
 <div id="equationModal" class="modal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -310,7 +304,6 @@
       Construct complex math formulas (Integration ∫, Matrices, Roots, Fractions).
     </p>
 
-    <!-- Shortcut Buttons for Teachers -->
     <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
       <button type="button" class="sym-btn" onclick="insertMathLive('\\int_{a}^{b} x dx')">∫ Integration</button>
       <button type="button" class="sym-btn" onclick="insertMathLive('\\frac{d}{dx}')">d/dx Derivative</button>
@@ -321,7 +314,6 @@
       <button type="button" class="sym-btn" onclick="insertMathLive('\\lim_{x \\to 0}')">lim Limit</button>
     </div>
 
-    <!-- MathLive Interactive Field with explicit mobile policy -->
     <math-field id="mathEditorField" math-virtual-keyboard-policy="auto">x^2 + \int_{0}^{\infty} e^{-x} dx</math-field>
 
     <div style="margin-top:15px; display:flex; gap:10px; justify-content:flex-end;">
@@ -551,7 +543,6 @@
             subQuestions: q.subQuestions || []
           });
 
-          // Also trigger optional Cloud Sheet sync
           saveSingleQuestionToCloud(q);
         }
       }
@@ -657,21 +648,13 @@
     triggerAutoSave();
   }
 
-  /* 🛠️ OPTIMIZED IMAGE UPLOAD FUNCTION TO PREVENT DRIVE DUPLICATES */
   function handleImageUpload(inputEl, previewId) {
     if (inputEl.files && inputEl.files[0]) {
       var file = inputEl.files[0];
-      
-      // Guard: Check if file was already processed to avoid re-upload loop
-      if (inputEl.getAttribute('data-loaded-file') === file.name + '_' + file.size) {
-        return;
-      }
-
       var reader = new FileReader();
       reader.onload = function(e) {
-        var base64 = e.target.result;
+        var base64 = e.target.result; 
         inputEl.setAttribute('data-base64', base64);
-        inputEl.setAttribute('data-loaded-file', file.name + '_' + file.size);
         
         var prev = document.getElementById(previewId);
         if (prev) {
@@ -694,21 +677,28 @@
       var text = card.querySelector('.q-text').value;
       var solution = card.querySelector('.q-sol').value;
       var marks = card.querySelector('.q-marks').value;
-      var qImg = card.querySelector('.q-img-input') ? card.querySelector('.q-img-input').getAttribute('data-base64') || '' : '';
-      var solImg = card.querySelector('.sol-img-input') ? card.querySelector('.sol-img-input').getAttribute('data-base64') || '' : '';
+      
+      var qImgEl = card.querySelector('.q-img-input');
+      var qImg = qImgEl ? (qImgEl.getAttribute('data-base64') || '') : '';
+      
+      var solImgEl = card.querySelector('.sol-img-input');
+      var solImg = solImgEl ? (solImgEl.getAttribute('data-base64') || '') : '';
       
       var opts = [];
       var optImgs = [];
       if (type === 'MCQ') {
         card.querySelectorAll('.q-opt').forEach(function(o) { opts.push(o.value); });
-        card.querySelectorAll('.opt-img-input').forEach(function(oi) { optImgs.push(oi.getAttribute('data-base64') || ''); });
+        card.querySelectorAll('.opt-img-input').forEach(function(oi) { 
+          optImgs.push(oi.getAttribute('data-base64') || ''); 
+        });
       }
 
       var subQs = [];
       if (type === 'CASE_STUDY') {
         card.querySelectorAll('.sub-q-card').forEach(function(sCard) {
           var sTxt = sCard.querySelector('.sub-q-input').value;
-          var sImg = sCard.querySelector('.sub-img-input') ? sCard.querySelector('.sub-img-input').getAttribute('data-base64') || '' : '';
+          var sImgEl = sCard.querySelector('.sub-img-input');
+          var sImg = sImgEl ? (sImgEl.getAttribute('data-base64') || '') : '';
           if (sTxt.trim() || sImg) {
             subQs.push({ text: sTxt.trim(), img: sImg });
           }
@@ -1010,7 +1000,6 @@
       savedBank = DEFAULT_BANK;
     }
 
-    // Combine local bank and cloud fetched bank questions
     var combinedBank = [].concat(savedBank, cloudBankQuestions);
 
     if (combinedBank.length === 0) {
@@ -1108,7 +1097,6 @@
     closeEquationModal();
   }
 
-  // ACCURATE TEX EX-UNIT SCALING (PROPORTIONAL TO 11pt ARIAL BODY TEXT)
   function latexToPngBase64(latex) {
     return new Promise(function(resolve) {
       try {
@@ -1135,7 +1123,7 @@
           var targetW = Math.max(10, exW * pxFactor);
 
           var canvas = document.createElement("canvas");
-          var renderScale = 3.0; // High-DPI sharpness
+          var renderScale = 3.0; 
           canvas.width = targetW * renderScale;
           canvas.height = targetH * renderScale;
 
