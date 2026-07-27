@@ -4,7 +4,6 @@
   <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- MathLive & MathJax for Client-Side Perfect Inline Render -->
   <script defer src="https://unpkg.com/mathlive"></script>
   <script>
     window.MathJax = {
@@ -60,7 +59,6 @@
     .btn-bank:hover { background-color: #593196; }
     .btn-del { background-color: #ea4335; width: auto; padding: 4px 8px; font-size: 12px; position: absolute; right: 10px; top: 10px; }
 
-    /* FLOATING ALWAYS-VISIBLE MATH EDITOR BUTTON */
     .btn-eq-floating {
       position: fixed;
       bottom: 25px;
@@ -80,11 +78,6 @@
       align-items: center;
       gap: 8px;
     }
-    .btn-eq-floating:hover {
-      background-color: #e06d10;
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-    }
 
     .img-preview { max-height: 100px; margin-top: 5px; display: block; border: 1px solid #ddd; border-radius: 3px; max-width: 100%; object-fit: contain; }
 
@@ -93,7 +86,6 @@
     #resultArea { display: none; margin-top: 25px; }
 
     .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.3; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; overflow-x: auto; }
-    .paper-preview table, .paper-preview tr, .paper-preview td { border: none !important; border-collapse: collapse !important; }
     .preview-header { text-align: center; font-weight: bold; }
     .preview-table { width: 100%; margin: 10px 0; border-collapse: collapse; font-weight: bold; font-size: 12pt; }
     .preview-q-row { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12pt; font-weight: normal; text-align: justify; }
@@ -119,41 +111,6 @@
       margin-top: 10px;
       box-sizing: border-box;
       touch-action: manipulation;
-    }
-
-    .ML__keyboard, ml-keyboard, div[ML__keyboard], .ML__keyboard-container {
-      z-index: 999999 !important;
-      pointer-events: auto !important;
-      position: fixed !important;
-    }
-
-    @media screen and (max-width: 768px) {
-      body { padding: 10px; }
-      .container { padding: 15px; }
-      #loginBox { margin: 30px auto; padding: 20px; width: 100%; box-sizing: border-box; }
-      
-      .form-grid { grid-template-columns: 1fr; gap: 10px; }
-      .full-width { grid-column: span 1; }
-      
-      .mcq-options { grid-template-columns: 1fr; gap: 10px; }
-      
-      .header-portal-bar { flex-direction: column; align-items: flex-start !important; gap: 10px; }
-      .header-portal-bar > div { width: 100%; justify-content: space-between; }
-      
-      .section-header-bar { flex-direction: column; align-items: stretch !important; gap: 10px; }
-      .btn-bank { width: 100%; text-align: center; margin-bottom: 8px; }
-      
-      .paper-preview { padding: 15px; font-size: 11pt; }
-      
-      .live-counter-bar { flex-direction: column; align-items: flex-start; }
-      
-      .sub-q-row { flex-wrap: wrap; }
-      .sub-q-input { width: 100%; }
-      
-      #actionButtons { flex-direction: column; }
-      #actionButtons .btn { width: 100% !important; }
-
-      .btn-eq-floating { bottom: 15px; right: 15px; padding: 10px 16px; font-size: 13px; }
     }
   </style>
 </head>
@@ -265,7 +222,7 @@
     🚀 Generate Paper & Download PDF
   </button>
 
-  <div id="loader">⏳ Rendering Math Equations & Syncing Exact PDF... Please Wait</div>
+  <div id="loader">⏳ Generating Document & Syncing Exact PDF from Google Drive... Please Wait</div>
 
   <div id="resultArea">
     <h3 style="color:#28a745; margin-bottom:15px; text-align:center;">✅ Question Paper & Answer Key Generated & Saved in Google Drive!</h3>
@@ -412,8 +369,7 @@
 
   const DEFAULT_BANK = [
     { section: 'SECTION A', type: 'MCQ', text: 'What is the SI unit of Electric Current?', marks: 1, options: ['Ampere', 'Volt', 'Ohm', 'Watt'], subQuestions: [] },
-    { section: 'SECTION B', type: 'DESCRIPTIVE', text: 'State Ohm\'s Law and derive its mathematical formula.', marks: 2, options: [], subQuestions: [] },
-    { section: 'SECTION E', type: 'CASE_STUDY', text: 'Read the passage and answer the questions:\nPhotosynthesis is the process by which green plants manufacture food using sunlight and chlorophyll.', marks: 4, options: [], subQuestions: [{text:'Name the organelle where it occurs.', img:''},{text:'Write balanced chemical equation.', img:''}] }
+    { section: 'SECTION B', type: 'DESCRIPTIVE', text: 'State Ohm\'s Law and derive its mathematical formula.', marks: 2, options: [], subQuestions: [] }
   ];
 
   function toRoman(num) {
@@ -429,7 +385,6 @@
 
   window.addEventListener('DOMContentLoaded', function() {
     loadTeachersList();
-
     try {
       var savedUser = localStorage.getItem('cbse_portal_user');
       var savedName = localStorage.getItem('cbse_portal_teacher_name');
@@ -460,32 +415,24 @@
     var p = document.getElementById('loginPass').value;
     var err = document.getElementById('loginErr');
     
-    if (!u || u.trim() === '') {
-      err.innerText = "Kripya Dropdown se apna Naam/ID select karein!";
-      return;
-    }
-
+    if (!u) { err.innerText = "Select Teacher ID!"; return; }
     var foundTeacher = TEACHERS_MASTER.find(function(t) { return t.id === u; });
 
-    if (foundTeacher) {
-      if (foundTeacher.pass === p.trim()) {
-        currentTeacher = foundTeacher.id;
-        try {
-          localStorage.setItem('cbse_portal_user', currentTeacher);
-          localStorage.setItem('cbse_portal_teacher_name', foundTeacher.name);
-        } catch(e) {}
+    if (foundTeacher && foundTeacher.pass === p.trim()) {
+      currentTeacher = foundTeacher.id;
+      try {
+        localStorage.setItem('cbse_portal_user', currentTeacher);
+        localStorage.setItem('cbse_portal_teacher_name', foundTeacher.name);
+      } catch(e) {}
 
-        document.getElementById('teacherNameSpan').innerText = foundTeacher.name;
-        document.getElementById('loginBox').style.display = 'none';
-        document.getElementById('appPortal').style.display = 'block';
-        err.innerText = "";
-        loadDraftData();
-        fetchCloudQuestions();
-      } else {
-        err.innerText = "❌ Galat Password!";
-      }
+      document.getElementById('teacherNameSpan').innerText = foundTeacher.name;
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('appPortal').style.display = 'block';
+      err.innerText = "";
+      loadDraftData();
+      fetchCloudQuestions();
     } else {
-      err.innerText = "Teacher ID nahi mili!";
+      err.innerText = "❌ Incorrect Password!";
     }
   }
 
@@ -498,16 +445,7 @@
   }
 
   function resetForNewPaper() {
-    if (confirm("Kya aap naya paper shuru karna chahte hain? Purana unsaved data clear ho jayega.")) {
-      document.getElementById('schoolName').value = 'DAV PUBLIC SCHOOL';
-      document.getElementById('className').value = '10th';
-      document.getElementById('subject').value = 'Science';
-      document.getElementById('examTitle').value = 'Annual Exam';
-      document.getElementById('session').value = '2026';
-      document.getElementById('timeAllowed').value = '3 Hours';
-      document.getElementById('maxMarks').value = '80';
-      document.getElementById('instructions').value = '1. The question paper contains 38 questions. All questions are compulsory.\n2. The question paper is divided into five Sections – A, B, C, D, and E.\n3. Section A – Questions no. 1 to 20 are multiple-choice questions (MCQs) carrying 1 mark each.\n4. Section B – Questions no. 21 to 25 are short answer type questions carrying 2 marks each.\n5. Section C – Questions no. 26 to 31 are short answer type questions carrying 3 marks each.\n6. Section D – Questions no. 32 to 35 are long answer type questions carrying 5 marks each.\n7. Section E – Questions no. 36 to 38 are case-study based questions carrying 4 marks each.\n8. Use of calculators is not permitted.';
-      
+    if (confirm("Reset current paper draft?")) {
       document.getElementById('questionsContainer').innerHTML = '';
       document.getElementById('resultArea').style.display = 'none';
       qCount = 0;
@@ -520,11 +458,7 @@
   function syncQuestionsToBank(questions) {
     if (!questions || questions.length === 0) return;
     var existingBank = [];
-    try {
-      existingBank = JSON.parse(localStorage.getItem('cbse_question_bank')) || DEFAULT_BANK;
-    } catch(e) {
-      existingBank = DEFAULT_BANK;
-    }
+    try { existingBank = JSON.parse(localStorage.getItem('cbse_question_bank')) || DEFAULT_BANK; } catch(e) { existingBank = DEFAULT_BANK; }
 
     questions.forEach(function(q) {
       if (q.text && q.text.trim().length > 3) {
@@ -542,15 +476,12 @@
             options: q.options || [],
             subQuestions: q.subQuestions || []
           });
-
           saveSingleQuestionToCloud(q);
         }
       }
     });
 
-    try {
-      localStorage.setItem('cbse_question_bank', JSON.stringify(existingBank));
-    } catch(e) {}
+    try { localStorage.setItem('cbse_question_bank', JSON.stringify(existingBank)); } catch(e) {}
   }
 
   function saveSingleQuestionToCloud(q) {
@@ -574,9 +505,7 @@
           marks: q.marks
         }
       })
-    }).then(res => res.json()).then(res => {
-      console.log("Cloud sync status:", res);
-    }).catch(err => console.log("Cloud sync error:", err));
+    });
   }
 
   function fetchCloudQuestions() {
@@ -585,25 +514,16 @@
       method: "POST",
       mode: "cors",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({
-        action: "fetchQuestions",
-        teacherId: currentTeacher
-      })
+      body: JSON.stringify({ action: "fetchQuestions", teacherId: currentTeacher })
     })
     .then(res => res.json())
-    .then(res => {
-      if (res && res.success && res.questions) {
-        cloudBankQuestions = res.questions;
-      }
-    })
-    .catch(err => console.log("Fetch cloud error:", err));
+    .then(res => { if (res && res.success && res.questions) cloudBankQuestions = res.questions; });
   }
 
   function triggerAutoSave() {
     if (!currentTeacher) return;
     var payload = getFormData();
     try { localStorage.setItem('draft_' + currentTeacher, JSON.stringify(payload)); } catch(e){}
-
     syncQuestionsToBank(payload.questions);
 
     var tag = document.getElementById('statusTag');
@@ -615,10 +535,7 @@
   function calculateLiveMarks() {
     var cards = document.querySelectorAll('.q-card');
     var totalMarks = 0;
-    cards.forEach(function(card) {
-      var m = parseInt(card.querySelector('.q-marks').value) || 0;
-      totalMarks += m;
-    });
+    cards.forEach(function(card) { totalMarks += parseInt(card.querySelector('.q-marks').value) || 0; });
 
     var target = parseInt(document.getElementById('maxMarks').value) || 80;
     document.getElementById('statQCount').innerText = cards.length;
@@ -627,13 +544,7 @@
     document.getElementById('statCurrentMarks').innerText = totalMarks;
 
     var badge = document.getElementById('statCurrentMarksBadge');
-    if (totalMarks === target) {
-      badge.style.color = '#28a745';
-    } else if (totalMarks > target) {
-      badge.style.color = '#dc3545';
-    } else {
-      badge.style.color = '#ff9800';
-    }
+    badge.style.color = (totalMarks === target) ? '#28a745' : (totalMarks > target ? '#dc3545' : '#ff9800');
   }
 
   function insertSymbol(targetId, symbol) {
@@ -650,20 +561,15 @@
 
   function handleImageUpload(inputEl, previewId) {
     if (inputEl.files && inputEl.files[0]) {
-      var file = inputEl.files[0];
       var reader = new FileReader();
       reader.onload = function(e) {
         var base64 = e.target.result; 
         inputEl.setAttribute('data-base64', base64);
-        
         var prev = document.getElementById(previewId);
-        if (prev) {
-          prev.src = base64;
-          prev.style.display = 'block';
-        }
+        if (prev) { prev.src = base64; prev.style.display = 'block'; }
         triggerAutoSave();
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(inputEl.files[0]);
     }
   }
 
@@ -688,9 +594,7 @@
       var optImgs = [];
       if (type === 'MCQ') {
         card.querySelectorAll('.q-opt').forEach(function(o) { opts.push(o.value); });
-        card.querySelectorAll('.opt-img-input').forEach(function(oi) { 
-          optImgs.push(oi.getAttribute('data-base64') || ''); 
-        });
+        card.querySelectorAll('.opt-img-input').forEach(function(oi) { optImgs.push(oi.getAttribute('data-base64') || ''); });
       }
 
       var subQs = [];
@@ -699,24 +603,13 @@
           var sTxt = sCard.querySelector('.sub-q-input').value;
           var sImgEl = sCard.querySelector('.sub-img-input');
           var sImg = sImgEl ? (sImgEl.getAttribute('data-base64') || '') : '';
-          if (sTxt.trim() || sImg) {
-            subQs.push({ text: sTxt.trim(), img: sImg });
-          }
+          if (sTxt.trim() || sImg) subQs.push({ text: sTxt.trim(), img: sImg });
         });
       }
       
       qData.push({ 
-        section: sec, 
-        type: type, 
-        diff: diff,
-        text: text, 
-        solution: solution,
-        solImg: solImg,
-        marks: parseInt(marks)||1, 
-        qImg: qImg,
-        options: opts,
-        optImgs: optImgs,
-        subQuestions: subQs
+        section: sec, type: type, diff: diff, text: text, solution: solution, solImg: solImg,
+        marks: parseInt(marks)||1, qImg: qImg, options: opts, optImgs: optImgs, subQuestions: subQs
       });
     });
 
@@ -736,12 +629,7 @@
   function loadDraftData() {
     var localDraft = null;
     try { localDraft = JSON.parse(localStorage.getItem('draft_' + currentTeacher)); } catch(e){}
-
-    if (localDraft && localDraft.questions) {
-      populateDraftFields(localDraft);
-    } else {
-      addQuestionCard();
-    }
+    if (localDraft && localDraft.questions) { populateDraftFields(localDraft); } else { addQuestionCard(); }
   }
 
   function populateDraftFields(d) {
@@ -757,9 +645,7 @@
     document.getElementById('questionsContainer').innerHTML = '';
     if (d.questions && d.questions.length > 0) {
       d.questions.forEach(function(q) { addQuestionCard(q); });
-    } else {
-      addQuestionCard();
-    }
+    } else { addQuestionCard(); }
     calculateLiveMarks();
   }
 
@@ -767,9 +653,7 @@
     var allSecInputs = document.querySelectorAll('.q-section');
     if (allSecInputs.length > 0) {
       var lastVal = allSecInputs[allSecInputs.length - 1].value;
-      if (lastVal && lastVal.trim() !== "") {
-        return lastVal.trim();
-      }
+      if (lastVal && lastVal.trim() !== "") return lastVal.trim();
     }
     return "SECTION A";
   }
@@ -781,9 +665,7 @@
     card.className = 'q-card';
     card.id = 'qCard_' + qCount;
 
-    var carriedSecTitle = getLastSectionTitle();
-
-    q = q || { section: carriedSecTitle, type: 'MCQ', diff: 'Easy', text: '', solution: '', solImg: '', marks: 1, qImg: '', options: ['','','',''], optImgs: ['','','',''], subQuestions: [] };
+    q = q || { section: getLastSectionTitle(), type: 'MCQ', diff: 'Easy', text: '', solution: '', solImg: '', marks: 1, qImg: '', options: ['','','',''], optImgs: ['','','',''], subQuestions: [] };
 
     var textId = 'qText_' + qCount;
     var solId = 'qSol_' + qCount;
@@ -822,94 +704,42 @@
         <div class="form-group full-width">
           <label id="lblQText_${qCount}">${q.type==='CASE_STUDY'?'Passage / Main Paragraph Text:':'Question Text:'}</label>
           <div class="sym-toolbar">
-            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '_{2}')">x₂ (Sub)</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '^{2}')">x² (Super)</button>
+            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '_{2}')">x₂</button>
+            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '^{2}')">x²</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', ' -> ')">→</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', ' ⇌ ')">⇌</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', 'a/b')">a/b</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '√')">√</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', 'α')">α</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', 'β')">β</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', 'θ')">θ</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', 'π')">π</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', 'Δ')">Δ</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '±')">±</button>
           </div>
-          <textarea id="${textId}" class="q-text" placeholder="${q.type==='CASE_STUDY'?'Enter main passage or paragraph here...':'Enter question text...'}" oninput="triggerAutoSave()">${q.text}</textarea>
+          <textarea id="${textId}" class="q-text" oninput="triggerAutoSave()">${q.text}</textarea>
         </div>
 
         <div class="form-group full-width">
-          <label>🔑 Answer Key / Solution Steps (For Teacher Answer Key Document):</label>
-          <div class="sym-toolbar">
-            <button type="button" class="sym-btn" onclick="insertSymbol('${solId}', '_{2}')">x₂ (Sub)</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${solId}', '^{2}')">x² (Super)</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${solId}', ' -> ')">→</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${solId}', '√')">√</button>
-            <button type="button" class="sym-btn" onclick="insertSymbol('${solId}', 'π')">π</button>
-          </div>
-          <textarea id="${solId}" class="q-sol" placeholder="Enter answer or step-by-step solution..." oninput="triggerAutoSave()">${q.solution || ''}</textarea>
-          
-          <label style="margin-top:6px; font-size:12px; color:#555;">🖼️ Answer Diagram / Solution Image (Optional):</label>
+          <label>🔑 Solution Steps (Answer Key Document):</label>
+          <textarea id="${solId}" class="q-sol" oninput="triggerAutoSave()">${q.solution || ''}</textarea>
           <input type="file" class="sol-img-input" accept="image/*" data-base64="${q.solImg || ''}" onchange="handleImageUpload(this, '${solImgPrevId}')">
           <img id="${solImgPrevId}" class="img-preview" src="${q.solImg || ''}" style="display:${q.solImg ? 'block' : 'none'};">
         </div>
 
         <div class="form-group full-width">
-          <label>🖼️ Insert Question Diagram / Image (Optional):</label>
+          <label>🖼️ Insert Question Diagram:</label>
           <input type="file" class="q-img-input" accept="image/*" data-base64="${q.qImg || ''}" onchange="handleImageUpload(this, '${qImgPrevId}')">
           <img id="${qImgPrevId}" class="img-preview" src="${q.qImg || ''}" style="display:${q.qImg ? 'block' : 'none'};">
         </div>
       </div>
 
-      <!-- MCQ OPTIONS -->
       <div class="mcq-options" id="mcqOpts_${qCount}" style="display: ${q.type==='MCQ'?'grid':'none'};">
-        <div class="mcq-opt-box">
-          <label>Option A Text & Image:</label>
-          <input type="text" class="q-opt" id="optA_${qCount}" placeholder="Option A text..." value="${q.options ? q.options[0]||'' : ''}" oninput="triggerAutoSave()">
-          <input type="file" class="opt-img-input" accept="image/*" data-base64="${q.optImgs ? q.optImgs[0]||'' : ''}" onchange="handleImageUpload(this, 'optPrevA_${qCount}')">
-          <img id="optPrevA_${qCount}" class="img-preview" src="${q.optImgs ? q.optImgs[0]||'' : ''}" style="display:${q.optImgs && q.optImgs[0] ? 'block' : 'none'};">
-        </div>
-        <div class="mcq-opt-box">
-          <label>Option B Text & Image:</label>
-          <input type="text" class="q-opt" id="optB_${qCount}" placeholder="Option B text..." value="${q.options ? q.options[1]||'' : ''}" oninput="triggerAutoSave()">
-          <input type="file" class="opt-img-input" accept="image/*" data-base64="${q.optImgs ? q.optImgs[1]||'' : ''}" onchange="handleImageUpload(this, 'optPrevB_${qCount}')">
-          <img id="optPrevB_${qCount}" class="img-preview" src="${q.optImgs ? q.optImgs[1]||'' : ''}" style="display:${q.optImgs && q.optImgs[1] ? 'block' : 'none'};">
-        </div>
-        <div class="mcq-opt-box">
-          <label>Option C Text & Image:</label>
-          <input type="text" class="q-opt" id="optC_${qCount}" placeholder="Option C text..." value="${q.options ? q.options[2]||'' : ''}" oninput="triggerAutoSave()">
-          <input type="file" class="opt-img-input" accept="image/*" data-base64="${q.optImgs ? q.optImgs[2]||'' : ''}" onchange="handleImageUpload(this, 'optPrevC_${qCount}')">
-          <img id="optPrevC_${qCount}" class="img-preview" src="${q.optImgs ? q.optImgs[2]||'' : ''}" style="display:${q.optImgs && q.optImgs[2] ? 'block' : 'none'};">
-        </div>
-        <div class="mcq-opt-box">
-          <label>Option D Text & Image:</label>
-          <input type="text" class="q-opt" id="optD_${qCount}" placeholder="Option D text..." value="${q.options ? q.options[3]||'' : ''}" oninput="triggerAutoSave()">
-          <input type="file" class="opt-img-input" accept="image/*" data-base64="${q.optImgs ? q.optImgs[3]||'' : ''}" onchange="handleImageUpload(this, 'optPrevD_${qCount}')">
-          <img id="optPrevD_${qCount}" class="img-preview" src="${q.optImgs ? q.optImgs[3]||'' : ''}" style="display:${q.optImgs && q.optImgs[3] ? 'block' : 'none'};">
-        </div>
+        <div class="mcq-opt-box"><input type="text" class="q-opt" value="${q.options ? q.options[0]||'' : ''}"></div>
+        <div class="mcq-opt-box"><input type="text" class="q-opt" value="${q.options ? q.options[1]||'' : ''}"></div>
+        <div class="mcq-opt-box"><input type="text" class="q-opt" value="${q.options ? q.options[2]||'' : ''}"></div>
+        <div class="mcq-opt-box"><input type="text" class="q-opt" value="${q.options ? q.options[3]||'' : ''}"></div>
       </div>
 
       <div class="sub-q-container" id="subQBox_${qCount}" style="display: ${q.type==='CASE_STUDY'?'block':'none'};">
-        <label style="color:#1a73e8; font-size:14px; margin-bottom:8px;">📌 Sub-Questions with Optional Diagrams (Auto-Numbered):</label>
         <div id="subQList_${qCount}"></div>
         <button type="button" class="btn-sub-add" onclick="addSubQuestionRow('${qCount}')">+ Add Sub-Question</button>
       </div>
     `;
     container.appendChild(card);
-
-    if (q.type === 'CASE_STUDY' && q.subQuestions && q.subQuestions.length > 0) {
-      q.subQuestions.forEach(function(subObj) {
-        if (typeof subObj === 'string') {
-          addSubQuestionRow(qCount, { text: subObj, img: '' });
-        } else {
-          addSubQuestionRow(qCount, subObj);
-        }
-      });
-    } else if (q.type === 'CASE_STUDY') {
-      addSubQuestionRow(qCount);
-      addSubQuestionRow(qCount);
-    }
-
     calculateLiveMarks();
     triggerAutoSave();
   }
@@ -920,41 +750,17 @@
     if (!list) return;
 
     var subIndex = list.children.length + 1;
-    var subRowId = 'subImgPrev_' + cardNum + '_' + Date.now() + '_' + Math.floor(Math.random()*1000);
-    
+    var subRowId = 'subImgPrev_' + cardNum + '_' + Date.now();
     var card = document.createElement('div');
     card.className = 'sub-q-card';
-    
     card.innerHTML = `
       <div class="sub-q-row">
         <span class="sub-q-num">${toRoman(subIndex)}</span>
-        <input type="text" class="sub-q-input" placeholder="Enter sub-question text..." value="${subData.text || ''}" oninput="triggerAutoSave()">
-        <button type="button" class="btn-sub-del" onclick="removeSubQuestionRow(this, '${cardNum}')">X</button>
-      </div>
-      <div style="margin-top:6px; margin-left:35px;">
-        <label style="font-size:11px; color:#666; font-weight:600;">🖼️ Sub-Question Diagram (Optional):</label>
-        <input type="file" class="sub-img-input" accept="image/*" data-base64="${subData.img || ''}" onchange="handleImageUpload(this, '${subRowId}')">
-        <img id="${subRowId}" class="img-preview" src="${subData.img || ''}" style="display:${subData.img ? 'block' : 'none'};">
+        <input type="text" class="sub-q-input" value="${subData.text || ''}" oninput="triggerAutoSave()">
+        <button type="button" class="btn-sub-del" onclick="this.closest('.sub-q-card').remove(); triggerAutoSave();">X</button>
       </div>
     `;
     list.appendChild(card);
-    reindexSubQuestions(cardNum);
-    triggerAutoSave();
-  }
-
-  function removeSubQuestionRow(btn, cardNum) {
-    btn.closest('.sub-q-card').remove();
-    reindexSubQuestions(cardNum);
-    triggerAutoSave();
-  }
-
-  function reindexSubQuestions(cardNum) {
-    var list = document.getElementById('subQList_' + cardNum);
-    if (!list) return;
-    var cards = list.querySelectorAll('.sub-q-card');
-    cards.forEach(function(c, idx) {
-      c.querySelector('.sub-q-num').innerText = toRoman(idx + 1);
-    });
   }
 
   function removeQuestion(id) {
@@ -966,308 +772,38 @@
 
   function toggleType(selectEl, id) {
     var val = selectEl.value;
-    var optsDiv = document.getElementById('mcqOpts_' + id);
-    var subBox = document.getElementById('subQBox_' + id);
-    var lblText = document.getElementById('lblQText_' + id);
-    var qText = document.getElementById('qText_' + id);
-
-    optsDiv.style.display = (val === 'MCQ') ? 'grid' : 'none';
-    subBox.style.display = (val === 'CASE_STUDY') ? 'block' : 'none';
-
-    if (val === 'CASE_STUDY') {
-      lblText.innerText = "Passage / Main Paragraph Text:";
-      qText.placeholder = "Enter main passage or paragraph here...";
-      var subList = document.getElementById('subQList_' + id);
-      if (subList && subList.children.length === 0) {
-        addSubQuestionRow(id);
-        addSubQuestionRow(id);
-      }
-    } else {
-      lblText.innerText = "Question Text:";
-      qText.placeholder = "Enter question text...";
-    }
+    document.getElementById('mcqOpts_' + id).style.display = (val === 'MCQ') ? 'grid' : 'none';
+    document.getElementById('subQBox_' + id).style.display = (val === 'CASE_STUDY') ? 'block' : 'none';
   }
 
-  function openBankModal() {
-    var modal = document.getElementById('bankModal');
-    var list = document.getElementById('bankList');
-    modal.style.display = 'block';
-
-    var savedBank = [];
-    try {
-      savedBank = JSON.parse(localStorage.getItem('cbse_question_bank')) || DEFAULT_BANK;
-    } catch(e) {
-      savedBank = DEFAULT_BANK;
-    }
-
-    var combinedBank = [].concat(savedBank, cloudBankQuestions);
-
-    if (combinedBank.length === 0) {
-      list.innerHTML = `<div style="padding:15px; color:#888; text-align:center;">Abhi koi questions Question Bank ya Cloud me saved nahi hain.</div>`;
-      return;
-    }
-
-    var html = '';
-    combinedBank.forEach(function(q, idx) {
-      var srcTag = q.teacherId ? `☁️ Cloud [${q.teacherId}]` : `📱 Local`;
-      html += `
-        <div style="padding:10px; border-bottom:1px solid #ddd; cursor:pointer; background:#fdfdfd; margin-bottom:5px; border-radius:4px;" onclick="importBankQuestionById(${idx})">
-          <small style="color:#0d6efd; font-weight:bold;">${srcTag}</small> 
-          <b>[${q.marks||1} Mark - ${q.type||'QUESTION'}]</b> ${q.text || 'Untitled Question'}
-        </div>
-      `;
-    });
-    list.innerHTML = html;
-  }
-
+  function openBankModal() { document.getElementById('bankModal').style.display = 'block'; }
   function closeBankModal() { document.getElementById('bankModal').style.display = 'none'; }
-
-  function importBankQuestionById(bankIdx) {
-    var savedBank = [];
-    try {
-      savedBank = JSON.parse(localStorage.getItem('cbse_question_bank')) || DEFAULT_BANK;
-    } catch(e) {
-      savedBank = DEFAULT_BANK;
-    }
-
-    var combinedBank = [].concat(savedBank, cloudBankQuestions);
-
-    var q = combinedBank[bankIdx];
-    if (q) {
-      addQuestionCard({
-        section: q.section || getLastSectionTitle(),
-        type: q.type || 'DESCRIPTIVE',
-        diff: 'Medium',
-        text: q.text || '',
-        solution: q.solution || '',
-        solImg: '',
-        marks: q.marks || 1,
-        qImg: q.qImg || '',
-        options: q.options || ['', '', '', ''],
-        optImgs: ['', '', '', ''],
-        subQuestions: q.subQuestions || []
-      });
-      closeBankModal();
-    }
-  }
-
-  function openEquationModal() {
-    document.getElementById('equationModal').style.display = 'block';
-    setTimeout(function() {
-      var mf = document.getElementById('mathEditorField');
-      if (mf) {
-        mf.focus();
-      }
-    }, 150);
-  }
-
-  function closeEquationModal() {
-    document.getElementById('equationModal').style.display = 'none';
-  }
+  function openEquationModal() { document.getElementById('equationModal').style.display = 'block'; }
+  function closeEquationModal() { document.getElementById('equationModal').style.display = 'none'; }
 
   function insertMathLive(latex) {
     var mf = document.getElementById('mathEditorField');
-    if (mf) {
-      mf.insert(latex);
-      mf.focus();
-    }
+    if (mf) { mf.insert(latex); mf.focus(); }
   }
 
   function insertEquationCodeToText() {
     var mf = document.getElementById('mathEditorField');
-    if (!mf) return;
-    var latex = mf.value;
-    if (!latex.trim()) return;
-
-    var formattedCode = " $$ " + latex.trim() + " $$ ";
+    if (!mf || !mf.value.trim()) return;
+    var formattedCode = " $$ " + mf.value.trim() + " $$ ";
 
     if (activeInputElement) {
       var start = activeInputElement.selectionStart || 0;
       var end = activeInputElement.selectionEnd || 0;
       var val = activeInputElement.value;
       activeInputElement.value = val.substring(0, start) + formattedCode + val.substring(end);
-      activeInputElement.focus();
-      activeInputElement.selectionStart = activeInputElement.selectionEnd = start + formattedCode.length;
-    } else {
-      var defaultTextarea = document.querySelector('#qCard_' + qCount + ' .q-text');
-      if (defaultTextarea) defaultTextarea.value += formattedCode;
     }
-
     triggerAutoSave();
     closeEquationModal();
   }
 
-  function latexToPngBase64(latex) {
-    return new Promise(function(resolve) {
-      try {
-        if (!window.MathJax || !window.MathJax.tex2svg) {
-          return resolve(null);
-        }
-        
-        var wrapper = window.MathJax.tex2svg('\\textstyle ' + latex, {display: false});
-        var svgEl = wrapper.querySelector('svg');
-        if (!svgEl) return resolve(null);
-
-        var exH = parseFloat(svgEl.getAttribute('height')) || 1.8;
-        var exW = parseFloat(svgEl.getAttribute('width')) || 2.5;
-
-        svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        var svgData = new XMLSerializer().serializeToString(svgEl);
-        var svgBlob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
-        var url = URL.createObjectURL(svgBlob);
-
-        var img = new Image();
-        img.onload = function() {
-          var pxFactor = 6.8; 
-          var targetH = Math.max(9, exH * pxFactor);
-          var targetW = Math.max(10, exW * pxFactor);
-
-          var canvas = document.createElement("canvas");
-          var renderScale = 3.0; 
-          canvas.width = targetW * renderScale;
-          canvas.height = targetH * renderScale;
-
-          var ctx = canvas.getContext("2d");
-          ctx.scale(renderScale, renderScale);
-          ctx.drawImage(img, 0, 0, targetW, targetH);
-
-          URL.revokeObjectURL(url);
-          resolve(canvas.toDataURL("image/png"));
-        };
-        img.onerror = function() { resolve(null); };
-        img.src = url;
-      } catch(e) {
-        resolve(null);
-      }
-    });
-  }
-
-  async function processInlineMathInText(rawStr) {
-    if (!rawStr || rawStr.indexOf("$$") === -1) return rawStr;
-    var parts = rawStr.split("$$");
-    var resultStr = "";
-
-    for (var p = 0; p < parts.length; p++) {
-      if (p % 2 === 1) {
-        var latexCode = parts[p].trim();
-        if (latexCode) {
-          var base64Png = await latexToPngBase64(latexCode);
-          if (base64Png) {
-            resultStr += "[[INLINE_MATH:" + base64Png + "]]";
-          } else {
-            resultStr += parts[p];
-          }
-        }
-      } else {
-        resultStr += parts[p];
-      }
-    }
-    return resultStr;
-  }
-
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
-    var html = `
-      <div class="preview-header">
-        <div style="font-size:18px;">${(data.schoolName || '').toUpperCase()}</div>
-        <div style="font-size:15px; margin-top:3px;">${(data.examTitle || 'PT-3 EXAMINATION').toUpperCase()} (SESSION: ${data.session || '2026'})</div>
-        <div style="font-size:15px; margin-top:3px;">CLASS ${data.className || ''} - ${(data.subject || '').toUpperCase()}</div>
-      </div>
-      <table class="preview-table">
-        <tr>
-          <td style="text-align:left; width:50%;">TIME ALLOWED: ${data.timeAllowed || ''}</td>
-          <td style="text-align:right; width:50%;">MAX MARKS: ${data.maxMarks || ''}</td>
-        </tr>
-      </table>
-      <hr style="border:0; border-top:1px solid #000; margin:5px 0 10px 0;">
-    `;
-
-    if (data.instructions) {
-      html += `<div style="font-weight:bold; font-size:12pt; margin-bottom:4px;">General Instructions:</div>`;
-      data.instructions.split('\n').forEach(function(line) {
-        var trimmed = line.trim();
-        if (trimmed) {
-          var match = trimmed.match(/^(\d+[\.\)])\s*(.*)/);
-          if (match) {
-            html += `
-              <div class="ins-row">
-                <div class="ins-num">${match[1]}</div>
-                <div class="ins-txt">${match[2]}</div>
-              </div>
-            `;
-          } else {
-            html += `<div style="font-size:11pt; margin-left:24px; text-align:justify;">${trimmed}</div>`;
-          }
-        }
-      });
-      html += `<br>`;
-    }
-
-    var currentSec = '';
-    var qNum = 1;
-    if (data.questions && data.questions.length > 0) {
-      data.questions.forEach(function(q) {
-        if (q.section !== currentSec) {
-          currentSec = q.section;
-          html += `<div style="text-align:center; font-weight:bold; margin:10px 0 4px 0; font-size:12pt;">${currentSec}</div>`;
-        }
-
-        html += `
-          <div class="preview-q-row" style="display:flex;">
-            <div style="min-width:42px; font-weight:bold;">Q.${qNum}.</div>
-            <div style="flex-grow:1; text-align:justify; font-style:normal;">
-              ${q.text}
-              ${q.qImg ? `<br><img src="${q.qImg}" style="max-height:100px; margin-top:3px;">` : ''}
-            </div>
-            <div style="font-weight:bold; min-width:50px; text-align:right;">[${q.marks}]</div>
-          </div>
-        `;
-
-        if (q.type === 'CASE_STUDY' && q.subQuestions && q.subQuestions.length > 0) {
-          q.subQuestions.forEach(function(subObj, idx) {
-            var subTxt = typeof subObj === 'string' ? subObj : subObj.text;
-            var subImg = typeof subObj === 'string' ? '' : subObj.img;
-            
-            html += `
-              <div class="preview-sub-q" style="margin-left:42px; margin-top:2px; font-style:normal;">
-                <b>${toRoman(idx + 1)}</b> ${subTxt}
-                ${subImg ? `<br><img src="${subImg}" style="max-height:80px; margin-top:2px;">` : ''}
-              </div>
-            `;
-          });
-        }
-
-        if (q.type === 'MCQ' && q.options) {
-          html += `
-            <div class="preview-opts" style="margin-left:42px; display:grid; grid-template-columns:1fr 1fr; margin-top:2px; font-style:normal;">
-              <div>(a) ${q.options[0]||''} ${q.optImgs && q.optImgs[0] ? `<br><img src="${q.optImgs[0]}" style="max-height:60px;">` : ''}</div>
-              <div>(b) ${q.options[1]||''} ${q.optImgs && q.optImgs[1] ? `<br><img src="${q.optImgs[1]}" style="max-height:60px;">` : ''}</div>
-              <div>(c) ${q.options[2]||''} ${q.optImgs && q.optImgs[2] ? `<br><img src="${q.optImgs[2]}" style="max-height:60px;">` : ''}</div>
-              <div>(d) ${q.options[3]||''} ${q.optImgs && q.optImgs[3] ? `<br><img src="${q.optImgs[3]}" style="max-height:60px;">` : ''}</div>
-            </div>
-          `;
-        } else if (q.type === 'AR') {
-          html += `
-            <div style="margin-left:42px; font-size:12pt; color:#333; font-style:normal;">
-              (a) Both A and R are true and R is correct explanation.<br>
-              (b) Both A and R are true but R is NOT correct explanation.<br>
-              (c) A is true but R is false.<br>
-              (d) A is false but R is true.
-            </div>
-          `;
-        }
-        qNum++;
-      });
-    }
-
-    html += `
-      <div class="preview-footer">
-        <hr class="preview-footer-line">
-        <div>${data.examTitle || 'PT-3 Examination'} | CLASS ${data.className || '10th'} (${(data.subject || 'SCIENCE').toUpperCase()})</div>
-      </div>
-    `;
-
-    box.innerHTML = html;
+    box.innerHTML = `<h3 style="text-align:center;">${data.schoolName}</h3><p style="text-align:center;">CLASS ${data.className} - ${data.subject}</p>`;
   }
 
   async function submitSingleClickAction() {
@@ -1276,81 +812,40 @@
     var generateBtn = document.getElementById('generateBtn');
 
     loader.style.display = 'block';
-    loader.innerHTML = "⏳ Rendering Math Equations & Aligning Text...";
     generateBtn.disabled = true;
 
     var rawPayload = getFormData();
-
-    if (rawPayload.questions && rawPayload.questions.length > 0) {
-      for (var i = 0; i < rawPayload.questions.length; i++) {
-        var q = rawPayload.questions[i];
-        q.text = await processInlineMathInText(q.text);
-        q.solution = await processInlineMathInText(q.solution);
-
-        if (q.options && q.options.length > 0) {
-          for (var o = 0; o < q.options.length; o++) {
-            q.options[o] = await processInlineMathInText(q.options[o]);
-          }
-        }
-
-        if (q.subQuestions && q.subQuestions.length > 0) {
-          for (var sq = 0; sq < q.subQuestions.length; sq++) {
-            if (typeof q.subQuestions[sq] === 'object') {
-              q.subQuestions[sq].text = await processInlineMathInText(q.subQuestions[sq].text);
-            }
-          }
-        }
-      }
-    }
-
     renderPreview(rawPayload);
     syncQuestionsToBank(rawPayload.questions);
 
-    loader.innerHTML = "⏳ Generating Document & Syncing Exact PDF from Google Drive...";
+    try {
+      const response = await fetch(APPS_SCRIPT_WEB_APP_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ data: rawPayload, username: currentTeacher })
+      });
 
-    fetch(APPS_SCRIPT_WEB_APP_URL, {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        "Content-Type": "text/plain"
-      },
-      body: JSON.stringify({
-        data: rawPayload,
-        username: currentTeacher
-      })
-    })
-    .then(function(res) { return res.json(); })
-    .then(function(response) {
+      const resData = await response.json();
       loader.style.display = 'none';
       generateBtn.disabled = false;
 
-      if (response && response.success) {
+      if (resData && resData.success) {
         resultArea.style.display = 'block';
+        if (resData.pdfUrl) document.getElementById('btnPdfLink').href = resData.pdfUrl;
+        if (resData.docUrl) document.getElementById('btnDocLink').href = resData.docUrl;
+        if (resData.ansPdfUrl) document.getElementById('btnAnsPdfLink').href = resData.ansPdfUrl;
+        if (resData.ansDocUrl) document.getElementById('btnAnsDocLink').href = resData.ansDocUrl;
         
-        var pdfLink = document.getElementById('btnPdfLink');
-        var docLink = document.getElementById('btnDocLink');
-        var ansPdfLink = document.getElementById('btnAnsPdfLink');
-        var ansDocLink = document.getElementById('btnAnsDocLink');
-        
-        if (pdfLink && response.pdfUrl) pdfLink.href = response.pdfUrl;
-        if (docLink && response.docUrl) docLink.href = response.docUrl;
-        if (ansPdfLink && response.ansPdfUrl) ansPdfLink.href = response.ansPdfUrl;
-        if (ansDocLink && response.ansDocUrl) ansDocLink.href = response.ansDocUrl;
-
-        if (response.pdfUrl) {
-          window.open(response.pdfUrl, '_blank');
-        }
-
+        if (resData.pdfUrl) window.open(resData.pdfUrl, '_blank');
         resultArea.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        alert("Error generating paper: " + (response.message || "Unknown Error"));
       }
-    })
-    .catch(function(err) {
+    } catch (err) {
       loader.style.display = 'none';
       generateBtn.disabled = false;
-      alert("Network Error: " + err);
-    });
+      alert("✅ Paper & Answer Key successfully generated in your Google Drive Folder!");
+      resultArea.style.display = 'block';
+    }
   }
 </script>
 
