@@ -657,12 +657,22 @@
     triggerAutoSave();
   }
 
+  /* 🛠️ OPTIMIZED IMAGE UPLOAD FUNCTION TO PREVENT DRIVE DUPLICATES */
   function handleImageUpload(inputEl, previewId) {
     if (inputEl.files && inputEl.files[0]) {
+      var file = inputEl.files[0];
+      
+      // Guard: Check if file was already processed to avoid re-upload loop
+      if (inputEl.getAttribute('data-loaded-file') === file.name + '_' + file.size) {
+        return;
+      }
+
       var reader = new FileReader();
       reader.onload = function(e) {
         var base64 = e.target.result;
         inputEl.setAttribute('data-base64', base64);
+        inputEl.setAttribute('data-loaded-file', file.name + '_' + file.size);
+        
         var prev = document.getElementById(previewId);
         if (prev) {
           prev.src = base64;
@@ -670,7 +680,7 @@
         }
         triggerAutoSave();
       };
-      reader.readAsDataURL(inputEl.files[0]);
+      reader.readAsDataURL(file);
     }
   }
 
