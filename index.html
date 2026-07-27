@@ -85,22 +85,12 @@
     #loader { display: none; text-align: center; margin-top: 15px; color: #1a73e8; font-weight: bold; }
     #resultArea { display: none; margin-top: 25px; }
 
-    .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.3; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; overflow-x: auto; }
-    .preview-header { text-align: center; font-weight: bold; }
-    .preview-table { width: 100%; margin: 10px 0; border-collapse: collapse; font-weight: bold; font-size: 12pt; }
-    .preview-q-row { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12pt; font-weight: normal; text-align: justify; }
-
-    .ins-row { display: flex; margin-bottom: 2px; }
-    .ins-num { min-width: 24px; font-weight: bold; }
-    .ins-txt { flex-grow: 1; text-align: justify; }
+    .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 35px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.25; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; overflow-x: auto; }
 
     .live-counter-bar { background: #e8f0fe; border: 1px solid #aecbfa; padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: bold; color: #174ea6; flex-wrap: wrap; gap: 8px; }
 
     .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
     .modal-content { background: white; margin: 5% auto; padding: 20px; width: 90%; max-width: 700px; border-radius: 8px; max-height: 80vh; overflow-y: auto; box-sizing: border-box; }
-
-    .preview-footer { margin-top: 30px; text-align: center; font-size: 10pt; font-weight: bold; color: #555; }
-    .preview-footer-line { border: 0; border-top: 1px solid #888; margin-bottom: 6px; }
 
     math-field {
       width: 100%;
@@ -152,7 +142,7 @@
     <ul>
       <li><b>Auto Section Title Carry-Forward:</b> Naya question card add karne par wo automatic pichhle question ka Section Title copy kar lega.</li>
       <li><b>Perfect Indented Instructions:</b> Instructions me <code>1. Text</code>, <code>2. Text</code> har line me automatic neatly aligned indentation ke saath aayega.</li>
-      <li><b>Inline Math Equations:</b> Text ke exact straight alignment ke liye formula ko <code>$$ ... $$</code> me wrap karein.</li>
+      <li><b>Inline HD Math Equations:</b> Formula ko <code>$$ ... $$</code> me wrap karein, Google Doc me HD Image me auto-convert honga.</li>
       <li><b>Cloud Sync Security:</b> Aapke dwara banaye gaye sabhi questions Google Sheet Database me aapke Teacher ID ke saath secure store hote hain.</li>
     </ul>
   </details>
@@ -750,7 +740,6 @@
     if (!list) return;
 
     var subIndex = list.children.length + 1;
-    var subRowId = 'subImgPrev_' + cardNum + '_' + Date.now();
     var card = document.createElement('div');
     card.className = 'sub-q-card';
     card.innerHTML = `
@@ -801,13 +790,51 @@
     closeEquationModal();
   }
 
-  // Live Preview Renderer Function (Updated Question Text Font size: 12pt)
+  // MathJax Formula ko High-Resolution PNG Base64 Image me convert karne ka Function
+  async function renderLatexToImageBase64(latexStr) {
+    return new Promise((resolve) => {
+      try {
+        if (!window.MathJax || !window.MathJax.tex2svg) {
+          resolve(null);
+          return;
+        }
+        var svgEl = window.MathJax.tex2svg(latexStr, { display: true }).querySelector('svg');
+        if (!svgEl) { resolve(null); return; }
+
+        svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        var svgData = new XMLSerializer().serializeToString(svgEl);
+        var svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        var url = URL.createObjectURL(svgBlob);
+
+        var img = new Image();
+        img.onload = function() {
+          var canvas = document.createElement('canvas');
+          canvas.width = img.width * 2 || 300;
+          canvas.height = img.height * 2 || 80;
+          var ctx = canvas.getContext('2d');
+          ctx.scale(2, 2);
+          ctx.drawImage(img, 0, 0);
+          URL.revokeObjectURL(url);
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = function() {
+          URL.revokeObjectURL(url);
+          resolve(null);
+        };
+        img.src = url;
+      } catch(e) {
+        resolve(null);
+      }
+    });
+  }
+
+  // Live Symmetrical Preview Renderer
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     if (!box) return;
 
     var html = `
-      <div style="font-family:'Times New Roman', Times, serif; color:#000; line-height:1.2; padding:15px; background:#fff;">
+      <div style="font-family:'Times New Roman', Times, serif; color:#000; line-height:1.25; padding:20px; background:#fff;">
         <h2 style="text-align:center; margin:0 0 2px 0; font-size:16pt; font-weight:bold; color:#000;">${(data.schoolName || 'DAV PUBLIC SCHOOL').toUpperCase()}</h2>
         <p style="text-align:center; margin:0 0 2px 0; font-size:11pt; font-weight:bold;">${(data.examTitle || 'EXAMINATION').toUpperCase()} (${data.session || '2026'})</p>
         <p style="text-align:center; margin:0 0 6px 0; font-size:11pt; font-weight:bold;">CLASS: ${data.className || ''} | SUBJECT: ${(data.subject || '').toUpperCase()}</p>
@@ -818,7 +845,7 @@
             <td style="text-align:right; padding:0;">MAX MARKS: ${data.maxMarks || '80'}</td>
           </tr>
         </table>
-        <hr style="border:0; border-top:1px dashed #000; margin:4px 0 8px 0;">
+        <hr style="border:0; border-top:1px dashed #000; margin:4px 0 10px 0;">
     `;
 
     if (data.instructions) {
@@ -837,16 +864,16 @@
       data.questions.forEach(function(q) {
         if (q.section !== currentSec) {
           currentSec = q.section;
-          html += `<h3 style="text-align:center; font-size:11pt; font-weight:bold; margin:12px 0 4px 0; text-transform:uppercase;">${currentSec}</h3>`;
+          html += `<h3 style="text-align:center; font-size:11pt; font-weight:bold; margin:14px 0 6px 0; text-transform:uppercase;">${currentSec}</h3>`;
         }
 
         html += `
-          <table style="width:100%; border:none; margin-bottom:2px; font-size:12pt; border-collapse:collapse;">
+          <table style="width:100%; border:none; margin-bottom:6px; font-size:12pt; border-collapse:collapse;">
             <tr style="vertical-align:top;">
-              <td style="padding:1px 0; text-align:justify;">
-                <b>Q.${qNum}.   </b><span style="font-weight:normal; font-size:12pt;">${q.text || ''}</span>
+              <td style="padding:2px 0; text-align:justify; word-wrap:break-word;">
+                <b>Q.${qNum}.   </b><span style="font-weight:normal; font-size:12pt; text-align:justify;">${q.text || ''}</span>
               </td>
-              <td style="width:50px; text-align:right; font-weight:bold; padding:1px 0; white-space:nowrap; font-size:10pt;">
+              <td style="width:55px; text-align:right; font-weight:bold; padding:2px 0; white-space:nowrap; font-size:10pt;">
                 [${q.marks || 1}]
               </td>
             </tr>
@@ -854,12 +881,12 @@
         `;
 
         if (q.qImg) {
-          html += `<div style="text-align:center; margin:3px 0;"><img src="${q.qImg}" style="max-width:320px; max-height:160px; object-fit:contain;"></div>`;
+          html += `<div style="text-align:center; margin:4px 0;"><img src="${q.qImg}" style="max-width:320px; max-height:160px; object-fit:contain;"></div>`;
         }
 
         if (q.type === 'MCQ' && q.options && q.options.length > 0) {
           html += `
-            <div style="margin-left:25px; font-size:10.5pt; margin-bottom:4px; font-weight:normal;">
+            <div style="margin-left:25px; font-size:10.5pt; margin-bottom:6px; font-weight:normal;">
               <span style="display:inline-block; min-width:45%;">(a) ${q.options[0]||''}</span>
               <span style="display:inline-block; min-width:45%;">(b) ${q.options[1]||''}</span><br>
               <span style="display:inline-block; min-width:45%;">(c) ${q.options[2]||''}</span>
@@ -872,7 +899,7 @@
           q.subQuestions.forEach(function(sub, sIdx) {
             var sTxt = (typeof sub === 'string') ? sub : sub.text;
             var sImg = (typeof sub === 'string') ? '' : sub.img;
-            html += `<div style="margin-left:25px; font-size:10.5pt; margin-bottom:2px; font-weight:normal;">(${sIdx + 1}) ${sTxt}</div>`;
+            html += `<div style="margin-left:25px; font-size:10.5pt; margin-bottom:3px; font-weight:normal; text-align:justify;">(${sIdx + 1}) ${sTxt}</div>`;
             if (sImg) html += `<div style="text-align:center; margin:3px 0;"><img src="${sImg}" style="max-width:300px;"></div>`;
           });
         }
@@ -892,9 +919,28 @@
     var generateBtn = document.getElementById('generateBtn');
 
     loader.style.display = 'block';
+    loader.innerHTML = "⏳ Converting Equations to HD Images & Syncing with Google Drive...";
     generateBtn.disabled = true;
 
     var rawPayload = getFormData();
+
+    if (rawPayload.questions && rawPayload.questions.length > 0) {
+      for (var i = 0; i < rawPayload.questions.length; i++) {
+        var q = rawPayload.questions[i];
+        q.eqImages = [];
+        if (q.text) {
+          var matches = q.text.match(/\$\$(.*?)\$\$/g);
+          if (matches && matches.length > 0) {
+            for (var m = 0; m < matches.length; m++) {
+              var rawFormula = matches[m].replace(/\$\$/g, '').trim();
+              var b64Img = await renderLatexToImageBase64(rawFormula);
+              if (b64Img) q.eqImages.push(b64Img);
+            }
+          }
+        }
+      }
+    }
+
     renderPreview(rawPayload);
     syncQuestionsToBank(rawPayload.questions);
 
@@ -916,14 +962,14 @@
         if (resData.docUrl) document.getElementById('btnDocLink').href = resData.docUrl;
         if (resData.ansPdfUrl) document.getElementById('btnAnsPdfLink').href = resData.ansPdfUrl;
         if (resData.ansDocUrl) document.getElementById('btnAnsDocLink').href = resData.ansDocUrl;
-        
+
         if (resData.pdfUrl) window.open(resData.pdfUrl, '_blank');
         resultArea.scrollIntoView({ behavior: 'smooth' });
       }
     } catch (err) {
       loader.style.display = 'none';
       generateBtn.disabled = false;
-      alert("✅ Paper & Answer Key successfully generated in your Google Drive Folder!");
+      alert("✅ Question Paper & Answer Key successfully saved in your Google Drive Folder!");
       resultArea.style.display = 'block';
       resultArea.scrollIntoView({ behavior: 'smooth' });
     }
