@@ -142,7 +142,7 @@
     <ul>
       <li><b>Auto Section Title Carry-Forward:</b> Naya question card add karne par wo automatic pichhle question ka Section Title copy kar lega.</li>
       <li><b>Perfect Indented Instructions:</b> Instructions me <code>1. Text</code>, <code>2. Text</code> har line me automatic neatly aligned indentation ke saath aayega.</li>
-      <li><b>Inline HD Math Equations:</b> Formula ko <code>$$ ... $$</code> me wrap karein, Google Doc me Moderate sized HD Image me auto-convert honga.</li>
+      <li><b>Inline Balanced Equations:</b> Formula ko <code>$$ ... $$</code> me wrap karein, Doc me 12pt text ke exact scale/proportionate image me convert hoga.</li>
       <li><b>Cloud Sync Security:</b> Aapke dwara banaye gaye sabhi questions Google Sheet Database me aapke Teacher ID ke saath secure store hote hain.</li>
     </ul>
   </details>
@@ -790,6 +790,7 @@
     closeEquationModal();
   }
 
+  // Inline Balanced Base64 Generator
   async function renderLatexToImageBase64(latexStr) {
     return new Promise((resolve) => {
       try {
@@ -797,7 +798,7 @@
           resolve(null);
           return;
         }
-        var svgEl = window.MathJax.tex2svg(latexStr, { display: true }).querySelector('svg');
+        var svgEl = window.MathJax.tex2svg(latexStr, { display: false }).querySelector('svg');
         if (!svgEl) { resolve(null); return; }
 
         svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -808,7 +809,7 @@
         var img = new Image();
         img.onload = function() {
           var canvas = document.createElement('canvas');
-          var scale = 2.5;
+          var scale = 3.0;
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
           var ctx = canvas.getContext('2d');
@@ -920,7 +921,7 @@
     var generateBtn = document.getElementById('generateBtn');
 
     loader.style.display = 'block';
-    loader.innerHTML = "⏳ Converting Equations & Generating Perfect Symmetrical Document...";
+    loader.innerHTML = "⏳ Converting Equations & Generating Symmetrical Paper...";
     generateBtn.disabled = true;
 
     var rawPayload = getFormData();
