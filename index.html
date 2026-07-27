@@ -801,9 +801,89 @@
     closeEquationModal();
   }
 
+  // Live Preview Renderer Function
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
-    box.innerHTML = `<h3 style="text-align:center;">${data.schoolName}</h3><p style="text-align:center;">CLASS ${data.className} - ${data.subject}</p>`;
+    if (!box) return;
+
+    var html = `
+      <div style="font-family:'Times New Roman', Times, serif; color:#000; line-height:1.2; padding:15px; background:#fff;">
+        <h2 style="text-align:center; margin:0 0 2px 0; font-size:16pt; font-weight:bold; color:#000;">${(data.schoolName || 'DAV PUBLIC SCHOOL').toUpperCase()}</h2>
+        <p style="text-align:center; margin:0 0 2px 0; font-size:11pt; font-weight:bold;">${(data.examTitle || 'EXAMINATION').toUpperCase()} (${data.session || '2026'})</p>
+        <p style="text-align:center; margin:0 0 6px 0; font-size:11pt; font-weight:bold;">CLASS: ${data.className || ''} | SUBJECT: ${(data.subject || '').toUpperCase()}</p>
+
+        <table style="width:100%; font-size:10pt; font-weight:bold; margin-bottom:4px; border:none; border-collapse:collapse;">
+          <tr>
+            <td style="text-align:left; padding:0;">TIME ALLOWED: ${data.timeAllowed || '3 Hours'}</td>
+            <td style="text-align:right; padding:0;">MAX MARKS: ${data.maxMarks || '80'}</td>
+          </tr>
+        </table>
+        <hr style="border:0; border-top:1px dashed #000; margin:4px 0 8px 0;">
+    `;
+
+    if (data.instructions) {
+      html += `<p style="font-weight:bold; font-size:10pt; margin:2px 0;">General Instructions:</p>`;
+      data.instructions.split('\n').forEach(function(line) {
+        if (line.trim()) {
+          html += `<p style="font-size:9.5pt; margin:1px 0 2px 0; text-align:justify;">${line.trim()}</p>`;
+        }
+      });
+    }
+
+    var currentSec = "";
+    var qNum = 1;
+
+    if (data.questions && data.questions.length > 0) {
+      data.questions.forEach(function(q) {
+        if (q.section !== currentSec) {
+          currentSec = q.section;
+          html += `<h3 style="text-align:center; font-size:11pt; font-weight:bold; margin:12px 0 4px 0; text-transform:uppercase;">${currentSec}</h3>`;
+        }
+
+        html += `
+          <table style="width:100%; border:none; margin-bottom:2px; font-size:10pt; border-collapse:collapse;">
+            <tr style="vertical-align:top;">
+              <td style="padding:1px 0; text-align:justify;">
+                <b>Q.${qNum}.   </b><span style="font-weight:normal;">${q.text || ''}</span>
+              </td>
+              <td style="width:50px; text-align:right; font-weight:bold; padding:1px 0; white-space:nowrap;">
+                [${q.marks || 1}]
+              </td>
+            </tr>
+          </table>
+        `;
+
+        if (q.qImg) {
+          html += `<div style="text-align:center; margin:3px 0;"><img src="${q.qImg}" style="max-width:320px; max-height:160px; object-fit:contain;"></div>`;
+        }
+
+        if (q.type === 'MCQ' && q.options && q.options.length > 0) {
+          html += `
+            <div style="margin-left:25px; font-size:9.5pt; margin-bottom:4px; font-weight:normal;">
+              <span style="display:inline-block; min-width:45%;">(a) ${q.options[0]||''}</span>
+              <span style="display:inline-block; min-width:45%;">(b) ${q.options[1]||''}</span><br>
+              <span style="display:inline-block; min-width:45%;">(c) ${q.options[2]||''}</span>
+              <span style="display:inline-block; min-width:45%;">(d) ${q.options[3]||''}</span>
+            </div>
+          `;
+        }
+
+        if (q.type === 'CASE_STUDY' && q.subQuestions) {
+          q.subQuestions.forEach(function(sub, sIdx) {
+            var sTxt = (typeof sub === 'string') ? sub : sub.text;
+            var sImg = (typeof sub === 'string') ? '' : sub.img;
+            html += `<div style="margin-left:25px; font-size:9.5pt; margin-bottom:2px; font-weight:normal;">(${sIdx + 1}) ${sTxt}</div>`;
+            if (sImg) html += `<div style="text-align:center; margin:3px 0;"><img src="${sImg}" style="max-width:300px;"></div>`;
+          });
+        }
+
+        qNum++;
+      });
+    }
+
+    html += `</div>`;
+    box.innerHTML = html;
+    box.style.display = 'block';
   }
 
   async function submitSingleClickAction() {
@@ -845,6 +925,7 @@
       generateBtn.disabled = false;
       alert("✅ Paper & Answer Key successfully generated in your Google Drive Folder!");
       resultArea.style.display = 'block';
+      resultArea.scrollIntoView({ behavior: 'smooth' });
     }
   }
 </script>
