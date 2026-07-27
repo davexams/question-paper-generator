@@ -142,7 +142,7 @@
     <ul>
       <li><b>Auto Section Title Carry-Forward:</b> Naya question card add karne par wo automatic pichhle question ka Section Title copy kar lega.</li>
       <li><b>Perfect Indented Instructions:</b> Instructions me <code>1. Text</code>, <code>2. Text</code> har line me automatic neatly aligned indentation ke saath aayega.</li>
-      <li><b>Inline HD Math Equations:</b> Formula ko <code>$$ ... $$</code> me wrap karein, Google Doc me HD Image me auto-convert honga.</li>
+      <li><b>Inline HD Math Equations:</b> Formula ko <code>$$ ... $$</code> me wrap karein, Google Doc me Moderate sized HD Image me auto-convert honga.</li>
       <li><b>Cloud Sync Security:</b> Aapke dwara banaye gaye sabhi questions Google Sheet Database me aapke Teacher ID ke saath secure store hote hain.</li>
     </ul>
   </details>
@@ -790,7 +790,7 @@
     closeEquationModal();
   }
 
-  // MathJax Formula ko High-Resolution PNG Base64 Image me convert karne ka Function
+  // Moderate Sized Moderate Base64 Equation Generator
   async function renderLatexToImageBase64(latexStr) {
     return new Promise((resolve) => {
       try {
@@ -809,10 +809,11 @@
         var img = new Image();
         img.onload = function() {
           var canvas = document.createElement('canvas');
-          canvas.width = img.width * 2 || 300;
-          canvas.height = img.height * 2 || 80;
+          var scale = 2.5; // High definition crisp quality
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
           var ctx = canvas.getContext('2d');
-          ctx.scale(2, 2);
+          ctx.scale(scale, scale);
           ctx.drawImage(img, 0, 0);
           URL.revokeObjectURL(url);
           resolve(canvas.toDataURL('image/png'));
@@ -828,7 +829,7 @@
     });
   }
 
-  // Live Symmetrical Preview Renderer
+  // Live Symmetrical Preview Renderer with Hanging Indent CSS
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     if (!box) return;
@@ -870,8 +871,8 @@
         html += `
           <table style="width:100%; border:none; margin-bottom:6px; font-size:12pt; border-collapse:collapse;">
             <tr style="vertical-align:top;">
-              <td style="padding:2px 0; text-align:justify; word-wrap:break-word;">
-                <b>Q.${qNum}.   </b><span style="font-weight:normal; font-size:12pt; text-align:justify;">${q.text || ''}</span>
+              <td style="padding:2px 0; text-align:justify; word-wrap:break-word; padding-left:32px; text-indent:-32px;">
+                <b>Q.${qNum}. </b><span style="font-weight:normal; font-size:12pt;">${q.text || ''}</span>
               </td>
               <td style="width:55px; text-align:right; font-weight:bold; padding:2px 0; white-space:nowrap; font-size:10pt;">
                 [${q.marks || 1}]
@@ -886,7 +887,7 @@
 
         if (q.type === 'MCQ' && q.options && q.options.length > 0) {
           html += `
-            <div style="margin-left:25px; font-size:10.5pt; margin-bottom:6px; font-weight:normal;">
+            <div style="margin-left:32px; font-size:10.5pt; margin-bottom:6px; font-weight:normal;">
               <span style="display:inline-block; min-width:45%;">(a) ${q.options[0]||''}</span>
               <span style="display:inline-block; min-width:45%;">(b) ${q.options[1]||''}</span><br>
               <span style="display:inline-block; min-width:45%;">(c) ${q.options[2]||''}</span>
@@ -899,7 +900,7 @@
           q.subQuestions.forEach(function(sub, sIdx) {
             var sTxt = (typeof sub === 'string') ? sub : sub.text;
             var sImg = (typeof sub === 'string') ? '' : sub.img;
-            html += `<div style="margin-left:25px; font-size:10.5pt; margin-bottom:3px; font-weight:normal; text-align:justify;">(${sIdx + 1}) ${sTxt}</div>`;
+            html += `<div style="margin-left:32px; font-size:10.5pt; margin-bottom:3px; font-weight:normal; text-align:justify;">(${sIdx + 1}) ${sTxt}</div>`;
             if (sImg) html += `<div style="text-align:center; margin:3px 0;"><img src="${sImg}" style="max-width:300px;"></div>`;
           });
         }
@@ -919,7 +920,7 @@
     var generateBtn = document.getElementById('generateBtn');
 
     loader.style.display = 'block';
-    loader.innerHTML = "⏳ Converting Equations to HD Images & Syncing with Google Drive...";
+    loader.innerHTML = "⏳ Converting Equations to Moderate Images & Syncing with Google Drive...";
     generateBtn.disabled = true;
 
     var rawPayload = getFormData();
