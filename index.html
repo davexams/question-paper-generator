@@ -4,7 +4,6 @@
   <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- MathLive & MathJax for Client-Side Inline Render -->
   <script defer src="https://unpkg.com/mathlive"></script>
   <script>
     window.MathJax = {
@@ -80,7 +79,8 @@
       gap: 8px;
     }
 
-    .img-preview { max-height: 90px; margin-top: 5px; display: block; border: 1px solid #ddd; border-radius: 3px; max-width: 100%; object-fit: contain; }
+    /* Proportional Preview Formatting */
+    .img-preview { max-height: 100px; width: auto; margin-top: 5px; display: block; border: 1px solid #ddd; border-radius: 3px; object-fit: contain; }
 
     #statusTag { position: fixed; top: 15px; right: 15px; background: #e6f4ea; color: #137333; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ceead6; display: none; z-index: 1000; }
     #loader { display: none; text-align: center; margin-top: 15px; color: #1a73e8; font-weight: bold; }
@@ -1015,6 +1015,7 @@
     });
   }
 
+  // UNBOLD TEXT & OPTION PREVIEW DISPLAY
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     if (!box) return;
@@ -1038,7 +1039,7 @@
       html += `<p style="font-weight:bold; font-size:10pt; margin:2px 0;">General Instructions:</p>`;
       data.instructions.split('\n').forEach(function(line) {
         if (line.trim()) {
-          html += `<p style="font-size:9.5pt; margin:1px 0 2px 0; text-align:justify;">${line.trim()}</p>`;
+          html += `<p style="font-size:9.5pt; margin:1px 0 2px 0; text-align:justify; font-weight:normal;">${line.trim()}</p>`;
         }
       });
     }
@@ -1057,7 +1058,7 @@
           <table style="width:100%; border:none; margin-bottom:6px; font-size:11pt; border-collapse:collapse;">
             <tr style="vertical-align:top;">
               <td style="width:35px; padding:2px 0; font-weight:bold;">Q.${qNum}.</td>
-              <td style="padding:2px 0; text-align:justify; word-wrap:break-word;">
+              <td style="padding:2px 0; text-align:justify; word-wrap:break-word; font-weight:normal;">
                 <span style="font-weight:normal; font-size:11pt;">${q.text || ''}</span>
               </td>
               <td style="width:45px; text-align:right; font-weight:bold; padding:2px 10px 2px 0; white-space:nowrap; font-size:10pt;">
@@ -1074,15 +1075,15 @@
         if (q.type === 'MCQ' && q.options && q.options.length > 0) {
           html += `
             <div style="margin-left:35px; font-size:10.5pt; margin-bottom:6px; font-weight:normal;">
-              <span style="display:inline-block; min-width:45%;">(a) ${q.options[0]||''} ${q.optImgs && q.optImgs[0] ? `<br><img src="${q.optImgs[0]}" style="max-height:60px;">` : ''}</span>
-              <span style="display:inline-block; min-width:45%;">(b) ${q.options[1]||''} ${q.optImgs && q.optImgs[1] ? `<br><img src="${q.optImgs[1]}" style="max-height:60px;">` : ''}</span><br>
-              <span style="display:inline-block; min-width:45%;">(c) ${q.options[2]||''} ${q.optImgs && q.optImgs[2] ? `<br><img src="${q.optImgs[2]}" style="max-height:60px;">` : ''}</span>
-              <span style="display:inline-block; min-width:45%;">(d) ${q.options[3]||''} ${q.optImgs && q.optImgs[3] ? `<br><img src="${q.optImgs[3]}" style="max-height:60px;">` : ''}</span>
+              <span style="display:inline-block; min-width:45%; font-weight:normal;">(a) ${q.options[0]||''} ${q.optImgs && q.optImgs[0] ? `<br><img src="${q.optImgs[0]}" style="max-height:60px;">` : ''}</span>
+              <span style="display:inline-block; min-width:45%; font-weight:normal;">(b) ${q.options[1]||''} ${q.optImgs && q.optImgs[1] ? `<br><img src="${q.optImgs[1]}" style="max-height:60px;">` : ''}</span><br>
+              <span style="display:inline-block; min-width:45%; font-weight:normal;">(c) ${q.options[2]||''} ${q.optImgs && q.optImgs[2] ? `<br><img src="${q.optImgs[2]}" style="max-height:60px;">` : ''}</span>
+              <span style="display:inline-block; min-width:45%; font-weight:normal;">(d) ${q.options[3]||''} ${q.optImgs && q.optImgs[3] ? `<br><img src="${q.optImgs[3]}" style="max-height:60px;">` : ''}</span>
             </div>
           `;
         } else if (q.type === 'AR') {
           html += `
-            <div style="margin-left:35px; font-size:10.5pt; color:#333; margin-bottom:6px;">
+            <div style="margin-left:35px; font-size:10.5pt; color:#333; margin-bottom:6px; font-weight:normal;">
               (a) Both A and R are true and R is correct explanation.<br>
               (b) Both A and R are true but R is NOT correct explanation.<br>
               (c) A is true but R is false.<br>
