@@ -60,7 +60,6 @@
     .btn-bank:hover { background-color: #593196; }
     .btn-del { background-color: #ea4335; width: auto; padding: 4px 8px; font-size: 12px; position: absolute; right: 10px; top: 10px; }
 
-    /* FLOATING ALWAYS-VISIBLE MATH EDITOR BUTTON */
     .btn-eq-floating {
       position: fixed;
       bottom: 25px;
@@ -80,11 +79,6 @@
       align-items: center;
       gap: 8px;
     }
-    .btn-eq-floating:hover {
-      background-color: #e06d10;
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-    }
 
     .img-preview { max-height: 90px; margin-top: 5px; display: block; border: 1px solid #ddd; border-radius: 3px; max-width: 100%; object-fit: contain; }
 
@@ -93,7 +87,6 @@
     #resultArea { display: none; margin-top: 25px; }
 
     .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 35px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.25; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; overflow-x: auto; }
-    .paper-preview table, .paper-preview tr, .paper-preview td { border: none !important; border-collapse: collapse !important; }
 
     .live-counter-bar { background: #e8f0fe; border: 1px solid #aecbfa; padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: bold; color: #174ea6; flex-wrap: wrap; gap: 8px; }
 
@@ -111,7 +104,6 @@
       touch-action: manipulation;
     }
 
-    /* 📱 MATHLIVE VIRTUAL KEYBOARD OVERLAY FIX */
     .ML__keyboard, ml-keyboard, div[ML__keyboard], .ML__keyboard-container {
       z-index: 999999 !important;
       pointer-events: auto !important;
@@ -772,7 +764,6 @@
         </div>
       </div>
 
-      <!-- RESTORED MCQ OPTIONS WITH IMAGE UPLOAD BOXES -->
       <div class="mcq-options" id="mcqOpts_${qCount}" style="display: ${q.type==='MCQ'?'grid':'none'};">
         <div class="mcq-opt-box">
           <label>Option A Text & Diagram:</label>
@@ -981,7 +972,6 @@
     closeEquationModal();
   }
 
-  // ACCURATE TEX EX-UNIT SCALING (PROPORTIONAL TO 11pt BODY TEXT - 20pt TARGET HEIGHT)
   async function latexToPngBase64(latex) {
     return new Promise(function(resolve) {
       try {
@@ -1006,7 +996,7 @@
           var targetW = Math.max(10, exW * pxFactor);
 
           var canvas = document.createElement("canvas");
-          var renderScale = 2.5; // High-DPI sharpness
+          var renderScale = 2.5;
           canvas.width = targetW * renderScale;
           canvas.height = targetH * renderScale;
 
@@ -1171,13 +1161,13 @@
 
         if (resData.pdfUrl) window.open(resData.pdfUrl, '_blank');
         resultArea.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        alert("Error Generating Files: " + (resData.message || "Unknown Error"));
       }
     } catch (err) {
       loader.style.display = 'none';
       generateBtn.disabled = false;
-      alert("✅ Question Paper & Answer Key successfully saved in your Google Drive Folder!");
-      resultArea.style.display = 'block';
-      resultArea.scrollIntoView({ behavior: 'smooth' });
+      alert("Network Error / Request Exception: " + err);
     }
   }
 </script>
