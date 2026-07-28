@@ -19,7 +19,7 @@
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
 
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; color: #333; }
+    body { font-family: Arial, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; color: #333; }
     .container { max-width: 950px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
     h2, h3 { text-align: center; color: #1a73e8; }
     
@@ -92,7 +92,7 @@
     #loader { display: none; text-align: center; margin-top: 15px; color: #1a73e8; font-weight: bold; }
     #resultArea { display: none; margin-top: 25px; }
 
-    .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 35px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.20; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; overflow-x: auto; }
+    .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 35px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.20; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; overflow-x: auto; }
 
     .live-counter-bar { background: #e8f0fe; border: 1px solid #aecbfa; padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: bold; color: #174ea6; flex-wrap: wrap; gap: 8px; }
 
@@ -110,7 +110,6 @@
       touch-action: manipulation;
     }
 
-    /* 📱 FIX MATHLIVE VIRTUAL KEYBOARD TOUCH EVENTS FOR MOBILE DEVICES */
     .ML__keyboard, ml-keyboard, div[ML__keyboard], .ML__keyboard-container {
       z-index: 999999 !important;
       pointer-events: auto !important;
@@ -171,7 +170,6 @@
     </div>
   </div>
 
-  <!-- INSTRUCTIONS GUIDE -->
   <details class="guide-box" open>
     <summary>💡 Instructions: Smart Features Guide</summary>
     <ul>
@@ -226,7 +224,6 @@
 
   <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
 
-  <!-- LIVE MARKS COUNTER BAR -->
   <div class="live-counter-bar">
     <span>📊 Total Questions Added: <span id="statQCount">0</span></span>
     <span>🎯 Target Marks: <span id="statTargetMarks">80</span></span>
@@ -262,12 +259,10 @@
   </div>
 </div>
 
-<!-- FLOATING ALWAYS-VISIBLE MATH EDITOR BUTTON -->
-<button type="button" class="btn-eq-floating" onclick="openEquationModal()" title="Open Math Equation Editor">
+<button type="button" class="btn-eq-floating" onclick="openEquationModal()" title="Open Math Editor">
   📐 Math Editor
 </button>
 
-<!-- QUESTION BANK MODAL -->
 <div id="bankModal" class="modal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -279,7 +274,6 @@
   </div>
 </div>
 
-<!-- VISUAL MATH EQUATION EDITOR MODAL -->
 <div id="equationModal" class="modal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -290,7 +284,6 @@
       Construct complex math formulas (Integration ∫, Matrices, Roots, Fractions).
     </p>
 
-    <!-- Shortcut Buttons for Teachers -->
     <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
       <button type="button" class="sym-btn" onclick="insertMathLive('\\int_{a}^{b} x dx')">∫ Integration</button>
       <button type="button" class="sym-btn" onclick="insertMathLive('\\frac{d}{dx}')">d/dx Derivative</button>
@@ -301,7 +294,6 @@
       <button type="button" class="sym-btn" onclick="insertMathLive('\\lim_{x \\to 0}')">lim Limit</button>
     </div>
 
-    <!-- MathLive Interactive Field -->
     <math-field id="mathEditorField" math-virtual-keyboard-policy="auto">x^2 + \int_{0}^{\infty} e^{-x} dx</math-field>
 
     <div style="margin-top:15px; display:flex; gap:10px; justify-content:flex-end;">
@@ -1033,13 +1025,13 @@
     });
   }
 
-  // ULTRA TIGHT PREVIEW RENDERER
+  // ULTRA TIGHT PREVIEW RENDERER (Arial Font)
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     if (!box) return;
 
     var html = `
-      <div style="font-family:'Times New Roman', Times, serif; color:#000; line-height:1.20; padding:15px; background:#fff;">
+      <div style="font-family: Arial, Helvetica, sans-serif; color:#000; line-height:1.20; padding:15px; background:#fff;">
         <h2 style="text-align:center; margin:0 0 1px 0; font-size:15pt; font-weight:bold; color:#000;">${(data.schoolName || 'DAV PUBLIC SCHOOL').toUpperCase()}</h2>
         <p style="text-align:center; margin:0 0 1px 0; font-size:10.5pt; font-weight:bold;">${(data.examTitle || 'EXAMINATION').toUpperCase()} (${data.session || '2026'})</p>
         <p style="text-align:center; margin:0 0 4px 0; font-size:10.5pt; font-weight:bold;">CLASS: ${data.className || ''} | SUBJECT: ${(data.subject || '').toUpperCase()}</p>
