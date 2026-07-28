@@ -1031,7 +1031,7 @@
     });
   }
 
-  // PREVIEW RENDERER (Arial Font & Minimal Gap Adjustments)
+  // PREVIEW RENDERER (Arial Font & Footer Line Separator)
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     if (!box) return;
@@ -1121,6 +1121,14 @@
       });
     }
 
+    // Preview Footer Separator Line
+    html += `
+      <hr style="border:0; border-top:1px solid #000; margin:15px 0 4px 0;">
+      <div style="text-align:center; font-size:9.5pt; font-weight:bold; color:#000;">
+        ${(data.examTitle || "EXAMINATION").toUpperCase()} | CLASS ${(data.className || "").toUpperCase()} (${(data.subject || "").toUpperCase()})
+      </div>
+    `;
+
     html += `</div>`;
     box.innerHTML = html;
     box.style.display = 'block';
@@ -1140,6 +1148,8 @@
     if (rawPayload.questions && rawPayload.questions.length > 0) {
       for (var i = 0; i < rawPayload.questions.length; i++) {
         var q = rawPayload.questions[i];
+        
+        // 1. Question Text Equations Parsing
         q.eqImages = [];
         if (q.text) {
           var matches = q.text.match(/\$\$(.*?)\$\$/g);
@@ -1148,6 +1158,47 @@
               var rawFormula = matches[m].replace(/\$\$/g, '').trim();
               var b64Img = await latexToPngBase64(rawFormula);
               if (b64Img) q.eqImages.push(b64Img);
+            }
+          }
+        }
+
+        // 2. MCQ Options Equations Parsing
+        if (q.type === 'MCQ' && q.options && q.options.length > 0) {
+          q.optEqImages = [];
+          for (var o = 0; o < q.options.length; o++) {
+            var oImgs = [];
+            if (q.options[o]) {
+              var oMatches = q.options[o].match(/\$\$(.*?)\$\$/g);
+              if (oMatches && oMatches.length > 0) {
+                for (var om = 0; om < oMatches.length; om++) {
+                  var rawForm = oMatches[om].replace(/\$\$/g, '').trim();
+                  var b66Img = await latexToPngBase64(rawForm);
+                  if (b66Img) oImgs.push(b66Img);
+                }
+              }
+            }
+            q.optEqImages.push(oImgs);
+          }
+        }
+
+        // 3. Case Study Sub-Questions Equations Parsing
+        if (q.type === 'CASE_STUDY' && q.subQuestions && q.subQuestions.length > 0) {
+          for (var sq = 0; sq < q.subQuestions.length; sq++) {
+            var subObj = q.subQuestions[sq];
+            var sTxt = (typeof subObj === 'string') ? subObj : (subObj.text || '');
+            var sEqImgs = [];
+            if (sTxt) {
+              var sMatches = sTxt.match(/\$\$(.*?)\$\$/g);
+              if (sMatches && sMatches.length > 0) {
+                for (var sm = 0; sm < sMatches.length; sm++) {
+                  var rawF = sMatches[sm].replace(/\$\$/g, '').trim();
+                  var bImg = await latexToPngBase64(rawF);
+                  if (bImg) sEqImgs.push(bImg);
+                }
+              }
+            }
+            if (typeof subObj === 'object') {
+              subObj.eqImages = sEqImgs;
             }
           }
         }
