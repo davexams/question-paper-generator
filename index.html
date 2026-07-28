@@ -85,7 +85,6 @@
     #loader { display: none; text-align: center; margin-top: 15px; color: #1a73e8; font-weight: bold; }
     #resultArea { display: none; margin-top: 25px; }
 
-    /* Paper Preview Updated to 11pt Body Text */
     .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 35px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.25; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; overflow-x: auto; }
 
     .live-counter-bar { background: #e8f0fe; border: 1px solid #aecbfa; padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: bold; color: #174ea6; flex-wrap: wrap; gap: 8px; }
@@ -791,7 +790,7 @@
     closeEquationModal();
   }
 
-  // Fine-tuned 2.5x Scale Equation Converter for 11pt Font Balance
+  // Fine-tuned 2.3x Scale Equation Converter
   async function renderLatexToImageBase64(latexStr) {
     return new Promise((resolve) => {
       try {
@@ -810,7 +809,7 @@
         var img = new Image();
         img.onload = function() {
           var canvas = document.createElement('canvas');
-          var scale = 2.5; // Scaled down to match 11pt text
+          var scale = 2.3;
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
           var ctx = canvas.getContext('2d');
@@ -830,7 +829,7 @@
     });
   }
 
-  // 3-Column Symmetrical Live Preview Renderer
+  // Live Preview Renderer with Inside Right Shift
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     if (!box) return;
@@ -844,7 +843,7 @@
         <table style="width:100%; font-size:10pt; font-weight:bold; margin-bottom:4px; border:none; border-collapse:collapse;">
           <tr>
             <td style="text-align:left; padding:0;">TIME ALLOWED: ${data.timeAllowed || '3 Hours'}</td>
-            <td style="text-align:right; padding:0;">MAX MARKS: ${data.maxMarks || '80'}</td>
+            <td style="text-align:right; padding-right:10px;">MAX MARKS: ${data.maxMarks || '80'}</td>
           </tr>
         </table>
         <hr style="border:0; border-top:1px dashed #000; margin:4px 0 10px 0;">
@@ -876,7 +875,7 @@
               <td style="padding:2px 0; text-align:justify; word-wrap:break-word;">
                 <span style="font-weight:normal; font-size:11pt;">${q.text || ''}</span>
               </td>
-              <td style="width:45px; text-align:right; font-weight:bold; padding:2px 0; white-space:nowrap; font-size:10pt;">
+              <td style="width:45px; text-align:right; font-weight:bold; padding:2px 10px 2px 0; white-space:nowrap; font-size:10pt;">
                 [${q.marks || 1}]
               </td>
             </tr>
