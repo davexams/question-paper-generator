@@ -85,7 +85,8 @@
     #loader { display: none; text-align: center; margin-top: 15px; color: #1a73e8; font-weight: bold; }
     #resultArea { display: none; margin-top: 25px; }
 
-    .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 35px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.25; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; overflow-x: auto; }
+    /* Paper Preview Updated to 11pt Body Text */
+    .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 35px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.25; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; overflow-x: auto; }
 
     .live-counter-bar { background: #e8f0fe; border: 1px solid #aecbfa; padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: bold; color: #174ea6; flex-wrap: wrap; gap: 8px; }
 
@@ -142,7 +143,7 @@
     <ul>
       <li><b>Auto Section Title Carry-Forward:</b> Naya question card add karne par wo automatic pichhle question ka Section Title copy kar lega.</li>
       <li><b>Perfect Indented Instructions:</b> Instructions me <code>1. Text</code>, <code>2. Text</code> har line me automatic neatly aligned indentation ke saath aayega.</li>
-      <li><b>Inline Balanced Equations:</b> Formula ko <code>$$ ... $$</code> me wrap karein, Doc me 12pt text ke exact scale/proportionate image me convert hoga.</li>
+      <li><b>Inline Balanced Equations:</b> Formula ko <code>$$ ... $$</code> me wrap karein, Doc me 11pt text ke exact scale/proportionate image me convert hoga.</li>
       <li><b>Cloud Sync Security:</b> Aapke dwara banaye gaye sabhi questions Google Sheet Database me aapke Teacher ID ke saath secure store hote hain.</li>
     </ul>
   </details>
@@ -790,7 +791,7 @@
     closeEquationModal();
   }
 
-  // Fine-tuned Proportional Inline Equation Converter (2.8x Scale)
+  // Fine-tuned 2.5x Scale Equation Converter for 11pt Font Balance
   async function renderLatexToImageBase64(latexStr) {
     return new Promise((resolve) => {
       try {
@@ -809,7 +810,7 @@
         var img = new Image();
         img.onload = function() {
           var canvas = document.createElement('canvas');
-          var scale = 2.8;
+          var scale = 2.5; // Scaled down to match 11pt text
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
           var ctx = canvas.getContext('2d');
@@ -869,11 +870,11 @@
         }
 
         html += `
-          <table style="width:100%; border:none; margin-bottom:6px; font-size:12pt; border-collapse:collapse;">
+          <table style="width:100%; border:none; margin-bottom:6px; font-size:11pt; border-collapse:collapse;">
             <tr style="vertical-align:top;">
               <td style="width:35px; padding:2px 0; font-weight:bold;">Q.${qNum}.</td>
               <td style="padding:2px 0; text-align:justify; word-wrap:break-word;">
-                <span style="font-weight:normal; font-size:12pt;">${q.text || ''}</span>
+                <span style="font-weight:normal; font-size:11pt;">${q.text || ''}</span>
               </td>
               <td style="width:45px; text-align:right; font-weight:bold; padding:2px 0; white-space:nowrap; font-size:10pt;">
                 [${q.marks || 1}]
