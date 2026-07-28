@@ -4,6 +4,7 @@
   <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
+  <!-- MathLive & MathJax for Client-Side Perfect Inline Render -->
   <script defer src="https://unpkg.com/mathlive"></script>
   <script>
     window.MathJax = {
@@ -59,6 +60,7 @@
     .btn-bank:hover { background-color: #593196; }
     .btn-del { background-color: #ea4335; width: auto; padding: 4px 8px; font-size: 12px; position: absolute; right: 10px; top: 10px; }
 
+    /* FLOATING ALWAYS-VISIBLE MATH EDITOR BUTTON */
     .btn-eq-floating {
       position: fixed;
       bottom: 25px;
@@ -78,8 +80,12 @@
       align-items: center;
       gap: 8px;
     }
+    .btn-eq-floating:hover {
+      background-color: #e06d10;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    }
 
-    /* Proportional Dynamic Moderate Image Box */
     .img-preview { max-height: 120px; width: auto; margin-top: 4px; display: block; border: 1px solid #ddd; border-radius: 3px; object-fit: contain; }
 
     #statusTag { position: fixed; top: 15px; right: 15px; background: #e6f4ea; color: #137333; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ceead6; display: none; z-index: 1000; }
@@ -104,6 +110,7 @@
       touch-action: manipulation;
     }
 
+    /* 📱 FIX MATHLIVE VIRTUAL KEYBOARD TOUCH EVENTS FOR MOBILE DEVICES */
     .ML__keyboard, ml-keyboard, div[ML__keyboard], .ML__keyboard-container {
       z-index: 999999 !important;
       pointer-events: auto !important;
@@ -164,6 +171,7 @@
     </div>
   </div>
 
+  <!-- INSTRUCTIONS GUIDE -->
   <details class="guide-box" open>
     <summary>💡 Instructions: Smart Features Guide</summary>
     <ul>
@@ -218,6 +226,7 @@
 
   <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
 
+  <!-- LIVE MARKS COUNTER BAR -->
   <div class="live-counter-bar">
     <span>📊 Total Questions Added: <span id="statQCount">0</span></span>
     <span>🎯 Target Marks: <span id="statTargetMarks">80</span></span>
@@ -239,7 +248,7 @@
     🚀 Generate Paper & Download PDF
   </button>
 
-  <div id="loader">⏳ Rendering Math Equations & Syncing Exact PDF... Please Wait</div>
+  <div id="loader">⏳ Converting Equations & Generating Symmetrical Paper...</div>
 
   <div id="resultArea">
     <h3 style="color:#28a745; margin-bottom:15px; text-align:center;">✅ Question Paper & Answer Key Generated & Saved in Google Drive!</h3>
@@ -253,10 +262,12 @@
   </div>
 </div>
 
-<button type="button" class="btn-eq-floating" onclick="openEquationModal()" title="Open Math Editor">
+<!-- FLOATING ALWAYS-VISIBLE MATH EDITOR BUTTON -->
+<button type="button" class="btn-eq-floating" onclick="openEquationModal()" title="Open Math Equation Editor">
   📐 Math Editor
 </button>
 
+<!-- QUESTION BANK MODAL -->
 <div id="bankModal" class="modal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -268,6 +279,7 @@
   </div>
 </div>
 
+<!-- VISUAL MATH EQUATION EDITOR MODAL -->
 <div id="equationModal" class="modal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -278,6 +290,7 @@
       Construct complex math formulas (Integration ∫, Matrices, Roots, Fractions).
     </p>
 
+    <!-- Shortcut Buttons for Teachers -->
     <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
       <button type="button" class="sym-btn" onclick="insertMathLive('\\int_{a}^{b} x dx')">∫ Integration</button>
       <button type="button" class="sym-btn" onclick="insertMathLive('\\frac{d}{dx}')">d/dx Derivative</button>
@@ -288,6 +301,7 @@
       <button type="button" class="sym-btn" onclick="insertMathLive('\\lim_{x \\to 0}')">lim Limit</button>
     </div>
 
+    <!-- MathLive Interactive Field -->
     <math-field id="mathEditorField" math-virtual-keyboard-policy="auto">x^2 + \int_{0}^{\infty} e^{-x} dx</math-field>
 
     <div style="margin-top:15px; display:flex; gap:10px; justify-content:flex-end;">
@@ -735,7 +749,11 @@
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '^{2}')">x² (Super)</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', ' -> ')">→</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', ' ⇌ ')">⇌</button>
+            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', 'a/b')">a/b</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '√')">√</button>
+            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', 'α')">α</button>
+            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', 'β')">β</button>
+            <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', 'θ')">θ</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', 'π')">π</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', 'Δ')">Δ</button>
             <button type="button" class="sym-btn" onclick="insertSymbol('${textId}', '±')">±</button>
