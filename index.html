@@ -92,7 +92,7 @@
     #loader { display: none; text-align: center; margin-top: 15px; color: #1a73e8; font-weight: bold; }
     #resultArea { display: none; margin-top: 25px; }
 
-    .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 35px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.20; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; overflow-x: auto; }
+    .paper-preview { background: #ffffff !important; color: #000000 !important; border: 1px solid #d3d3d3; padding: 35px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.25; margin-bottom: 20px; min-height: 400px; display: block; width: 100%; box-sizing: border-box; overflow-x: auto; }
 
     .live-counter-bar { background: #e8f0fe; border: 1px solid #aecbfa; padding: 10px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: bold; color: #174ea6; flex-wrap: wrap; gap: 8px; }
 
@@ -1025,24 +1025,24 @@
     });
   }
 
-  // ULTRA TIGHT PREVIEW RENDERER (Arial Font)
+  // PREVIEW RENDERER (Arial Font & Minimal Gap Adjustments)
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     if (!box) return;
 
     var html = `
-      <div style="font-family: Arial, Helvetica, sans-serif; color:#000; line-height:1.20; padding:15px; background:#fff;">
+      <div style="font-family: Arial, Helvetica, sans-serif; color:#000; line-height:1.25; padding:15px; background:#fff;">
         <h2 style="text-align:center; margin:0 0 1px 0; font-size:15pt; font-weight:bold; color:#000;">${(data.schoolName || 'DAV PUBLIC SCHOOL').toUpperCase()}</h2>
         <p style="text-align:center; margin:0 0 1px 0; font-size:10.5pt; font-weight:bold;">${(data.examTitle || 'EXAMINATION').toUpperCase()} (${data.session || '2026'})</p>
         <p style="text-align:center; margin:0 0 4px 0; font-size:10.5pt; font-weight:bold;">CLASS: ${data.className || ''} | SUBJECT: ${(data.subject || '').toUpperCase()}</p>
 
-        <table style="width:100%; font-size:10pt; font-weight:bold; margin-bottom:2px; border:none; border-collapse:collapse;">
+        <table style="width:100%; font-size:10pt; font-weight:bold; margin-bottom:0px; border:none; border-collapse:collapse;">
           <tr>
             <td style="text-align:left; padding:0;">TIME ALLOWED: ${data.timeAllowed || '3 Hours'}</td>
             <td style="text-align:right; padding-right:8px;">MAX MARKS: ${data.maxMarks || '80'}</td>
           </tr>
         </table>
-        <hr style="border:0; border-top:1px dashed #000; margin:2px 0 6px 0;">
+        <hr style="border:0; border-top:1px solid #000; margin:1px 0 2px 0;">
     `;
 
     if (data.instructions) {
@@ -1061,17 +1061,17 @@
       data.questions.forEach(function(q) {
         if (q.section !== currentSec) {
           currentSec = q.section;
-          html += `<h3 style="text-align:center; font-size:11pt; font-weight:bold; margin:8px 0 3px 0; text-transform:uppercase;">${currentSec}</h3>`;
+          html += `<h3 style="text-align:center; font-size:11pt; font-weight:bold; margin:6px 0 2px 0; text-transform:uppercase;">${currentSec}</h3>`;
         }
 
         html += `
-          <table style="width:100%; border:none; margin-bottom:3px; font-size:11pt; border-collapse:collapse;">
+          <table style="width:100%; border:none; margin-bottom:1px; font-size:11pt; border-collapse:collapse;">
             <tr style="vertical-align:top;">
-              <td style="width:35px; padding:1px 0; font-weight:bold;">Q.${qNum}.</td>
-              <td style="padding:1px 0; text-align:justify; word-wrap:break-word; font-weight:normal;">
+              <td style="width:35px; padding:0; font-weight:bold;">Q.${qNum}.</td>
+              <td style="padding:0; text-align:justify; word-wrap:break-word; font-weight:normal; line-height:1.25;">
                 <span style="font-weight:normal; font-size:11pt;">${q.text || ''}</span>
               </td>
-              <td style="width:45px; text-align:right; font-weight:bold; padding:1px 8px 1px 0; white-space:nowrap; font-size:10pt;">
+              <td style="width:45px; text-align:right; font-weight:bold; padding:0 8px 0 0; white-space:nowrap; font-size:10pt;">
                 [${q.marks || 1}]
               </td>
             </tr>
@@ -1079,12 +1079,12 @@
         `;
 
         if (q.qImg) {
-          html += `<div style="text-align:center; margin:2px 0;"><img src="${q.qImg}" style="max-width:360px; max-height:180px; object-fit:contain;"></div>`;
+          html += `<div style="text-align:center; margin:1px 0;"><img src="${q.qImg}" style="max-width:360px; max-height:180px; object-fit:contain;"></div>`;
         }
 
         if (q.type === 'MCQ' && q.options && q.options.length > 0) {
           html += `
-            <div style="margin-left:35px; font-size:10.5pt; margin-bottom:4px; font-weight:normal;">
+            <div style="margin-left:35px; font-size:10.5pt; margin-bottom:2px; font-weight:normal;">
               <span style="display:inline-block; min-width:45%; font-weight:normal;">(a) ${q.options[0]||''} ${q.optImgs && q.optImgs[0] ? `<br><img src="${q.optImgs[0]}" style="max-height:80px;">` : ''}</span>
               <span style="display:inline-block; min-width:45%; font-weight:normal;">(b) ${q.options[1]||''} ${q.optImgs && q.optImgs[1] ? `<br><img src="${q.optImgs[1]}" style="max-height:80px;">` : ''}</span><br>
               <span style="display:inline-block; min-width:45%; font-weight:normal;">(c) ${q.options[2]||''} ${q.optImgs && q.optImgs[2] ? `<br><img src="${q.optImgs[2]}" style="max-height:80px;">` : ''}</span>
@@ -1093,7 +1093,7 @@
           `;
         } else if (q.type === 'AR') {
           html += `
-            <div style="margin-left:35px; font-size:10.5pt; color:#333; margin-bottom:4px; font-weight:normal;">
+            <div style="margin-left:35px; font-size:10.5pt; color:#333; margin-bottom:2px; font-weight:normal;">
               (a) Both A and R are true and R is correct explanation.<br>
               (b) Both A and R are true but R is NOT correct explanation.<br>
               (c) A is true but R is false.<br>
@@ -1106,8 +1106,8 @@
           q.subQuestions.forEach(function(sub, sIdx) {
             var sTxt = (typeof sub === 'string') ? sub : sub.text;
             var sImg = (typeof sub === 'string') ? '' : sub.img;
-            html += `<div style="margin-left:35px; font-size:10.5pt; margin-bottom:2px; font-weight:normal; text-align:justify;">${toRoman(sIdx + 1)} ${sTxt}</div>`;
-            if (sImg) html += `<div style="text-align:center; margin:2px 0;"><img src="${sImg}" style="max-width:320px;"></div>`;
+            html += `<div style="margin-left:35px; font-size:10.5pt; margin-bottom:1px; font-weight:normal; text-align:justify; line-height:1.25;">${toRoman(sIdx + 1)} ${sTxt}</div>`;
+            if (sImg) html += `<div style="text-align:center; margin:1px 0;"><img src="${sImg}" style="max-width:320px;"></div>`;
           });
         }
 
