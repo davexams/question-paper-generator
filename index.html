@@ -993,62 +993,59 @@
     closeEquationModal();
   }
 
-  // ROBUST MATHJAX TO BASE64 PNG CONVERTER WITH PROMISE SYNC
+  // FAST EQUATION TO BASE64 PNG CONVERTER WITH SAFETY TIMEOUT
   async function latexToPngBase64(latex) {
     return new Promise((resolve) => {
+      // Safety 1.5s Timeout to NEVER hang the UI
+      const timer = setTimeout(() => { resolve(null); }, 1500);
+
       try {
-        if (!window.MathJax) return resolve(null);
-
-        const renderAction = () => {
-          try {
-            var wrapper = window.MathJax.tex2svg(latex, { display: false });
-            var svgEl = wrapper.querySelector('svg');
-            if (!svgEl) return resolve(null);
-
-            svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-            
-            var exH = parseFloat(svgEl.getAttribute('height')) || 1.8;
-            var exW = parseFloat(svgEl.getAttribute('width')) || 2.5;
-
-            var svgData = new XMLSerializer().serializeToString(svgEl);
-            var svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-            var url = URL.createObjectURL(svgBlob);
-
-            var img = new Image();
-            img.onload = function() {
-              var scale = 3.0;
-              var targetH = Math.min(24, Math.max(14, exH * 8));
-              var targetW = Math.max(12, exW * 8);
-
-              var canvas = document.createElement("canvas");
-              canvas.width = targetW * scale;
-              canvas.height = targetH * scale;
-
-              var ctx = canvas.getContext("2d");
-              ctx.scale(scale, scale);
-              ctx.drawImage(img, 0, 0, targetW, targetH);
-
-              URL.revokeObjectURL(url);
-              resolve(canvas.toDataURL("image/png"));
-            };
-            img.onerror = function() {
-              URL.revokeObjectURL(url);
-              resolve(null);
-            };
-            img.src = url;
-          } catch(err) {
-            resolve(null);
-          }
-        };
-
-        if (window.mathJaxIsReady && window.MathJax.tex2svg) {
-          renderAction();
-        } else if (window.MathJax.startup && window.MathJax.startup.promise) {
-          window.MathJax.startup.promise.then(renderAction).catch(() => resolve(null));
-        } else {
-          setTimeout(renderAction, 300);
+        if (!window.MathJax || !window.MathJax.tex2svg) {
+          clearTimeout(timer);
+          return resolve(null);
         }
+
+        var wrapper = window.MathJax.tex2svg(latex, { display: false });
+        var svgEl = wrapper ? wrapper.querySelector('svg') : null;
+        if (!svgEl) {
+          clearTimeout(timer);
+          return resolve(null);
+        }
+
+        svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        var exH = parseFloat(svgEl.getAttribute('height')) || 1.8;
+        var exW = parseFloat(svgEl.getAttribute('width')) || 2.5;
+
+        var svgData = new XMLSerializer().serializeToString(svgEl);
+        var svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+        var url = URL.createObjectURL(svgBlob);
+
+        var img = new Image();
+        img.onload = function() {
+          clearTimeout(timer);
+          var scale = 2.5;
+          var targetH = Math.min(22, Math.max(14, exH * 8));
+          var targetW = Math.max(12, exW * 8);
+
+          var canvas = document.createElement("canvas");
+          canvas.width = targetW * scale;
+          canvas.height = targetH * scale;
+
+          var ctx = canvas.getContext("2d");
+          ctx.scale(scale, scale);
+          ctx.drawImage(img, 0, 0, targetW, targetH);
+
+          URL.revokeObjectURL(url);
+          resolve(canvas.toDataURL("image/png"));
+        };
+        img.onerror = function() {
+          clearTimeout(timer);
+          URL.revokeObjectURL(url);
+          resolve(null);
+        };
+        img.src = url;
       } catch(e) {
+        clearTimeout(timer);
         resolve(null);
       }
     });
