@@ -4,7 +4,6 @@
   <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- MathLive & MathJax for Client-Side Perfect Inline Render -->
   <script defer src="https://unpkg.com/mathlive"></script>
   <script>
     window.MathJax = {
@@ -13,6 +12,12 @@
       },
       svg: {
         fontCache: 'none'
+      },
+      startup: {
+        ready: () => {
+          MathJax.defaultReady();
+          window.mathJaxIsReady = true;
+        }
       }
     };
   </script>
@@ -60,7 +65,6 @@
     .btn-bank:hover { background-color: #593196; }
     .btn-del { background-color: #ea4335; width: auto; padding: 4px 8px; font-size: 12px; position: absolute; right: 10px; top: 10px; }
 
-    /* FLOATING ALWAYS-VISIBLE MATH EDITOR BUTTON */
     .btn-eq-floating {
       position: fixed;
       bottom: 25px;
@@ -988,50 +992,69 @@
     closeEquationModal();
   }
 
+  // ROBUST MATHJAX TO BASE64 PNG CONVERTER WITH PROMISE SYNC
   async function latexToPngBase64(latex) {
-    return new Promise(function(resolve) {
+    return new Promise((resolve) => {
       try {
-        if (!window.MathJax || !window.MathJax.tex2svg) return resolve(null);
-        
-        var wrapper = window.MathJax.tex2svg('\\textstyle ' + latex, {display: false});
-        var svgEl = wrapper.querySelector('svg');
-        if (!svgEl) return resolve(null);
+        if (!window.MathJax) return resolve(null);
 
-        var exH = parseFloat(svgEl.getAttribute('height')) || 1.8;
-        var exW = parseFloat(svgEl.getAttribute('width')) || 2.5;
+        // Ensure MathJax is ready before requesting SVG node
+        const renderAction = () => {
+          try {
+            var wrapper = window.MathJax.tex2svg(latex, { display: false });
+            var svgEl = wrapper.querySelector('svg');
+            if (!svgEl) return resolve(null);
 
-        svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        var svgData = new XMLSerializer().serializeToString(svgEl);
-        var svgBlob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
-        var url = URL.createObjectURL(svgBlob);
+            svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+            
+            var exH = parseFloat(svgEl.getAttribute('height')) || 1.8;
+            var exW = parseFloat(svgEl.getAttribute('width')) || 2.5;
 
-        var img = new Image();
-        img.onload = function() {
-          var pxFactor = 6.8; 
-          var targetH = Math.min(20, Math.max(12, exH * pxFactor));
-          var targetW = Math.max(10, exW * pxFactor);
+            var svgData = new XMLSerializer().serializeToString(svgEl);
+            var svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+            var url = URL.createObjectURL(svgBlob);
 
-          var canvas = document.createElement("canvas");
-          var renderScale = 2.5;
-          canvas.width = targetW * renderScale;
-          canvas.height = targetH * renderScale;
+            var img = new Image();
+            img.onload = function() {
+              var scale = 3.0; // High resolution for sharp text in Docs
+              var targetH = Math.min(24, Math.max(14, exH * 8));
+              var targetW = Math.max(12, exW * 8);
 
-          var ctx = canvas.getContext("2d");
-          ctx.scale(renderScale, renderScale);
-          ctx.drawImage(img, 0, 0, targetW, targetH);
+              var canvas = document.createElement("canvas");
+              canvas.width = targetW * scale;
+              canvas.height = targetH * scale;
 
-          URL.revokeObjectURL(url);
-          resolve(canvas.toDataURL("image/png"));
+              var ctx = canvas.getContext("2d");
+              ctx.scale(scale, scale);
+              ctx.drawImage(img, 0, 0, targetW, targetH);
+
+              URL.revokeObjectURL(url);
+              resolve(canvas.toDataURL("image/png"));
+            };
+            img.onerror = function() {
+              URL.revokeObjectURL(url);
+              resolve(null);
+            };
+            img.src = url;
+          } catch(err) {
+            resolve(null);
+          }
         };
-        img.onerror = function() { resolve(null); };
-        img.src = url;
+
+        if (window.mathJaxIsReady && window.MathJax.tex2svg) {
+          renderAction();
+        } else if (window.MathJax.startup && window.MathJax.startup.promise) {
+          window.MathJax.startup.promise.then(renderAction).catch(() => resolve(null));
+        } else {
+          setTimeout(renderAction, 300);
+        }
       } catch(e) {
         resolve(null);
       }
     });
   }
 
-  // PREVIEW RENDERER (Arial Font & Footer Line Separator)
+  // PREVIEW RENDERER
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     if (!box) return;
@@ -1085,7 +1108,7 @@
         `;
 
         if (q.qImg) {
-          html += `<div style="text-align:center; margin:1px 0;"><img src="${q.qImg}" style="max-width:360px; max-height:180px; object-fit:contain;"></div>`;
+          html += `<div style="text-align:left; margin:1px 0 1px 35px;"><img src="${q.qImg}" style="max-width:360px; max-height:180px; object-fit:contain;"></div>`;
         }
 
         if (q.type === 'MCQ' && q.options && q.options.length > 0) {
@@ -1113,7 +1136,7 @@
             var sTxt = (typeof sub === 'string') ? sub : sub.text;
             var sImg = (typeof sub === 'string') ? '' : sub.img;
             html += `<div style="margin-left:35px; font-size:10.5pt; margin-bottom:1px; font-weight:normal; text-align:justify; line-height:1.25;">${toRoman(sIdx + 1)} ${sTxt}</div>`;
-            if (sImg) html += `<div style="text-align:center; margin:1px 0;"><img src="${sImg}" style="max-width:320px;"></div>`;
+            if (sImg) html += `<div style="text-align:left; margin:1px 0 1px 35px;"><img src="${sImg}" style="max-width:320px;"></div>`;
           });
         }
 
@@ -1121,7 +1144,6 @@
       });
     }
 
-    // Preview Footer Separator Line
     html += `
       <hr style="border:0; border-top:1px solid #000; margin:15px 0 4px 0;">
       <div style="text-align:center; font-size:9.5pt; font-weight:bold; color:#000;">
@@ -1132,6 +1154,11 @@
     html += `</div>`;
     box.innerHTML = html;
     box.style.display = 'block';
+
+    // Typeset MathJax in live preview as well
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([box]).catch(err => {});
+    }
   }
 
   async function submitSingleClickAction() {
@@ -1168,7 +1195,7 @@
           for (var o = 0; o < q.options.length; o++) {
             var oImgs = [];
             if (q.options[o]) {
-              var oMatches = q.options[o].match(/\$\$(.*?)\$\$/g);
+              var oMatches = q.options[o].match(/\$\$$?\$\$/g) || q.options[o].match(/\$\$(.*?)\$\$/g);
               if (oMatches && oMatches.length > 0) {
                 for (var om = 0; om < oMatches.length; om++) {
                   var rawForm = oMatches[om].replace(/\$\$/g, '').trim();
