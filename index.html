@@ -4,7 +4,6 @@
   <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- MathLive & MathJax for Client-Side Perfect Inline Render -->
   <script defer src="https://unpkg.com/mathlive"></script>
   <script>
     window.MathJax = {
@@ -60,7 +59,6 @@
     .btn-bank:hover { background-color: #593196; }
     .btn-del { background-color: #ea4335; width: auto; padding: 4px 8px; font-size: 12px; position: absolute; right: 10px; top: 10px; }
 
-    /* FLOATING ALWAYS-VISIBLE MATH EDITOR BUTTON */
     .btn-eq-floating {
       position: fixed;
       bottom: 25px;
@@ -988,17 +986,15 @@
     closeEquationModal();
   }
 
+  // FAST CANVAS MATHJAX TO PNG ENGINE
   async function latexToPngBase64(latex) {
     return new Promise(function(resolve) {
       try {
         if (!window.MathJax || !window.MathJax.tex2svg) return resolve(null);
         
-        var wrapper = window.MathJax.tex2svg('\\textstyle ' + latex, {display: false});
+        var wrapper = window.MathJax.tex2svg(latex, { display: false });
         var svgEl = wrapper.querySelector('svg');
         if (!svgEl) return resolve(null);
-
-        var exH = parseFloat(svgEl.getAttribute('height')) || 1.8;
-        var exW = parseFloat(svgEl.getAttribute('width')) || 2.5;
 
         svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
         var svgData = new XMLSerializer().serializeToString(svgEl);
@@ -1007,23 +1003,25 @@
 
         var img = new Image();
         img.onload = function() {
-          var pxFactor = 6.8; 
-          var targetH = Math.min(20, Math.max(12, exH * pxFactor));
-          var targetW = Math.max(10, exW * pxFactor);
-
           var canvas = document.createElement("canvas");
-          var renderScale = 2.5;
-          canvas.width = targetW * renderScale;
-          canvas.height = targetH * renderScale;
+          var scale = 2.5;
+          var targetH = Math.max(20, img.height || 20);
+          var targetW = Math.max(15, img.width || 30);
+
+          canvas.width = targetW * scale;
+          canvas.height = targetH * scale;
 
           var ctx = canvas.getContext("2d");
-          ctx.scale(renderScale, renderScale);
+          ctx.scale(scale, scale);
           ctx.drawImage(img, 0, 0, targetW, targetH);
 
           URL.revokeObjectURL(url);
           resolve(canvas.toDataURL("image/png"));
         };
-        img.onerror = function() { resolve(null); };
+        img.onerror = function() {
+          URL.revokeObjectURL(url);
+          resolve(null);
+        };
         img.src = url;
       } catch(e) {
         resolve(null);
@@ -1031,7 +1029,7 @@
     });
   }
 
-  // PREVIEW RENDERER (Left-Aligned Images & Equations)
+  // PREVIEW RENDERER
   function renderPreview(data) {
     var box = document.getElementById('paperPreviewBox');
     if (!box) return;
@@ -1121,7 +1119,6 @@
       });
     }
 
-    // Preview Footer Separator Line
     html += `
       <hr style="border:0; border-top:1px solid #000; margin:15px 0 4px 0;">
       <div style="text-align:center; font-size:9.5pt; font-weight:bold; color:#000;">
