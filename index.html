@@ -993,59 +993,46 @@
     closeEquationModal();
   }
 
-  // FAST EQUATION TO BASE64 PNG CONVERTER WITH SAFETY TIMEOUT
+  // ULTRA-RELIABLE DIRECT MATHJAX SVG TO BASE64 PNG ENGINE
   async function latexToPngBase64(latex) {
     return new Promise((resolve) => {
-      // Safety 1.5s Timeout to NEVER hang the UI
-      const timer = setTimeout(() => { resolve(null); }, 1500);
-
       try {
-        if (!window.MathJax || !window.MathJax.tex2svg) {
-          clearTimeout(timer);
-          return resolve(null);
-        }
+        if (!window.MathJax || !window.MathJax.tex2svg) return resolve(null);
 
         var wrapper = window.MathJax.tex2svg(latex, { display: false });
         var svgEl = wrapper ? wrapper.querySelector('svg') : null;
-        if (!svgEl) {
-          clearTimeout(timer);
-          return resolve(null);
-        }
+        if (!svgEl) return resolve(null);
 
         svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        var exH = parseFloat(svgEl.getAttribute('height')) || 1.8;
-        var exW = parseFloat(svgEl.getAttribute('width')) || 2.5;
-
         var svgData = new XMLSerializer().serializeToString(svgEl);
-        var svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-        var url = URL.createObjectURL(svgBlob);
+        
+        // Direct Base64 Data URI from SVG
+        var svgBase64 = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
 
         var img = new Image();
+        img.crossOrigin = "anonymous";
         img.onload = function() {
-          clearTimeout(timer);
-          var scale = 2.5;
-          var targetH = Math.min(22, Math.max(14, exH * 8));
-          var targetW = Math.max(12, exW * 8);
+          try {
+            var canvas = document.createElement("canvas");
+            var targetH = Math.max(20, img.height || 20);
+            var targetW = Math.max(15, img.width || 30);
 
-          var canvas = document.createElement("canvas");
-          canvas.width = targetW * scale;
-          canvas.height = targetH * scale;
+            canvas.width = targetW * 2;
+            canvas.height = targetH * 2;
 
-          var ctx = canvas.getContext("2d");
-          ctx.scale(scale, scale);
-          ctx.drawImage(img, 0, 0, targetW, targetH);
-
-          URL.revokeObjectURL(url);
-          resolve(canvas.toDataURL("image/png"));
+            var ctx = canvas.getContext("2d");
+            ctx.scale(2, 2);
+            ctx.drawImage(img, 0, 0, targetW, targetH);
+            resolve(canvas.toDataURL("image/png"));
+          } catch(err) {
+            resolve(svgBase64); // Fallback to raw base64 SVG
+          }
         };
         img.onerror = function() {
-          clearTimeout(timer);
-          URL.revokeObjectURL(url);
-          resolve(null);
+          resolve(svgBase64);
         };
-        img.src = url;
+        img.src = svgBase64;
       } catch(e) {
-        clearTimeout(timer);
         resolve(null);
       }
     });
